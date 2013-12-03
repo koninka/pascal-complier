@@ -1,0 +1,11 @@
+var
+   a: integer;
+
+   procedure foo(a: integer; b: double);
+   begin
+
+   end;
+
+begin
+   foo(a, a)
+end.

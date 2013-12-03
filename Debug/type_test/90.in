@@ -1,0 +1,11 @@
+type
+   int3 = integer;
+   int2 = int3;
+   int1 = int2;
+   int  = int1;
+var
+   a: array[1..2] of int;
+   b: array[1..2] of integer;
+begin
+   a := b;
+end.

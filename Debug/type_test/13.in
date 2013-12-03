@@ -1,0 +1,6 @@
+var
+   a: double;
+   b: integer;
+begin
+   a := b + 5.5;
+end.

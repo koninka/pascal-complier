@@ -1,0 +1,7 @@
+const
+   H1 = 25;
+var
+   a: integer;
+begin
+   a := h1;
+end.

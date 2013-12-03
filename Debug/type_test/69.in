@@ -1,0 +1,8 @@
+   function foo(var a: integer): integer;
+   begin
+
+   end;
+
+begin
+   foo(5);
+end.

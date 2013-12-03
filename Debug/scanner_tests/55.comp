@@ -1,0 +1,46 @@
+  Type                  Line   Text                            Value                           
+
+  Identificator         1      a                               a                               
+
+  Operator              1      :=                              :=                              
+
+  Integer number        1      5                               5                               
+
+  Operator              1      +                               +                               
+
+  Integer number        1      2                               2                               
+
+  Operator              1      *                               *                               
+
+  Separator             1      (                               (                               
+
+  Integer number        1      35                              35                              
+
+  Operator              1      -                               -                               
+
+  Integer number        1      20                              20                              
+
+  Separator             1      )                               )                               
+
+  Separator             1      ;                               ;                               
+
+  Identificator         2      a                               a                               
+
+  Operator              2      :=                              :=                              
+
+  Separator             2      (                               (                               
+
+  Integer number        2      25                              25                              
+
+  Operator              2      /                               /                               
+
+  Integer number        2      23                              23                              
+
+  Separator             2      )                               )                               
+
+  Operator              2      +                               +                               
+
+  Identificator         2      identificator                   identificator                   
+
+  Separator             2      ;                               ;                               
+

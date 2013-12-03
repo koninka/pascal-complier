@@ -1,0 +1,9 @@
+var
+   tt: integer;
+
+   procedure foo();
+   var
+      aa: tt;
+   begin
+
+   end;

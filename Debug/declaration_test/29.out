@@ -1,0 +1,4 @@
+ char    type                                                                 0
+ double  type                                                                 0
+ integer type                                                                 0
+ arry    type alias     array            array[0..25] of integer              0

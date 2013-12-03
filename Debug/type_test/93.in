@@ -1,0 +1,9 @@
+type
+   elemType = array[1..2] of integer;
+var
+   a: array[1..4] of elemType;
+   b: array[1..4, 1..2] of integer;
+begin
+   a := b;
+   b := a;
+end.

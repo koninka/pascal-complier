@@ -1,0 +1,15 @@
+type
+   rec = record
+      x, y: integer;
+   end;
+var
+   r: rec;
+
+   function foo(var a: rec): integer;
+   begin
+
+   end;
+
+begin
+   foo(r);
+end.

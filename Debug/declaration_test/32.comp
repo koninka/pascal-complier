@@ -1,0 +1,9 @@
+ char    type                                                                 0
+ double  type                                                                 0
+ integer type                                                                 0
+ trec    type alias                      record                               0
+ record fields:
+ a       variable                        integer                              1
+ b       variable                        integer                              1
+ c       variable                        integer                              1
+

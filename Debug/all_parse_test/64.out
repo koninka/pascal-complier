@@ -1,0 +1,19 @@
+             ---- 10             
+       ---- final expr       
+
+       ---- initial expr       
+             ---- 0             
+
+       ---- var i       
+
+ ---- for block 
+
+       ---- to do       
+                   ---- 20                   
+             ---- :=             
+                         ---- i                         
+                   ---- .                   
+                         ---- j                         
+program main
+
+

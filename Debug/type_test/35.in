@@ -1,0 +1,6 @@
+var
+   a: integer;
+   c: record x, y: integer; end;
+begin
+   c.x := a;
+end.

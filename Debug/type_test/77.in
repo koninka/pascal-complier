@@ -1,0 +1,10 @@
+var
+   a: array[1..2] of integer;
+   function foo(a: array of double): integer;
+   begin
+
+   end;
+
+begin
+   foo(a);
+end.

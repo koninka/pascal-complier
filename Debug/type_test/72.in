@@ -1,0 +1,10 @@
+var
+   a: double;
+   function foo(var a: integer): integer;
+   begin
+
+   end;
+
+begin
+   foo(a);
+end.

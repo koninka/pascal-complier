@@ -1,0 +1,24 @@
+       ---- empty block       
+ ---- foo 
+
+
+       ---- call       
+             ---- foo             
+ ---- := 
+       ---- a       
+program main
+                         ---- 20                         
+                   ---- >                   
+                         ---- a                         
+             ---- expr             
+
+       ---- if block       
+
+             ---- then             
+                               ---- a1                               
+                         ---- -                         
+                   ---- :=                   
+                         ---- a                         
+ ---- inner block 
+
+

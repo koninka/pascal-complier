@@ -1,0 +1,10 @@
+type
+   TPoint = record
+      x, y: integer;
+   end;
+procedure foo(var a: tpoint);
+var
+   b: char;
+begin
+
+end;

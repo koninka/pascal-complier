@@ -1,0 +1,9 @@
+type 
+   rec = record
+      arry: array[1..20] of char;
+   end;
+var
+   pt: rec;
+begin
+   pt.arry[5] := 'afdsfsd';
+end.

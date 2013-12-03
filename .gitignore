@@ -1,0 +1,10 @@
+*.psess
+*.sdf
+*.suo
+*.opensdf
+pascal_compiler/Debug/*
+test_tree
+*.exe
+*.ilk
+*.pdb
+*.sublime-workspace

@@ -1,0 +1,6 @@
+procedure foo(var a: record x, y: integer; dist: double; end);
+var
+   b: char;
+begin
+
+end;

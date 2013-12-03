@@ -1,0 +1,46 @@
+  Type                  Line   Text                            Value                           
+
+  Keyword               1      var                             var                             
+
+  Identificator         2      a                               a                               
+
+  Separator             2      :                               :                               
+
+  Identificator         2      integer                         integer                         
+
+  Separator             2      ;                               ;                               
+
+  Keyword               4      procedure                       procedure                       
+
+  Identificator         4      inc                             inc                             
+
+  Separator             4      (                               (                               
+
+  Identificator         4      a                               a                               
+
+  Separator             4      :                               :                               
+
+  Identificator         4      integer                         integer                         
+
+  Separator             4      )                               )                               
+
+  Separator             4      ;                               ;                               
+
+  Keyword               6      for                             for                             
+
+  Identificator         6      i                               i                               
+
+  Operator              6      :=                              :=                              
+
+  Integer number        6      0                               0                               
+
+  Keyword               6      to                              to                              
+
+  Integer number        6      10                              10                              
+
+  Keyword               6      do                              do                              
+
+  Keyword               8      end                             end                             
+
+  Separator             8      ;                               ;                               
+

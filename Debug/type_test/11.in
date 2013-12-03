@@ -1,0 +1,5 @@
+var
+   a: double;
+begin
+   a := 3 mod 2;
+end.

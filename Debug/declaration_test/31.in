@@ -1,0 +1,8 @@
+const
+   UPPER = 20;
+   LOWER = -UPPER - 30;
+type
+   range = 0..UPPER;
+   range1 = LOWER..-LOWER;
+   arry = array[range] of integer;
+   arry1 = array[range1] of char;

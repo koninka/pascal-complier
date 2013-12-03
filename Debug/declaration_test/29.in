@@ -1,0 +1,2 @@
+type
+   arry = array[0..25] of integer;

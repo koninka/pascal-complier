@@ -1,0 +1,25 @@
+var
+   a: integer;
+
+   procedure foo();
+   var
+      a: integer;
+
+      procedure foo();
+      var
+         a: integer;
+
+         function foo(): integer;
+         var
+            a: integer;
+         begin
+
+         end;
+
+      begin
+
+      end;
+
+   begin
+
+   end;

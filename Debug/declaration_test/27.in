@@ -1,0 +1,5 @@
+const
+   A = 20;
+type
+   range = 10..A;
+   range1 = range;

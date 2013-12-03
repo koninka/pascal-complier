@@ -1,0 +1,22 @@
+                   ---- 30                   
+             ---- =             
+                   ---- a                   
+       ---- expr       
+
+ ---- if block 
+
+       ---- then       
+                               ---- 5                               
+                         ---- -                         
+                   ---- :=                   
+                         ---- a                         
+             ---- inner block             
+       ---- else       
+
+                         ---- 5                         
+                   ---- :=                   
+                         ---- a                         
+             ---- inner block             
+program main
+
+

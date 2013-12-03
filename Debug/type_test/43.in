@@ -1,0 +1,14 @@
+type 
+   TPoint = record
+      x, y: integer;
+   end;
+   
+   TPoints = record
+      pts: array[1..20] of tpoint;
+   end;
+var
+   point: Tpoint;
+   pt: TPoints;
+begin
+   pt.pts[20].x := 4324 div 39;
+end.

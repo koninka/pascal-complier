@@ -1,0 +1,3 @@
+type
+   range = 25..45;
+   arr = array [0..2] of range;

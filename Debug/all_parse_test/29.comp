@@ -1,0 +1,18 @@
+       ---- empty block       
+ ---- readln 
+
+
+                   ---- 0                   
+             ---- <             
+                   ---- n                   
+       ---- expr       
+
+ ---- while block 
+
+       ---- do       
+                   ---- n                   
+             ---- call             
+                   ---- readln                   
+program read_
+
+

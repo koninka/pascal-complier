@@ -1,0 +1,5 @@
+var
+   ch: char;
+begin
+   ch := chr(ord(chr(39)));
+end.

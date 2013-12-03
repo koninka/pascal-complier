@@ -1,0 +1,21 @@
+ char    type                                                                 0
+ double  type                                                                 0
+ integer type                                                                 0
+ a       variable                        record                               0
+ record fields:
+ x       variable                        integer                              1
+ y       variable                        integer                              1
+ dist    variable                        double                               1
+
+ b       variable                        record                               0
+ record fields:
+ x       variable                        integer                              1
+ y       variable                        integer                              1
+ dist    variable                        double                               1
+
+ c       variable                        record                               0
+ record fields:
+ x       variable                        integer                              1
+ y       variable                        integer                              1
+ dist    variable                        double                               1
+

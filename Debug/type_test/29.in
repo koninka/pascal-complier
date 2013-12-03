@@ -1,0 +1,6 @@
+var
+   a, b: array[1..2] of double;
+   c: integer;
+begin
+   a[2] := c;
+end.

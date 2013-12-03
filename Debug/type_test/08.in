@@ -1,0 +1,7 @@
+const
+   h = 25;
+var
+   ch: char;
+begin
+   ch := chr(41 + h mod 3);
+end.

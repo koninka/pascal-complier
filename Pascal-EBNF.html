@@ -1,0 +1,592 @@
+<html>
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=windows-1251">
+	<title>EBNF Definition of the Pascal Programming Language</title>
+	<meta name="author" content="Stephen Fitzpatrick">
+	<link rev="made" href="mailto:S.Fitzpatrick@cs.qub.ac.uk">
+	<meta name="definitive" content="Pascal EBNF Definition">
+</head>
+   <body>
+   <h1 align="center">Pascal EBNF Definition</h1>
+
+   <blockquote><p>This document is an <em>Extended Backus-Naur Form</em> definition of the Pascal programming language.</p></blockquote>
+
+   <p><strong>Notation:</strong>
+   Square brackets <code>[ ]</code> delimit optional constructs; braces <code>{ }</code> indicate zero or more repetitions of the enclosed construct; parantheses <code>( )</code> indicate simple grouping of constructs; a vertical bar <code>|</code> indicates choice of one from many; literal text in definitions is denoted using bold font or double quotation marks <code>" "</code>.</p>
+
+   <p><strong>Credits:</strong>
+   Copyright <a href="http://www.cs.qub.ac.uk/%7ES.Fitzpatrick/">Stephen Fitzpatrick</a>,
+    Department of Computer Science, The Queen's University of Belfast,
+   Northern Ireland.
+   This document may be used for non-profit purposes only; no part of this
+   document may be duplicated unless this copyright notice is included.</p>
+
+   <p><strong>References:</strong>
+   I hope this definition is accurate (and would appreciate any
+   corrections), but it cannot be taken as being definitive. For more
+   information, see the ISO standard `ISO 10206:1990(E)' or a good text book
+   such as
+   "Introduction to Pascal" by Jim Welsh and John Elder, Prentice Hall,
+   International Series in Computer Science, ISBN 0-13-491549-6.</p>
+
+   <p align="right">
+   Last major revision: October 1995
+   <br>Last updates: August 1996 (SF), May 2002 (BdT)</p>
+
+   <hr>
+
+   <h2>Definitions of Syntactic Classes</h2>
+
+   <h3><a name="Programs and Blocks">Programs and Blocks</a></h3>
+
+   <dl>
+      <dt><a name="program">program =</a></dt>
+      <dd> [ <a href="#program-heading">program-heading</a> ] <a href="#block">block</a> "." .</dd>
+
+      <dt> <a name="program-heading">program-heading =</a></dt>
+      <dd><b>program</b> <a href="#identifier">identifier</a>";" .</dd>
+
+      <dt> <a name="block">block =</a></dt>
+      <dd><a href="#declaration-part">declaration-part</a> <a href="#statement-part">statement-part</a> .</dd>
+
+      <dt> <a name="declaration-part">declaration-part =</a></dt>
+      <dd>
+               { <a href="#constant-definition-part">constant-definition-part</a>
+         <br>	| <a href="#type-definition-part">type-definition-part</a>
+         <br>	| <a href="#variable-declaration-part">variable-declaration-part</a>
+         <br>	| <a href="#procedure-and-function-declaration-part">procedure-and-function-declaration-part</a> } .</dd>
+
+      <dt> <a name="constant-definition-part">constant-definition-part =</a></dt>
+      <dd><b>const</b> <a href="#constant-definition">constant-definition</a> ";" { <a href="#constant-definition">constant-definition</a> ";" } .</dd>
+
+      <dt> <a name="constant-definition">constant-definition =</a></dt>
+      <dd><a href="#identifier">identifier</a> "=" <a href="#constant-expression">constant-expression</a> .</dd>
+
+      <dt> <a name="constant-expression">constant-expression =</a></dt>
+      <dd><a href="#identifier"><a href="#expression">expression</a> .</dd>
+
+      <dt> <a name="type-definition-part">type-definition-part =</a></dt>
+      <dd><b>type</b> <a href="#type-definition">type-definition</a> ";" { <a href="#type-definition">type-definition</a> ";" } .</dd>
+
+      <dt> <a name="type-definition">type-definition =</a></dt>
+      <dd><a href="#identifier">identifier</a> "=" <a href="#type">type</a> .</dd>
+
+      <dt> <a name="variable-declaration-part">variable-declaration-part =</a></dt>
+      <dd><b>var</b> <a href="#variable-declaration">variable-declaration</a> ";" { <a href="#variable-declaration">variable-declaration</a> ";" } .</dd>
+
+      <dt> <a name="variable-declaration">variable-declaration =</a></dt>
+      <dd><a href="#identifier-list">identifier-list</a> ":" <a href="#type">type</a> .</dd>
+
+      <dt> <a name="procedure-and-function-declaration-part">procedure-and-function-declaration-part =</a></dt>
+      <dd>
+         { (<a href="#procedure-declaration">procedure-declaration</a> |
+         <a href="#function-declaration">function-declaration</a>) ";" } .
+      </dd>
+
+      <dt> <a name="procedure-declaration">procedure-declaration =</a></dt>
+      <dd>
+         <a href="#procedure-heading">procedure-heading</a> ";"<a href="#procedure-body">procedure-body</a>
+      </dd>
+
+      <dt> <a name="procedure-body">procedure-body =</a></dt>
+      <dd><a href="#block">block</a> ";" .</dd>
+
+      <dt> <a name="function-declaration">function-declaration =</a></dt>
+      <dd>
+               <a href="#function-heading">function-heading</a> ";" <a href="#function-body">function-body</a>
+
+      <dt> <a name="function-body">function-body =</a></dt>
+      <dd><a href="#block">block</a> ";" .</dd>
+
+      <dt> <a name="statement-part">statement-part =</a></dt>
+      <dd><a href="#compound-statement">compound-statement</a> .</dd>
+   </dl>
+
+   <hr>
+
+   <h3><a name="Procedure and Function Definitions">Procedure and Function Definitions</a></h3>
+
+   <dl>
+      <dt> <a name="procedure-heading">procedure-heading</a> =</dt>
+      <dd><b>procedure</b> <a href="#identifier">identifier</a> [ <a href="#formal-parameter-list">formal-parameter-list</a> ] .</dd>
+
+      <dt> <a name="function-heading">function-heading</a> =</dt>
+      <dd><b>function</b> <a href="#identifier">identifier</a> [ <a href="#formal-parameter-list">formal-parameter-list</a> ] ":" <a href="#result-type">result-type</a> .</dd>
+
+      <dt> <a name="result-type">result-type</a> =</dt>
+      <dd><a href="#type-identifier">type-identifier</a> .</dd>
+
+      <dt> <a name="formal-parameter-list">formal-parameter-list</a> =</dt>
+      <dd>"(" <a href="#formal-parameter-section">formal-parameter-section</a> { ";" <a href="#formal-parameter-section">formal-parameter-section</a> } ")" .</dd>
+
+      <dt> <a name="formal-parameter-section">formal-parameter-section</a> =</dt>
+      <dd>
+               <a href="#value-parameter-section">value-parameter-section</a> |
+         <br>	<a href="#variable-parameter-section">variable-parameter-section</a> .
+      </dd>
+
+      <dt> <a name="value-parameter-section">value-parameter-section</a> =</dt>
+      <dd><a href="#identifier-list">identifier-list</a> ":" <a href="#parameter-type">parameter-type</a> .</dd>
+
+      <dt> <a name="variable-parameter-section">variable-parameter-section</a> =</dt>
+      <dd><b>var</b> <a href="#identifier-list">identifier-list</a> ":" <a href="#parameter-type">parameter-type</a> .</dd>
+
+      <dt> <a name="parameter-type">parameter-type</a> =</dt>
+      <dd>
+         [ <b>array of</b> ] <a href="#type-identifier">type-identifier</a> .
+      </dd>
+   </dl>
+
+   <hr>
+
+   <h3><a name="Statements">Statements</a></h3>
+
+   <dl>
+      <dt> <a name="statement-sequence">statement-sequence</a> =</dt>
+      <dd><a href="#statement">statement</a> { ";" <a href="#statement">statement</a> } .</dd>
+
+      <dt> <a name="statement">statement</a> =</dt>
+      <dd>( <a href="#simple-statement">simple-statement</a> | <a href="#structured-statement">structured-statement</a> ) .</dd>
+
+      <dt> <a name="simple-statement">simple-statement</a> =</dt>
+      <dd>
+         [ <a href="#assignment-statement">assignment-statement</a> |
+           <a href="#procedure-statement">procedure-statement</a> ] .
+      </dd>
+
+      <dt> <a name="assignment-statement">assignment-statement</a> =</dt>
+      <dd>
+         <a href="#variable">variable</a> ":=" <a href="#expression">expression</a> .
+      </dd>
+
+      <dt> <a name="procedure-statement">procedure-statement</a> =</dt>
+      <dd><a href="#procedure-identifier">procedure-identifier</a> [ <a href="#actual-parameter-list">actual-parameter-list</a> ] .</dd>
+
+      <dt> <a name="structured-statement">structured-statement</a> =</dt>
+      <dd>
+         <a href="#compound-statement">compound-statement</a> |
+         <a href="#repetitive-statement">repetitive-statement</a> |
+         <a href="#if-statement">if-statement</a> .
+      </dd>
+
+      <dt> <a name="compound-statement">compound-statement</a> =</dt>
+      <dd><b>begin</b> <a href="#statement-sequence">statement-sequence</a> <b>end</b> .</dd>
+
+      <dt> <a name="repetitive-statement">repetitive-statement</a> =</dt>
+      <dd>
+         <a href="#while-statement">while-statement</a> |
+         <a href="#repeat-statement">repeat-statement</a> |
+         <a href="#for-statement">for-statement</a> .
+      </dd>
+
+      <dt> <a name="while-statement">while-statement</a> =</dt>
+      <dd><b>while</b> <a href="#expression">expression</a> <b>do</b> <a href="#statement">statement</a> .</dd>
+
+      <dt> <a name="repeat-statement">repeat-statement</a> =</dt>
+      <dd><b>repeat</b> <a href="#statement-sequence">statement-sequence</a> <b>until</b> <a href="#expression">expression</a> .</dd>
+
+      <dt> <a name="for-statement">for-statement</a> =</dt>
+      <dd><b>for</b> <a href="#variable-identifier">variable-identifier</a> ":=" <a href="#initial-expression">initial-expression</a> (<b>to</b> | <b>downto</b>) <a href="#final-expression">final-expression</a> <b>do</b> <a href="#statement">statement</a> .</dd>
+
+      <dt> <a name="initial-expression">initial-expression</a> =</dt>
+      <dd><a href="#expression">expression</a> .</dd>
+
+      <dt> <a name="final-expression">final-expression</a> =</dt>
+      <dd><a href="#expression">expression</a> .</dd>
+
+      <dt> <a name="if-statement">if-statement</a> =</dt>
+      <dd><b>if</b> <a href="#expression">expression</a> <b>then</b> <a href="#statement">statement</a> [ <b>else</b> <a href="#statement">statement</a> ] .</dd>
+
+      <dt> <a name="actual-parameter-list">actual-parameter-list</a> =</dt>
+      <dd>"(" <a href="#actual-parameter">actual-parameter</a> { "," <a href="#actual-parameter">actual-parameter</a> } ")" .</dd>
+
+      <dt> <a name="actual-parameter">actual-parameter</a> =</dt>
+      <dd><a href="#actual-value">actual-value</a> | <a href="#actual-variable">actual-variable</a> .</dd>
+
+      <dt> <a name="actual-value">actual-value</a> =</dt>
+      <dd><a href="#expression">expression</a> .</dd>
+   </dl>
+
+   <hr>
+
+   <h3><a name="Expressions">Expressions</a></h3>
+
+   <dl>
+      <dt> <a name="expression">expression</a> =</dt>
+      <dd><a href="#simple-expression">simple-expression</a> [ <a href="#relational-operator">relational-operator</a> <a href="#simple-expression">simple-expression</a> ] .</dd>
+
+      <dt> <a name="simple-expression">simple-expression</a> =</dt>
+      <dd>[ <a href="#sign">sign</a> ] <a href="#term">term</a> { <a href="#addition-operator">addition-operator</a> <a href="#term">term</a> } .</dd>
+
+      <dt> <a name="term">term</a> =</dt>
+      <dd><a href="#factor">factor</a> { <a href="#multiplication-operator">multiplication-operator</a> <a href="#factor">factor</a> } .</dd>
+
+      <dt> <a name="factor">factor</a> =</dt>
+      <dd><a href="#variable">variable</a> |
+         <a href="#number">number</a> |
+         <a href="#string">string</a> |
+         <a href="#constant-identifier">constant-identifier</a> |
+         <a href="#function-designator">function-designator</a> |
+         "(" <a href="#expression">expression</a> ")" |
+         <b>not</b> <a href="#factor">factor</a> .</dd>
+
+      <dt> <a name="relational-operator">relational-operator</a> =</dt>
+      <dd>"=" | "&lt;&gt;" | "&lt;" | "&lt;=" | "&gt;" | "&gt;=" .</dd><dt> <a name="addition-operator">addition-operator</a> =</dt>
+      <dd>"+" | "-" | <b>or</b> .</dd>
+
+      <dt> <a name="multiplication-operator">multiplication-operator</a> =</dt>
+      <dd>"*" | "/" | <b>div</b> | <b>mod</b> | <b>and</b> .</dd>
+
+      <dt> <a name="variable">variable</a> =</dt>
+      <dd><a href="#entire-variable">entire-variable</a> | <a href="#component-variable">component-variable</a> .</dd>
+
+      <dt> <a name="entire-variable">entire-variable</a> =</dt>
+      <dd><a href="#variable-identifier">variable-identifier</a> .</dd>
+
+      <dt> <a name="component-variable">component-variable</a> =</dt>
+      <dd>
+         <a href="#indexed-variable">indexed-variable</a> |
+         <a href="#field-designator">field-designator</a>  .
+      </dd>
+
+      <dt> <a name="indexed-variable">indexed-variable</a> =</dt>
+      <dd><a href="#array-variable">array-variable</a> "[ " <a href="#expression-list">expression-list</a> " ]" .</dd>
+
+      <dt> <a name="field-designator">field-designator</a> =</dt>
+      <dd><a href="#record-variable">record-variable</a> "." <a href="#field-identifier">field-identifier</a> .</dd>
+
+      <dt> <a name="element-list">element-list</a> =</dt>
+      <dd>[ <a href="#expression">expression</a> { "," <a href="#expression">expression</a> } ] .</dd>
+
+      <dt> <a name="function-designator">function-designator</a> =</dt>
+      <dd><a href="#function-identifier">function-identifier</a> [ <a href="#actual-parameter-list">actual-parameter-list</a> ] .</dd>
+
+   </dl>
+
+   <hr>
+
+   <h3><a name="Types">Types</a></h3>
+
+   <dl>
+      <dt> <a name="type">type</a> =</dt>
+      <dd>
+         <a href="#subrange-type">subrange-type</a> |
+         <a href="#structured-type">structured-type</a> |
+         <a href="#type-identifier">type-identifier</a> .
+      </dd>
+
+      <dt> <a name="subrange-bound">subrange-bound</a> =</dt>
+      <dd><a href="#expression">expression</a> .</dd>
+
+      <dt> <a name="subrange-type">subrange-type</a> =</dt>
+      <dd><a href="#subrange-bound">subrange-bound</a> ".." <a href="#subrange-bound">subrange-bound</a> .</dd>
+
+      <dt> <a name="structured-type">structured-type</a> =</dt>
+      <dd>
+         <a href="#array-type">array-type</a> |
+         <a href="#record-type">record-type</a> .
+      </dd>
+
+      <dt> <a name="array-type">array-type</a> =</dt>
+      <dd><b>array</b> "[ " <a href="#index-type">index-type</a> { "," <a href="#index-type">index-type</a> } " ]" <b>of</b> <a href="#element-type">element-type</a> .</dd>
+
+      <dt> <a name="index-type">index-type</a> =</dt>
+      <dd><a href="#ordinal-type">ordinal-type</a> .</dd>
+
+      <dt> <a name="ordinal-type">ordinal-type</a> =</dt>
+      <dd>
+         <a href="#subrange-type">subrange-type</a> |
+         <a href="#ordinal-type-name">ordinal-type-name</a>
+      </dd>
+
+      <dt> <a name="ordinal-type-name">ordinal-type-name</a> =</dt>
+      <dd> <a href="#type-identifier">type-identifier</a> </dd>
+
+      <dt> <a name="element-type">element-type</a> =</dt>
+      <dd><a href="#type">type</a> .</dd>
+
+      <dt> <a name="record-type">record-type</a> =</dt>
+      <dd><b>record</b> <a href="#field-list">field-list</a> <b>end</b> .</dd>
+   </dl>
+
+   <hr>
+
+   <h3><a name="Record Fields">Record Fields</a></h3>
+
+   <dl>
+      <dt> <a name="field-list">field-list</a> =</dt>
+      <dd><a href="#record-section">[ record-section</a> { ";" <a href="#record-section">record-section</a> } ] .</dd>
+
+      <dt> <a name="record-section">record-section</a> =</dt>
+      <dd><a href="#identifier-list">identifier-list</a> ":" <a href="#type">type</a> .</dd>
+   </dl>
+
+   <hr>
+
+   <h3><a name="Input/Output">Input/Output</a></h3>
+
+   <dl>
+      <dt> <a name="output-list">output-list</a> =</dt>
+      <dd><a href="#output-value">output-value</a> { "," <a href="#output-value">output-value</a> } .</dd>
+
+      <dt> <a name="output-value">output-value</a> =</dt>
+      <dd><a href="#expression">expression</a> [ ";" <a href="#field-width">field-width</a> [ ":" <a href="#fraction-length">fraction-length</a> ] ] .</dd>
+
+      <dt> <a name="field-width">field-width</a> =</dt>
+      <dd><a href="#expression">expression</a> .</dd>
+
+      <dt> <a name="fraction-length">fraction-length</a> =</dt>
+      <dd><a href="#expression">expression</a> .</dd>
+   </dl>
+
+   <hr>
+
+   <h3><a name="Variable and Identifier Categories">Variable and Identifier Categories</a></h3>
+
+   <dl>
+      <dt> <a name="identifier">identifier</a> =</dt>
+      <dd><a href="#letter">letter</a> { [ <a href="#underscore">underscore</a> ] ( <a href="#letter">letter</a> | <a href="#digit">digit</a> ) } .</dd>
+
+      <dt> <a name="record-variable">record-variable</a> =</dt>
+      <dd><a href="#variable">variable</a> .</dd>
+
+      <dt> <a name="actual-variable">actual-variable</a> =</dt>
+      <dd><a href="#variable">variable</a> .</dd>
+
+      <dt> <a name="array-variable">array-variable</a> =</dt>
+      <dd><a href="#variable">variable</a> .</dd>
+
+      <dt> <a name="field-identifier">field-identifier</a> =</dt>
+      <dd><a href="#identifier">identifier</a> .</dd>
+
+      <dt> <a name="constant-identifier">constant-identifier</a> =</dt>
+      <dd><a href="#identifier">identifier</a> .</dd>
+
+      <dt> <a name="variable-identifier">variable-identifier</a> =</dt>
+      <dd><a href="#identifier">identifier</a> .</dd>
+
+      <dt> <a name="type-identifier">type-identifier</a> =</dt>
+      <dd><a href="#identifier">identifier</a> .</dd>
+
+      <dt> <a name="procedure-identifier">procedure-identifier</a> =</dt>
+      <dd><a href="#identifier">identifier</a> .</dd>
+
+      <dt> <a name="function-identifier">function-identifier</a> =</dt>
+      <dd><a href="#identifier">identifier</a> .</dd>
+   </dl>
+
+   <hr>
+
+   <h3><a name="Low Level Definitions">Low Level Definitions</a></h3>
+
+   <dl>
+      <dt> <a name="variable-list">variable-list</a> =</dt>
+      <dd><a href="#variable">variable</a> { "," <a href="#variable">variable</a> } : .</dd>
+
+      <dt> <a name="identifier-list">identifier-list</a> =</dt>
+      <dd><a href="#identifier">identifier</a> { "," <a href="#identifier">identifier</a> } .</dd>
+
+      <dt> <a name="expression-list">expression-list</a> =</dt>
+      <dd><a href="#expression">expression</a> { "," <a href="#expression">expression</a> } .</dd>
+
+      <dt> <a name="number">number</a> =</dt>
+      <dd><a href="#integer-number">integer-number</a> | <a href="#real-number">real-number</a> .</dd>
+
+      <dt> <a name="integer-number">integer-number</a> =</dt>
+      <dd><a href="#digit-sequence">digit-sequence</a> .</dd>
+
+      <dt> <a name="real-number">real-number</a> =</dt>
+      <dd>
+         <a href="#digit-sequence">digit-sequence</a> "." [ <a href="#unsigned-digit-sequence">unsigned-digit-sequence</a> ]
+                                                          [ <a href="#scale-factor">scale-factor</a> ] .
+      </dd>
+
+      <dt> <a name="scale-factor">scale-factor</a> =</dt>
+      <dd>("E" | "e") <a href="#digit-sequence">digit-sequence</a> .</dd>
+
+      <dt> <a name="unsigned-digit-sequence">unsigned-digit-sequence</a> =</dt>
+      <dd><a href="#digit">digit</a> { <a href="#digit">digit</a> } .</dd>
+
+      <dt> <a name="digit-sequence">digit-sequence</a> =</dt>
+      <dd>[ <a href="#sign">sign</a> ] <a href="#unsigned-digit-sequence">unsigned-digit-sequence</a> .</dd>
+
+      <dt> <a name="sign">sign</a> =</dt>
+      <dd>"+" | "-" .</dd>
+
+      <dt> <a name="letter">letter</a> =</dt>
+      <dd>"A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K"
+        | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W"
+        | "X" | "Y" | "Z" | "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i"
+        | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u"
+        | "v" | "w" | "x" | "y" | "z" .</dd>
+
+      <dt> <a name="digit">digit</a> =</dt>
+      <dd>"0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" .</dd>
+
+      <dt> <a name="underscore">underscore</a> =</dt>
+      <dd>"_" .</dd>
+
+      <dt> <a name="string">string</a> =</dt>
+      <dd>"'" <a href="#string-character">string-character</a> { <a href="#string-character">string-character</a> } "'" .</dd>
+
+      <dt> <a name="string-character">string-character</a> =</dt>
+      <dd>any-character-except-quote | "''" .</dd>
+
+      <dt> <a name="constant">constant</a> =</dt>
+      <dd>
+      [ <a href="#sign">sign</a> ] (<a href="#constant-identifier">constant-identifier</a> | <a href="#number">number</a>) | <a href="#string">string</a> .
+      </dd>
+   </dl>
+
+   <!--+++++++++++++++++++++++++++++++++++++++++++++++-->
+   <hr>
+
+   <h2>Main Categories of Syntactic Classes</h2>
+
+   <a href="#Programs%20and%20Blocks">Programs and Blocks</a>,
+   <a href="#Procedure%20and%20Function%20Definitions">Procedure and Function Definitions</a>,
+   <a href="#Statements">Statements</a>,
+   <a href="#Expressions">Expressions</a>,
+   <a href="#Types">Types</a>,
+   <a href="#Record%20Fields">Record Fields</a>,
+   <a href="#Input/Output">Input/Output</a>,
+   <a href="#Variable%20and%20Identifier%20Categories">Variable and Identifier Categories</a>,
+   <a href="#Low%20Level%20Definitions">Low Level Definitions</a>
+
+   <h2>Alphabetical List of Syntactic Classes</h2>
+
+   <ul>
+      <li>
+         <a href="#actual-parameter">actual-parameter</a>,
+         <a href="#actual-parameter-list">actual-parameter-list</a>,
+         <a href="#actual-value">actual-value</a>,
+         <a href="#actual-variable">actual-variable</a>,
+         <a href="#addition-operator">addition-operator</a>,
+         <a href="#array-type">array-type</a>,
+         <a href="#array-variable">array-variable</a>,
+         <a href="#assignment-statement">assignment-statement</a>
+      </li>
+      <li>
+         <a href="#block">block</a>
+      </li>
+      <li>
+         <a href="#component-variable">component-variable</a>,
+         <a href="#compound-statement">compound-statement</a>,
+         <a href="#constant">constant</a>,
+         <a href="#constant-definition">constant-definition</a>,
+         <a href="#constant-expression">constant-expression</a>,
+         <a href="#constant-definition-part">constant-definition-part</a>,
+         <a href="#constant-identifier">constant-identifier</a>
+      </li>
+      <li>
+         <a href="#declaration-part">declaration-part</a>,
+         <a href="#digit">digit</a>,
+         <a href="#digit-sequence">digit-sequence</a>
+      </li>
+      <li>
+         <a href="#element-list">element-list</a>,
+         <a href="#element-type">element-type</a>,
+         <a href="#entire-variable">entire-variable</a>,
+         <a href="#expression">expression</a>,
+         <a href="#expression-list">expression-list</a>
+      </li>
+      <li>
+         <a href="#factor">factor</a>,
+         <a href="#field-designator">field-designator</a>,
+         <a href="#field-identifier">field-identifier</a>,
+         <a href="#field-list">field-list</a>,
+         <a href="#field-width">field-width</a>,
+         <a href="#final-expression">final-expression</a>,
+         <a href="#for-statement">for-statement</a>,
+         <a href="#formal-parameter-list">formal-parameter-list</a>,
+         <a href="#fraction-length">fraction-length</a>,
+         <a href="#function-body">function-body</a>,
+         <a href="#function-declaration">function-declaration</a>,
+         <a href="#function-designator">function-designator</a>,
+         <a href="#function-heading">function-heading</a>,
+         <a href="#function-identifier">function-identifier</a>
+      </li>
+      <li>
+         <a href="#identifier">identifier</a>,
+         <a href="#identifier-list">identifier-list</a>,
+         <a href="#if-statement">if-statement</a>,
+         <a href="#index-type">index-type</a>,
+         <a href="#indexed-variable">indexed-variable</a>,
+         <a href="#initial-expression">initial-expression</a>,
+         <a href="#integer-number">integer-number</a>
+      </li>
+      <li>
+         <a href="#letter">letter</a>
+      </li>
+      <li>
+         <a href="#multiplication-operator">multiplication-operator</a>
+      </li>
+      <li>
+         <a href="#number">number</a>
+      </li>
+      <li>
+         <a href="#ordinal-type">ordinal-type</a>,
+         <a href="#ordinal-type-name">ordinal-type-name</a>,
+         <a href="#output-list">output-list</a>,
+         <a href="#output-value">output-value</a>
+      </li>
+      <li>
+         <a href="#parameter-type">parameter-type</a>,
+         <a href="#procedure-and-function-declaration-part">procedure-and-function-declaration-part</a>,
+         <a href="#procedure-body">procedure-body</a>,
+         <a href="#procedure-declaration">procedure-declaration</a>,
+         <a href="#procedure-heading">procedure-heading</a>,
+         <a href="#procedure-identifier">procedure-identifier</a>,
+         <a href="#procedure-statement">procedure-statement</a>,
+         <a href="#program">program</a>,
+         <a href="#program-heading">program-heading</a>
+      </li>
+      <li>
+         <a href="#real-number">real-number</a>,
+         <a href="#record-section">record-section</a>,
+         <a href="#record-type">record-type</a>,
+         <a href="#record-variable">record-variable</a>,
+         <a href="#relational-operator">relational-operator</a>,
+         <a href="#repeat-statement">repeat-statement</a>,
+         <a href="#repetitive-statement">repetitive-statement</a>,
+         <a href="#result-type">result-type</a>
+      </li>
+      <li>
+         <a href="#scale-factor">scale-factor</a>,
+         <a href="#sign">sign</a>,
+         <a href="#simple-expression">simple-expression</a>,
+         <a href="#simple-statement">simple-statement</a>,
+         <a href="#statement">statement</a>,
+         <a href="#statement-part">statement-part</a>,
+         <a href="#statement-sequence">statement-sequence</a>,
+         <a href="#structured-statement">structured-statement</a>,
+         <a href="#structured-type">structured-type</a>,
+         <a href="#subrange-bound">subrange-bound</a>,
+         <a href="#subrange-type">subrange-type</a>
+      </li>
+      <li>
+         <a href="#term">term</a>,
+         <a href="#type">type</a>,
+         <a href="#type-definition">type-definition</a>,
+         <a href="#type-definition-part">type-definition-part</a>,
+         <a href="#type-identifier">type-identifier</a>
+      </li>
+      <li>
+         <a href="#underscore">underscore</a>,
+         <a href="#unsigned-digit-sequence">unsigned-digit-sequence</a>
+      </li>
+      <li>
+         <a href="#value-parameter-section">value-parameter-section</a>,
+         <a href="#variable">variable</a>,
+         <a href="#variable-declaration">variable-declaration</a>,
+         <a href="#variable-declaration-part">variable-declaration-part</a>,
+         <a href="#variable-identifier">variable-identifier</a>,
+         <a href="#variable-list">variable-list</a>,
+         <a href="#variable-parameter-section">variable-parameter-section</a>
+      </li>
+      <li>
+         <a href="#while-statement">while-statement</a>
+      </li>
+   </ul>
+</body>
+</html>

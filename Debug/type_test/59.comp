@@ -1,0 +1,13 @@
+       ---- empty block       
+ ---- foo 
+
+
+       ---- a       
+ ---- := 
+             ---- x             
+       ---- .       
+             ---- call             
+                   ---- foo                   
+program main
+
+

@@ -1,0 +1,11 @@
+var
+   a: integer;
+
+   function ord(): integer;
+   begin
+
+   end;
+
+begin
+   a := 3
+end.

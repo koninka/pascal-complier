@@ -1,0 +1,10 @@
+ char    type                                                                 0
+ double  type                                                                 0
+ integer type                                                                 0
+ a       type alias                      integer                              0
+ f       function                        a                                    0
+ f params:
+ f locals:
+ result  variable                        a                                    1
+ a       int scalar     45                                                    1
+

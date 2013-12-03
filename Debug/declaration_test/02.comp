@@ -1,0 +1,6 @@
+ char    type                                                                 0
+ double  type                                                                 0
+ integer type                                                                 0
+ a1      int scalar     20                                                    0
+ a2      int scalar     20                                                    0
+ a3      int scalar     -20                                                   0

@@ -1,0 +1,76 @@
+  Type                  Line   Text                            Value                           
+
+  Keyword               1      begin                           begin                           
+
+  Keyword               2      if                              if                              
+
+  Separator             2      (                               (                               
+
+  Keyword               2      true                            true                            
+
+  Operator              2      and                             and                             
+
+  Separator             2      (                               (                               
+
+  Separator             2      (                               (                               
+
+  Integer number        2      100                             100                             
+
+  Operator              2      -                               -                               
+
+  Identificator         2      a                               a                               
+
+  Operator              2      +                               +                               
+
+  Integer number        2      200                             200                             
+
+  Separator             2      )                               )                               
+
+  Operator              2      >                               >                               
+
+  Integer number        2      0                               0                               
+
+  Separator             2      )                               )                               
+
+  Operator              2      or                              or                              
+
+  Separator             2      (                               (                               
+
+  Identificator         2      a                               a                               
+
+  Operator              2      +                               +                               
+
+  Identificator         2      b                               b                               
+
+  Operator              2      =                               =                               
+
+  Integer number        2      20                              20                              
+
+  Separator             2      )                               )                               
+
+  Operator              2      or                              or                              
+
+  Separator             2      (                               (                               
+
+  Identificator         2      a                               a                               
+
+  Operator              2      <>                              <>                              
+
+  Integer number        2      20                              20                              
+
+  Separator             2      )                               )                               
+
+  Separator             2      )                               )                               
+
+  Keyword               2      then                            then                            
+
+  Identificator         3      writeln                         writeln                         
+
+  Separator             3      (                               (                               
+
+  Character string      3      'all good'                      all good                        
+
+  Separator             3      )                               )                               
+
+  Keyword               4      end                             end                             
+

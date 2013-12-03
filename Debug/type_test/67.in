@@ -1,0 +1,8 @@
+   procedure foo(a: integer);
+   begin
+
+   end;
+
+begin
+   foo(foo(4));
+end.

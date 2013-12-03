@@ -1,0 +1,8 @@
+var
+   a, a1: array[1..4, 5..10, 10..50] of integer;
+   b: array[5..10, 10..50] of integer;
+   c: array[10..50] of integer;
+   d: integer;
+begin
+   a := c;
+end.

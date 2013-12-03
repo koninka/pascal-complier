@@ -1,0 +1,14 @@
+ char    type                                                                 0
+ double  type                                                                 0
+ integer type                                                                 0
+ tpoint  type alias                      record                               0
+ record fields:
+ x       variable                        integer                              1
+ y       variable                        integer                              1
+
+ foo     procedure                                                            0
+ foo params:
+ a       func var param                  tpoint                               1
+ foo locals:
+ b       variable                        char                                 1
+

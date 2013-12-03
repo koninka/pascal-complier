@@ -1,0 +1,10 @@
+function foo1(var b: integer): integer;
+
+   function foo(var b: integer): foo1;
+   begin
+
+   end;
+
+begin
+
+end;

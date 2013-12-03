@@ -1,0 +1,6 @@
+var
+   a: integer;
+   c: record x, y: double; end;
+begin
+   c.x := a + 20;
+end.

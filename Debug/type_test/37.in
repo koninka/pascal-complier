@@ -1,0 +1,14 @@
+type 
+   rec = record
+      arry: array[1..20] of char;
+   end;
+var
+   a: array[1..20] of char;
+   pt: rec;
+begin
+   a := pt.arry;
+   pt.arry := a;
+   a[3] := pt.arry[5];
+   pt.arry[5] := a[3];
+   pt.arry[5] := 'a';
+end.

@@ -1,0 +1,8 @@
+const
+   UPPER = 20;
+   LOWER = -20;
+   OFFSET = 10;
+type
+   arry = array[0..UPPER] of integer;
+   arry2 = array[LOWER..UPPER] of integer;
+   arry3 = array[LOWER - OFFSET mod 6 - 5..(UPPER + OFFSET) div 7] of integer;

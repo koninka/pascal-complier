@@ -1,0 +1,10 @@
+var
+   a: integer;
+
+   function foo(): integer;
+   begin
+
+   end;
+begin
+   a := foo();
+end.

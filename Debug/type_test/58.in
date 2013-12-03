@@ -1,0 +1,14 @@
+type
+   rec = record
+      x, y:integer;
+   end;
+var
+   a: integer;
+
+   function foo(): rec;
+   begin
+
+   end;
+begin
+   a := foo().x;
+end.

@@ -1,0 +1,18 @@
+function foo(var b: integer): integer;
+
+   function foo(var b: integer): integer;
+
+      function foo(b: integer): integer;
+
+         function foo(var b: char): double;
+         begin
+
+         end;
+
+      begin
+
+      end;
+
+begin
+
+end;

@@ -1,0 +1,13 @@
+ char    type                                                                 0
+ double  type                                                                 0
+ integer type                                                                 0
+ tpoint  type alias                      record                               0
+ record fields:
+ x       variable                        double                               1
+ y       variable                        double                               1
+
+ t2point type alias                      record                               0
+ record fields:
+ point1  variable                        tpoint                               1
+ point2  variable                        tpoint                               1
+

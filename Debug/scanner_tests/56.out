@@ -1,0 +1,50 @@
+  Type                  Line   Text                            Value                           
+
+  Identificator         1      a                               a                               
+
+  Operator              1      :=                              :=                              
+
+  Identificator         1      b                               b                               
+
+  Operator              1      <                               <                               
+
+  Identificator         1      c                               c                               
+
+  Separator             1      ;                               ;                               
+
+  Identificator         2      a                               a                               
+
+  Operator              2      :=                              :=                              
+
+  Identificator         2      b                               b                               
+
+  Operator              2      <                               <                               
+
+  Identificator         2      c                               c                               
+
+  Separator             2      ;                               ;                               
+
+  Identificator         3      a                               a                               
+
+  Operator              3      :=                              :=                              
+
+  Identificator         3      b                               b                               
+
+  Operator              3      <>                              <>                              
+
+  Identificator         3      c                               c                               
+
+  Separator             3      ;                               ;                               
+
+  Identificator         4      a                               a                               
+
+  Operator              4      :=                              :=                              
+
+  Identificator         4      b                               b                               
+
+  Operator              4      <>                              <>                              
+
+  Identificator         4      c                               c                               
+
+  Separator             4      ;                               ;                               
+

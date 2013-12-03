@@ -1,0 +1,16 @@
+                   ---- 30                   
+             ---- :=             
+                   ---- result                   
+       ---- bar       
+
+
+             ---- 4             
+       ---- :=       
+             ---- result             
+ ---- foo 
+
+
+ ---- empty block 
+program main
+
+

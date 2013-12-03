@@ -1,0 +1,82 @@
+  Type                  Line   Text                            Value                           
+
+  Keyword               1      program                         program                         
+
+  Identificator         1      comment                         comment                         
+
+  Separator             1      ;                               ;                               
+
+  Keyword               2      var                             var                             
+
+  Identificator         3      a                               a                               
+
+  Separator             3      :                               :                               
+
+  Identificator         3      integer                         integer                         
+
+  Separator             3      ;                               ;                               
+
+  Identificator         4      b                               b                               
+
+  Separator             4      :                               :                               
+
+  Identificator         4      word                            word                            
+
+  Separator             4      ;                               ;                               
+
+  Identificator         5      c                               c                               
+
+  Separator             5      :                               :                               
+
+  Keyword               5      string                          string                          
+
+  Separator             5      ;                               ;                               
+
+  Keyword               7      function                        function                        
+
+  Identificator         7      sum                             sum                             
+
+  Separator             7      (                               (                               
+
+  Identificator         7      a                               a                               
+
+  Separator             7      ,                               ,                               
+
+  Identificator         7      b                               b                               
+
+  Separator             7      :                               :                               
+
+  Identificator         7      integer                         integer                         
+
+  Separator             7      )                               )                               
+
+  Separator             7      :                               :                               
+
+  Identificator         7      int                             int                             
+
+  Separator             7      ;                               ;                               
+
+  Keyword               8      begin                           begin                           
+
+  Identificator         9      result                          result                          
+
+  Operator              9      :=                              :=                              
+
+  Identificator         9      a                               a                               
+
+  Operator              9      +                               +                               
+
+  Identificator         9      b                               b                               
+
+  Separator             9      ;                               ;                               
+
+  Keyword               10     end                             end                             
+
+  Separator             10     ;                               ;                               
+
+  Keyword               29     begin                           begin                           
+
+  Keyword               42     end                             end                             
+
+  Separator             42     .                               .                               
+

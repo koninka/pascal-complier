@@ -1,0 +1,12 @@
+       ---- empty block       
+ ---- foo 
+
+
+             ---- 3             
+       ---- +       
+             ---- a             
+ ---- call 
+       ---- foo       
+program main
+
+

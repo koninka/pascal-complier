@@ -1,0 +1,9 @@
+ char    type                                                                 0
+ double  type                                                                 0
+ integer type                                                                 0
+ upper   int scalar     20                                                    0
+ lower   int scalar     -50                                                   0
+ range   type alias     subrange         0..20                                0
+ range1  type alias     subrange         -50..50                              0
+ arry    type alias     array            array[range] of integer              0
+ arry1   type alias     array            array[range1] of char                0

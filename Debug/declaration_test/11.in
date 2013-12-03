@@ -1,0 +1,7 @@
+const
+   a = 0;
+   b = 20;
+   c = a or b;
+   d = a and b;
+   e = not a and b;
+   f = not a and not b;

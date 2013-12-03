@@ -1,0 +1,11 @@
+ char    type                                                                 0
+ double  type                                                                 0
+ integer type                                                                 0
+ a       variable                        integer                              0
+ foo     function                        integer                              0
+ foo params:
+ b       func var param                  array of integer                     1
+ c       func param                      array of char                        1
+ foo locals:
+ result  variable                        integer                              1
+

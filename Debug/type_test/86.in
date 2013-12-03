@@ -1,0 +1,6 @@
+var
+   a: integer;
+begin
+   for a := 25.4 to 200 do
+      a := 2;
+end.

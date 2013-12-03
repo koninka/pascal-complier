@@ -1,0 +1,14 @@
+             ---- 4             
+       ---- :=       
+             ---- a             
+ ---- foo 
+       ---- exit       
+
+
+       ---- 3       
+ ---- call 
+       ---- foo       
+program main
+ ---- exit 
+
+

@@ -1,0 +1,12 @@
+type
+   t = array[1..2] of integer;
+var
+   a: double;
+
+   function foo(): t;
+   begin
+
+   end;
+begin
+   a := -foo()[2];
+end.

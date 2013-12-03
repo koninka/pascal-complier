@@ -1,0 +1,10 @@
+ char    type                                                                 0
+ double  type                                                                 0
+ integer type                                                                 0
+ arr     type alias     array            array[0..40] of integer              0
+ foo     function                        integer                              0
+ foo params:
+ b       func var param                  arr                                  1
+ foo locals:
+ result  variable                        integer                              1
+

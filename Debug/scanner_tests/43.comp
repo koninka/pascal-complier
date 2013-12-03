@@ -1,0 +1,62 @@
+  Type                  Line   Text                            Value                           
+
+  Identificator         1      c                               c                               
+
+  Operator              1      :=                              :=                              
+
+  Identificator         1      a                               a                               
+
+  Operator              1      +                               +                               
+
+  Identificator         1      b                               b                               
+
+  Operator              1      -                               -                               
+
+  Integer number        1      20                              20                              
+
+  Operator              1      /                               /                               
+
+  Integer number        1      43                              43                              
+
+  Operator              1      *                               *                               
+
+  Separator             1      (                               (                               
+
+  Identificator         1      g                               g                               
+
+  Operator              1      -                               -                               
+
+  Integer number        1      79                              79                              
+
+  Separator             1      )                               )                               
+
+  Identificator         2      c                               c                               
+
+  Operator              2      :=                              :=                              
+
+  Identificator         2      a                               a                               
+
+  Operator              2      +                               +                               
+
+  Identificator         2      b                               b                               
+
+  Operator              2      -                               -                               
+
+  Integer number        2      20                              20                              
+
+  Operator              2      /                               /                               
+
+  Integer number        2      43                              43                              
+
+  Operator              2      *                               *                               
+
+  Separator             2      (                               (                               
+
+  Identificator         2      g                               g                               
+
+  Operator              2      -                               -                               
+
+  Integer number        2      79                              79                              
+
+  Separator             2      )                               )                               
+

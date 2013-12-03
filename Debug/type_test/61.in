@@ -1,0 +1,11 @@
+var
+   a: integer;
+
+   procedure foo(a: integer);
+   begin
+
+   end;
+
+begin
+   foo(a + 3)
+end.

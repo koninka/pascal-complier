@@ -1,0 +1,11 @@
+type
+   TPoint = record
+      x: double;
+      y: double;
+   end;
+
+   TPoints = array[0..100] of TPoint;
+
+   TRec1 = record
+      points1, points2:TPoints;
+   end;

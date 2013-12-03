@@ -1,0 +1,17 @@
+ char    type                                                                 0
+ double  type                                                                 0
+ integer type                                                                 0
+ aa      int scalar     20                                                    0
+ range1  type alias     subrange         1..2                                 0
+ ggg     int scalar     4                                                     0
+ range2  type alias     subrange         1..2                                 0
+ bb      int scalar     400                                                   0
+ arr     type alias     array            array[20..25] of integer             0
+ trec    type alias                      record                               0
+ record fields:
+ a       variable                        integer                              1
+ b       variable                        integer                              1
+ c       variable                        integer                              1
+ ch      variable                        char                                 1
+ tr      variable                        arr                                  1
+

@@ -1,0 +1,18 @@
+  Type                  Line   Text                            Value                           
+
+  Identificator         1      abc                             abc                             
+
+  Identificator         2      _abcd                           _abcd                           
+
+  Identificator         3      _abcd132                        _abcd132                        
+
+  Identificator         4      abcddef                         abcddef                         
+
+  Keyword               5      var                             var                             
+
+  Keyword               6      var                             var                             
+
+  Keyword               7      program                         program                         
+
+  Identificator         8      programm                        programm                        
+

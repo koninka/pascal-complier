@@ -1,0 +1,10 @@
+var
+   a: integer;
+   function foo(var a: integer): integer;
+   begin
+
+   end;
+
+begin
+   foo(a + 5);
+end.

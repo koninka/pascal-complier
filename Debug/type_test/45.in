@@ -1,0 +1,20 @@
+type 
+   rec = record
+      f: array[0..200] of double;
+   end;
+
+   TPoint = record
+      x: rec;
+      y: integer;
+   end;
+   
+   TPoints = record
+      pts: array[1..20] of tpoint;
+   end;
+var
+   a: integer;
+   point: Tpoint;
+   pt: TPoints;
+begin
+   pt.pts[20].x.f[100] := a;
+end.

@@ -1,0 +1,12 @@
+   procedure foo();
+   var
+      a: integer;
+   begin
+      foo();
+   end;
+
+var
+   a: char;
+begin
+   foo();
+end.

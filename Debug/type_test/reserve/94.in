@@ -1,0 +1,3 @@
+var
+   a: record x, y: integer; dist: double; end;
+   

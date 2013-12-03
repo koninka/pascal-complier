@@ -1,0 +1,6 @@
+type
+   arr = array[0..40] of integer;
+   function foo(var b: arr): integer;
+   begin
+
+   end;

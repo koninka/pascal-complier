@@ -1,0 +1,6 @@
+var
+   d: char;
+   a: array[0..100] of char;
+begin
+   d := a[1.2];
+end;

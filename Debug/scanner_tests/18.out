@@ -1,0 +1,14 @@
+  Type                  Line   Text                            Value                           
+
+  Real number           1      1.0                             1                               
+
+  Real number           2      1.15                            1.15                            
+
+  Real number           3      0.0                             0                               
+
+  Real number           4      0.432                           0.432                           
+
+  Real number           5      0.432e3                         432                             
+
+  Real number           6      432.05e-4                       0.043205                        
+

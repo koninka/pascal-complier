@@ -1,0 +1,64 @@
+  Type                  Line   Text                            Value                           
+
+  Identificator         1      a                               a                               
+
+  Operator              1      +=                              +=                              
+
+  Integer number        1      2                               2                               
+
+  Operator              1      *                               *                               
+
+  Identificator         1      d                               d                               
+
+  Identificator         2      a                               a                               
+
+  Operator              2      -=                              -=                              
+
+  Integer number        2      2                               2                               
+
+  Operator              2      *                               *                               
+
+  Identificator         2      d                               d                               
+
+  Identificator         3      a                               a                               
+
+  Operator              3      /=                              /=                              
+
+  Real number           3      43.32                           43.32                           
+
+  Operator              3      div                             div                             
+
+  Integer number        3      17                              17                              
+
+  Identificator         4      b                               b                               
+
+  Operator              4      *=                              *=                              
+
+  Integer number        4      43                              43                              
+
+  Operator              4      mod                             mod                             
+
+  Integer number        4      15                              15                              
+
+  Operator              4      +                               +                               
+
+  Identificator         4      a                               a                               
+
+  Identificator         5      b                               b                               
+
+  Operator              5      *=                              *=                              
+
+  Integer number        5      0043                            43                              
+
+  Operator              5      mod                             mod                             
+
+  Integer number        5      15                              15                              
+
+  Operator              5      +                               +                               
+
+  Integer number        5      43                              43                              
+
+  Operator              5      div                             div                             
+
+  Integer number        5      17                              17                              
+

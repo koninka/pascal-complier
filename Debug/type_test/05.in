@@ -1,0 +1,5 @@
+var
+   ch: char;
+begin
+   ch := chr('3');
+end.

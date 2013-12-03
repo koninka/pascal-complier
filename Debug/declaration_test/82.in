@@ -1,0 +1,9 @@
+var
+   a: integer;
+
+   function foo(var a, b: integer; c: double; var d: char): integer;
+	var
+		loc: integer;
+   begin
+
+   end;

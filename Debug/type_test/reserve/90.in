@@ -1,0 +1,4 @@
+function foo(var b: array[1..4] of integer): integer;
+begin
+
+end;

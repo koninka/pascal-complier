@@ -1,0 +1,15 @@
+       ---- empty block       
+ ---- foo 
+
+
+                         ---- 2                         
+                   ---- []                   
+                         ---- call                         
+                               ---- foo                               
+             ---- -             
+       ---- i2f       
+ ---- := 
+       ---- a       
+program main
+
+

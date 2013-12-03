@@ -1,0 +1,12 @@
+const
+   a = 0;
+   b = 20;
+   c = -2;
+   d = b + (a - c)*400;
+   e = b shr 2;
+   f = e shl 2;
+   g = b div 7;
+   h = b mod 7;
+   a1 = 0.5;
+   b1 = 5;
+   c1 = a1*b1;

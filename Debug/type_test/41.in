@@ -1,0 +1,13 @@
+type 
+   TPoint = record
+      x, y: integer;
+   end;
+   
+   TPoints = record
+      pts: array[1..20] of tpoint;
+   end;
+var
+   pt: TPoints;
+begin
+   pt.x := 3;
+end.

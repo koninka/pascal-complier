@@ -1,0 +1,9 @@
+type
+   int = integer;
+   int1 = int;
+
+procedure a(var c: int): int1;
+
+begin
+
+end;

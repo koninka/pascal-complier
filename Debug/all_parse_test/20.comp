@@ -1,0 +1,13 @@
+       ---- empty block       
+ ---- foo 
+
+
+             ---- 50             
+       ---- div       
+             ---- call             
+                   ---- foo                   
+ ---- := 
+       ---- c       
+program main
+
+

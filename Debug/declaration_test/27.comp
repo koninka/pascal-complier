@@ -1,0 +1,6 @@
+ char    type                                                                 0
+ double  type                                                                 0
+ integer type                                                                 0
+ a       int scalar     20                                                    0
+ range   type alias     subrange         10..20                               0
+ range1  type alias     subrange         10..20                               0

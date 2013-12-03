@@ -1,0 +1,9 @@
+type
+   TPoint = record
+      x: double;
+      y: double;
+   end;
+
+   T2Point = record
+      point1, point2: TPoint;
+   end;

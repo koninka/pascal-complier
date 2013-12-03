@@ -1,0 +1,9 @@
+type
+   int = integer;
+   int1 = int;
+
+function a(var c: int): int1;
+
+begin
+
+end;

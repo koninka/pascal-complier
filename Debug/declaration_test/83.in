@@ -1,0 +1,7 @@
+var
+   a: integer;
+
+   function foo(var b: array of integer; c: array of char): integer;
+   begin
+
+   end;

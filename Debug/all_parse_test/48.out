@@ -1,0 +1,21 @@
+                         ---- 30                         
+                   ---- :=                   
+                         ---- n                         
+             ---- inner block             
+                                     ---- 20                                     
+                               ---- -                               
+                                     ---- n                                     
+                         ---- :=                         
+                               ---- a                               
+                   ---- inner block                   
+       ---- repeate       
+
+ ---- repeate block 
+
+       ---- until       
+                   ---- 0                   
+             ---- >             
+                   ---- a                   
+program main
+
+
