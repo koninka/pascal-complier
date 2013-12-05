@@ -148,7 +148,9 @@ void Parser::CheckExpectedToken(Tag::identificators tag, bool isResetToken)
 	} else {
 		PutToken(token);
 	}
-	if (tok_tag != tag) throw SyntaxException(scanner.fname, value, _line, tag);
+   if (tok_tag != tag) {
+      throw SyntaxException(scanner.fname, value, _line, tag);
+   }
 }
 
 void Parser::CheckExpectedType(Symbol* symbol, SymbolType type)
@@ -813,6 +815,8 @@ SyntaxNode* Parser::ParseStatement()
 	if (*token == Tag::BEGIN) {
 		PutToken(token);
 		statement = ParseCompoundStatement("inner block");
+   } else if (*token == Tag::WRITE) {
+      statement = CreateWriteNode();
 	} else if (*token == Tag::IF) {
 		statement = ParseIfStatement();
 	} else if (*token == Tag::WHILE) {
@@ -973,6 +977,23 @@ NodeArrIdx* Parser::CreateArrIdxNode(NodeExpr* name, Args args)
 		}
 	}
 	return new NodeArrIdx(name, args);
+}
+
+NodeWrite* Parser::CreateWriteNode()
+{
+   CheckExpectedToken(Tag::LPARENTHESIS);
+   Args args = ParseCommaSeparated();
+   for (auto &arg : args) {
+      bool isPossibleType = false;
+      for (auto type : {stTypeChar, stConstCharacterString, stTypeInteger, stTypeFloat}) {
+         isPossibleType = isPossibleType || *(GetReferenceType(arg->GetType())) == type;
+      }
+      if (!isPossibleType) {
+         throw SimpleException(scanner.fname, _line, "Can't read or write variables of this type");
+      }
+   }
+   CheckExpectedToken(Tag::RPARENTHESIS);
+   return new NodeWrite(args);
 }
 
 NodeAssignOp* Parser::CreateAssignmentStatement(TokenPtr token, NodeExpr* stmt, NodeExpr* expr)

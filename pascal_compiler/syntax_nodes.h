@@ -109,6 +109,11 @@ struct NodeArgs: public NodeExpr {
 	void PrintNode(int) override;
 };
 
+struct NodeWrite: public NodeArgs {
+   NodeWrite(Args);
+   void PrintNode(int) override;
+};
+
 struct NodeCall: public NodeArgs {
 	Symbol* resultType;
 	NodeExpr* callName;

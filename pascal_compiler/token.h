@@ -77,6 +77,7 @@ namespace Tag {
 		UNTIL,
 		VAR,
 		WHILE,
+		WRITE,
 		XOR 
    };
 

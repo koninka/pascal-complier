@@ -1,6 +1,0 @@
- char    type                                                                 0
- double  type                                                                 0
- integer type                                                                 0
- a       type alias                      integer                              0
- b       type alias                      integer                              0
- c       type alias                      integer                              0

@@ -1,9 +1,0 @@
-  Type                  Line   Text                            Value                           
-
-  Keyword               1      while                           while                           
-
-  Keyword               2      if                              if                              
-
-  Identificator         3      p                               p                               
-
-scanner_tests\62.in(5) Fatal: Illegal character "Ì"

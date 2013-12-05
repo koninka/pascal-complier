@@ -177,3 +177,4 @@ struct SymTypeAlias: public SymType {
 extern Symbol* typeChar;
 extern Symbol* typeFloat;
 extern Symbol* typeInteger;
+extern Symbol* typeDefault;

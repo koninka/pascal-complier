@@ -1,9 +1,0 @@
- char    type                                                                 0
- double  type                                                                 0
- integer type                                                                 0
- a       int scalar     20                                                    0
- range   type alias     subrange         10..20                               0
- range1  type alias     subrange         -20..10                              0
- range2  type alias     subrange         -20..20                              0
- range3  type alias     subrange         -30..30                              0
- range4  type alias     subrange         10..20                               0

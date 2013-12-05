@@ -1,0 +1,13 @@
+             ---- 4             
+       ---- :=       
+             ---- result             
+ ---- foo 
+
+
+       ---- call       
+             ---- foo             
+       ---- a       
+ ---- write 
+program main
+
+

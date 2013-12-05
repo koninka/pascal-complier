@@ -5,6 +5,7 @@
 Symbol* typeChar	  = new SymTypeChar;
 Symbol* typeFloat	  = new SymTypeFloat;
 Symbol* typeInteger = new SymTypeInteger;
+Symbol* typeDefault = new SymType;
 
 static void printPart(string str, int len)
 {
@@ -55,7 +56,7 @@ Symbol* Symbol::GetType()
 
 Symbol* GetReferenceType(Symbol* symbol)
 {
-	return *symbol == stTypeAlias ? dynamic_cast<SymTypeAlias*>(symbol)->refType : symbol;
+	return symbol != nullptr && *symbol == stTypeAlias ? dynamic_cast<SymTypeAlias*>(symbol)->refType : symbol;
 }
 
 bool Symbol::IsEqualType(Symbol* symbol)

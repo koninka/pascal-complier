@@ -130,8 +130,9 @@ class Parser {
 
 	NodeArrIdx* CreateArrIdxNode(NodeExpr*, Args);
 
-	NodeAssignOp* CreateAssignmentStatement(TokenPtr, NodeExpr*, NodeExpr*);
+   NodeWrite* CreateWriteNode();
 
+	NodeAssignOp* CreateAssignmentStatement(TokenPtr, NodeExpr*, NodeExpr*);
 public:
 	bool isDeclarationParse;
 	Scanner scanner;

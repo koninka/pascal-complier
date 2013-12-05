@@ -1,9 +1,0 @@
- char    type                                                                 0
- double  type                                                                 0
- integer type                                                                 0
- arr     type alias     array            array[0..2] of integer               0
- a       variable                        integer                              0
- b       variable                        integer                              0
- c       variable                        integer                              0
- g       variable                        char                                 0
- abc     variable                        arr                                  0

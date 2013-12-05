@@ -1,9 +1,0 @@
- char    type                                                                 0
- double  type                                                                 0
- integer type                                                                 0
- upper   int scalar     20                                                    0
- lower   int scalar     -20                                                   0
- offset  int scalar     10                                                    0
- arry    type alias     array            array[0..20] of integer              0
- arry2   type alias     array            array[-20..20] of integer            0
- arry3   type alias     array            array[-29..4] of integer             0

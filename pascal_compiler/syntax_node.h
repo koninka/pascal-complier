@@ -16,6 +16,7 @@ enum NodeType {
 	ntAssignOp,
 	ntRecordAccess,
 	ntCall,
+   ntWrite,
 	ntOrd,
 	ntChr,
 	ntArrIdx,

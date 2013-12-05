@@ -239,6 +239,14 @@ void NodeArgs::PrintNode(int d)
 	}
 }
 
+NodeWrite::NodeWrite(Args AArgs): NodeArgs(AArgs, ntWrite) {}
+
+void NodeWrite::PrintNode(int d)
+{
+   NodeArgs::PrintNode(d + 1);
+   SyntaxNode::PrintText(d, "write");
+}
+
 NodeCall::NodeCall(NodeExpr* ACallName, Args AArgs, Symbol* AResultType):
 		NodeArgs(AArgs, ntCall), callName(ACallName), resultType(AResultType) {}
 
@@ -256,7 +264,7 @@ bool NodeCall::IsSubroutineCall()
 
 Symbol* NodeCall::GetType()
 {
-	return resultType != nullptr ? GetReferenceType(resultType) : nullptr;
+	return resultType != nullptr ? GetReferenceType(resultType) : typeDefault;
 }
 
 NodeArrIdx::NodeArrIdx(NodeExpr* AArrName, Args AArgs): NodeArgs(AArgs, ntArrIdx), arrName(AArrName) {}

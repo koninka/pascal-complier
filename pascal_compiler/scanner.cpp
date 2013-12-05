@@ -72,6 +72,7 @@ Scanner::Scanner(const char* _fname):
    reserve<Word>(_keywords, Word(Tag::UNTIL,     "until"));
    reserve<Word>(_keywords, Word(Tag::VAR,       "var"));
    reserve<Word>(_keywords, Word(Tag::WHILE,     "while"));
+	reserve<Word>(_keywords, Word(Tag::WRITE,		 "write"));
 
    reserve<Operator>(_operators, Operator(Tag::ADDITION,                  operatorArithmetic, "+"));
    reserve<Operator>(_operators, Operator(Tag::ADDITION_ASSIGNMENT,       operatorArithmetic, "+="));

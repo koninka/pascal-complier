@@ -1,9 +1,0 @@
- char    type                                                                 0
- double  type                                                                 0
- integer type                                                                 0
- foo     procedure                                                            0
- foo params:
- foo locals:
- a       variable                        integer                              1
- tt      int scalar     45                                                    1
-

@@ -8,3 +8,6 @@ test_tree
 *.ilk
 *.pdb
 *.sublime-workspace
+*.vcxproj
+*.vcxproj.filters
+*.comp

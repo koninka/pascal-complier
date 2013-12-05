@@ -1,5 +1,0 @@
- char    type                                                                 0
- double  type                                                                 0
- integer type                                                                 0
- range   type alias     subrange         0..10                                0
- range1  type alias     subrange         0..10                                0
