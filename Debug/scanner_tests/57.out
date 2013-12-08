@@ -64,7 +64,7 @@
 
   Keyword               2      then                            then                            
 
-  Identificator         3      writeln                         writeln                         
+  Keyword               3      writeln                         writeln                         
 
   Separator             3      (                               (                               
 

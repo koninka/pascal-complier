@@ -3,7 +3,8 @@
 *.suo
 *.opensdf
 pascal_compiler/Debug/*
-test_tree
+test.tree
+tree.asm
 *.exe
 *.ilk
 *.pdb
