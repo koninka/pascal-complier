@@ -5,6 +5,6 @@
  f       function                        a                                    0
  f params:
  f locals:
- result  variable                        a                                    1
+ result  local variable                  a                                    1
  a       int scalar     45                                                    1
 

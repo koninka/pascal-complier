@@ -13,7 +13,7 @@
  foo     function                        integer                              2
  foo params:
  foo locals:
- result  variable                        integer                              3
+ result  local variable                  integer                              3
  a       local variable                  integer                              3
 
 

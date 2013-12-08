@@ -7,5 +7,5 @@
  a params:
  c       func var param                  int                                  1
  a locals:
- result  variable                        int1                                 1
+ result  local variable                  int1                                 1
 

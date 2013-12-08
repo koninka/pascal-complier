@@ -7,5 +7,5 @@
  b       func var param                  array of integer                     1
  c       func param                      array of char                        1
  foo locals:
- result  variable                        integer                              1
+ result  local variable                  integer                              1
 

@@ -9,7 +9,7 @@
  serv    function                        char                                 1
  serv params:
  serv locals:
- result  variable                        char                                 2
+ result  local variable                  char                                 2
  a       type alias                      integer                              2
 
 
