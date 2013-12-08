@@ -1,0 +1,18 @@
+type
+   rec = record
+      x, y: integer;
+      a: array[1..3, 1..2] of integer;
+   end;
+var
+   a: rec;
+   b: array[1..2] of integer;
+   c: integer;
+begin
+   b[1] := 20;
+   b[2] := 29;
+   writeln(a.a[1, 1]);
+   writeln(a.a[1, 2]);
+   a.a[1] := b;
+   writeln(a.a[1, 1]);
+   writeln(a.a[1, 2]);
+end.

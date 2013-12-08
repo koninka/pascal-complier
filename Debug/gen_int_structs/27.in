@@ -1,0 +1,9 @@
+var
+   a: array[1..2, 1..3] of integer;
+   c: array[1..3] of integer;
+   d: integer;
+begin
+   a[1, 2] := 64;
+   d := a[1, 2] + 6;
+   write(d);
+end.

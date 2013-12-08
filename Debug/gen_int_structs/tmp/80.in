@@ -1,0 +1,13 @@
+type
+   tt = integer;
+
+   function foo(tt1: char): tt;
+   const
+      tt = 25;
+   begin
+      foo := 3;
+   end;
+
+begin
+
+end.

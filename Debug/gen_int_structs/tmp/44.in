@@ -1,0 +1,2 @@
+type
+   range = a..b;

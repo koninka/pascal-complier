@@ -19,16 +19,16 @@ int main(int argc, char *argv[])
 		//SimpleParser parser(scanner);
 		//printer.printParseTree(parser);
 		//printer.printLexicalTable(scanner, true);
-		Scanner scanner1("test.tree");
-		Parser parser(scanner1);
-		parser.isDeclarationParse = false;
-		parser.ParseProgram();
+		//Scanner scanner1("test.tree");
+		//Parser parser(scanner1);
+		//parser.isDeclarationParse = false;
+		//parser.ParseProgram();
+  //    freopen("tree.asm", "w", stdout);
+  //    parser.Generate();
 		//cout << "-----------TABLE-----------" << endl << endl;
 		//parser.PrintSymTable();
-      cout << endl << endl << "-----------ASM-----------" << endl << endl;
+      //cout << endl << endl << "-----------ASM-----------" << endl << endl;
       //parser.Generate();
-      freopen("tree.asm", "w", stdout);
-      parser.Generate();
       //cout << "-----------BLOCK-----------" << endl << endl;
       //parser.PrintBlock();
 		//parser.Parse();
@@ -64,6 +64,12 @@ int main(int argc, char *argv[])
 									printer.printProgramParseTree(parser);
 								}
 								break;
+                     case 'g':
+                        {
+                           Parser parser(scanner);
+                           printer.printAsmCode(parser);
+                        }
+                        break;
 						}
 					}
 				}
@@ -112,5 +118,5 @@ int main(int argc, char *argv[])
 	if (isErr) {
 		cout << errMsg << endl;
 	}
-	return 0;
+   return 0;
 }

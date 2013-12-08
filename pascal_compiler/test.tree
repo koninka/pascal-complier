@@ -1,17 +1,14 @@
 var
-	a, c: array[1..2, 1..2] of integer;
-	b:array[1..2] of integer;
-	//a, c: integer;
-	d: integer;
-	r: record
-		x, y: integer;
-	end;
+	a: array[1..2, 1..2] of integer;
+	tmp: integer;
 begin
-	//b[1] := 27;
-	//b[2] := 3;
-	//b[5] := 4;
-	//b[6] := 5;
-	r.y := 230;
-	c[2, 1] := 30 + r.y;
-	write(c[2, 1]);
+	a[1, 2] := 3;
+	a[1, 1] := 4;
+	writeln(a[1, 1]);
+	writeln(a[1, 2]);
+	tmp := a[1, 1];
+	a[1, 1] := a[1, 2];
+	a[1, 2] := tmp;
+	writeln(a[1, 1]);
+	writeln(a[1, 2]);
 end.

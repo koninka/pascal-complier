@@ -17,10 +17,7 @@ enum Register {
 };
 
 enum OpCode {
-	EXIT,
    TEST,
-	INC, 
-	DEC,
 	CALL,
 	PUSH,
 	POP,
@@ -29,17 +26,6 @@ enum OpCode {
 	DIV,
 	NOT,
    NEG,
-	JE,
-	JL,
-	JNL,
-	JLE,
-	JNLE,
-	JNGE,
-	JGE,
-	JNG,
-	JG,
-	JMP,
-	JNE,
    SAR,
    SAL,
    SETG,
@@ -49,11 +35,10 @@ enum OpCode {
    SETE,
    SETNE,
 	MOV,
-   MOVZB,
+   MOVZX,
 	ADD,
 	SUB,
 	CMP,
-	XCHG,
 	XOR,
 	AND,
 	OR,
@@ -120,15 +105,6 @@ public:
    void Print() const override;
 };
 
-class AsmLabel: public Asm {
-   AsmStrImmediate* _label;
-public:
-   AsmLabel(AsmStrImmediate*);
-   AsmLabel(AsmStrImmediate);
-   AsmLabel(string);
-   void Print() const override;
-};
-
 class AsmRawCmd: public Asm {
    string _str;
 public:
@@ -159,7 +135,6 @@ class AsmIntImmediate: public AsmImmediate {
    int _value;
 public:
    AsmIntImmediate(int);
-   AsmIntImmediate(const AsmIntImmediate&);
    int GetIntValue() const override;
    void PrintBase() const override;
 };
@@ -184,9 +159,7 @@ struct AsmVarDword: public AsmVarBase {
 class AsmStrImmediate: public AsmImmediate {
    string _value;
 public:
-   AsmStrImmediate();
    AsmStrImmediate(const string&);
-   AsmStrImmediate(const AsmStrImmediate&);
    string GetStrValue() const override;
    void PrintBase() const override;
 };
@@ -196,8 +169,6 @@ class AsmMemory: public AsmOperand {
    int _offset;
 public:
    AsmMemory(AsmOperand*, int = 0);
-   AsmMemory(AsmStrImmediate, int = 0);
-   AsmMemory(AsmIntImmediate, int = 0);
    AsmMemory(Register, int = 0);
    void Print() const override;
 };
@@ -219,50 +190,26 @@ class AsmCode {
 
    Data data;
    Commands commands;
-   unsigned label_counter;
 public:
    AsmCode();
-   string GenStrLabel();
-   AsmStrImmediate GenLabel(string);
-   string GenStrLabel(string);
-   AsmStrImmediate LabelByStr(string);
-   void AddCmd(AsmCmd*);
-   void AddCmd(AsmLabel);
    void AddCmd(string);
    void AddCmd(OpCode);
-   void AddCmd(OpCode, AsmOperand*);
    void AddCmd(OpCode, AsmVarAddr);
    void AddCmd(OpCode, AsmVarDword);
    void AddCmd(OpCode, Register);
-   void AddCmd(OpCode, AsmMemory*);
    void AddCmd(OpCode, AsmMemory);
-   void AddCmd(OpCode, AsmImmediate*);
    void AddCmd(OpCode, AsmStrImmediate);
    void AddCmd(OpCode, AsmIntImmediate);
    void AddCmd(OpCode, int);
    void AddCmd(OpCode, AsmOperand*, AsmOperand*);
    void AddCmd(OpCode, Register, Register);
-   void AddCmd(OpCode, Register, AsmImmediate*);
-   void AddCmd(OpCode, Register, AsmStrImmediate);
-   void AddCmd(OpCode, Register, AsmIntImmediate);
    void AddCmd(OpCode, Register, int);
-   void AddCmd(OpCode, AsmMemory*, Register);
    void AddCmd(OpCode, AsmMemory, Register);
-   void AddCmd(OpCode, Register, AsmMemory*);
    void AddCmd(OpCode, Register, AsmMemory);
-   void AddCmd(OpCode, AsmImmediate*, AsmMemory*);
-   void AddCmd(OpCode, AsmMemory, AsmStrImmediate);
-   void AddCmd(OpCode, AsmMemory, AsmIntImmediate);
-   void AddData(AsmData*);
    AsmStrImmediate* AddData(string, size_t);
    AsmStrImmediate* AddData(string, string);
-   void AddLabel(AsmStrImmediate*);
-   void AddLabel(AsmStrImmediate);
-   void AddLabel(string);
    void Print() const;
    void PushMemory(unsigned);
-   void MoveMemory(unsigned);
-   void AddMainFunctionLabel();
    void GenCallWriteForInt();
    void GenCallWriteForReal();
    void GenCallWriteForStr();

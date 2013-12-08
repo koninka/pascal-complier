@@ -897,7 +897,7 @@ SyntaxNode* Parser::ParseForStatement()
 	if (var == nullptr) {
 		throw IdentifierNotFoundException(scanner.fname, token->text, _line);
 	}
-	if ((*var != stVar && *var != stVarLocal) || *(var->GetType()) != stTypeInteger) {
+	if ((*var != stVarGlobal && *var != stVarLocal) || *(var->GetType()) != stTypeInteger) {
 		throw SimpleException(scanner.fname, _line, "Integer variable identifier expected");
 	}
 	CheckVariableForLoopUsage(var);

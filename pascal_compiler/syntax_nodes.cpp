@@ -188,7 +188,7 @@ void NodeUnaryOp::GenerateForInt(AsmCode& asmCode) const
       case Tag::NEGATION:
          asmCode.AddCmd(TEST, EAX, EAX);
          asmCode.AddCmd(SETE, AL);
-         asmCode.AddCmd(MOVZB, AL, EAX);
+         asmCode.AddCmd(MOVZX, EAX, AL);
          break;
       case Tag::ADDITION:
          break;
@@ -324,13 +324,13 @@ void NodeBinaryOp::GenerateForInt(AsmCode& asmCode) const
          asmCode.AddCmd(XOR, EAX, EBX);
          break;
       case Tag::SHR:
-         asmCode.AddCmd(SAR, EAX, EBX);
+         //asmCode.AddCmd(SAR, EAX, EBX);
          //asmCode.AddCmd(SAR, EBX, EAX);
          //asmCode.AddCmd(PUSH, EBX);
          //return;
          break;
       case Tag::SHL:
-         asmCode.AddCmd(SAL, EAX, EBX);
+         //asmCode.AddCmd(SAL, EAX, EBX);
          //asmCode.AddCmd(PUSH, EBX);
          //return;
          break;
@@ -370,7 +370,7 @@ void NodeBinaryOp::GenerateForIntRelationalOp(AsmCode& asmCode) const
       case Tag::NE:
          asmCode.AddCmd(SETNE, AL);
    }
-   asmCode.AddCmd(MOVZB, EAX, AL);
+   asmCode.AddCmd(MOVZX, EAX, AL);
 }
 
 void NodeBinaryOp::GenerateForRealRelationalOp(AsmCode& asmCode) const
@@ -532,12 +532,12 @@ void NodeArrIdx::Generate(AsmCode& asmCode) const
 {
    ComputeIndexToEax(asmCode);
    size_t size = dynamic_cast<SymTypeArray*>(arrName->GetSymbol()->GetType())->elemType->GetSize();
-   if (size > 4) {
-      asmCode.PushMemory(size);
-   } else {
+   //if (size > 4) {
+   //   asmCode.PushMemory(size);
+   //} else {
       asmCode.AddCmd(POP, EAX);
       asmCode.AddCmd(PUSH, AsmMemory(EAX));
-   }
+   //}
 }
 
 void NodeArrIdx::GenerateLValue(AsmCode& asmCode) const
@@ -548,17 +548,19 @@ void NodeArrIdx::GenerateLValue(AsmCode& asmCode) const
 void NodeArrIdx::ComputeIndexToEax(AsmCode& asmCode) const
 {
    arrName->GenerateLValue(asmCode);
-   Symbol* type = dynamic_cast<SymTypeArray*>(arrName->GetSymbol()->GetType())->elemType;
+   SymTypeArray* type = dynamic_cast<SymTypeArray*>(arrName->GetSymbol()->GetType());
    for (auto &arg : args) {
       arg->Generate(asmCode);
-      asmCode.AddCmd(MOV, EBX, type->GetSize());
+      asmCode.AddCmd(MOV, EBX, type->elemType->GetSize());
       asmCode.AddCmd(POP, EAX);
+      asmCode.AddCmd(SUB, EAX, type->GetLow());
+      asmCode.AddCmd(XOR, EDX, EDX);
       asmCode.AddCmd(IMUL, EAX, EBX);
       asmCode.AddCmd(POP, EBX);
       asmCode.AddCmd(ADD, EAX, EBX);
       asmCode.AddCmd(PUSH, EAX);
-      SymTypeArray* arry = dynamic_cast<SymTypeArray*>(type);
-      type = arry != nullptr ? arry->elemType : type;
+      SymTypeArray* arry = dynamic_cast<SymTypeArray*>(type->elemType);
+      type = arry != nullptr ? arry : type;
    }
 }
 

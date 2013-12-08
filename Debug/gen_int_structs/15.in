@@ -1,0 +1,12 @@
+type
+   rec = record
+      x, y: integer;
+   end;
+var
+   a: rec;
+begin
+   a.x := 39;
+   a.y := 5;
+   writeln(a.x);
+   write(a.y);
+end.

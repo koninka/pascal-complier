@@ -1,0 +1,4 @@
+begin
+   writeln(25);
+   write(3 + 220 mod 17);
+end.

@@ -1,0 +1,8 @@
+var
+   a: array[1..2, 1..3] of integer;
+   d: integer;
+begin
+   d := 37;
+   a[1, 2] := d;
+   write(a[1, 2]);
+end.

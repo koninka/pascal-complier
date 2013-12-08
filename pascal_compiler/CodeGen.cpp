@@ -19,31 +19,18 @@ string GetReg(Register reg)
 string GetCmd(OpCode opCode)
 {
    switch (opCode) {
+      case SAR:         return "sar";
+      case SAL:         return "sal";
       case LEA:         return "lea";
-      case JNE:         return "jne";
-      case JMP:         return "jmp";
-      case JE:          return "je";
-      case JL:          return "jl";
-      case JNL:         return "jnl";
-      case JLE:         return "jle";
-      case JNLE:        return "jnle";
-      case JNGE:        return "jnge";
-      case JGE:         return "jge";
-      case JNG:         return "jng";
-      case JG:          return "jg";
       case RCL:         return "rcl";
       case RCR:         return "rcr";
       case NOT:         return "not";
       case CMP:         return "cmp";
-      case XCHG:        return "xchg";
       case XOR:         return "xor";
       case AND:         return "and";
       case OR:          return "or";
       case NEG:         return "neg";
-      case EXIT:        return "exit";
       case TEST:        return "test";
-      case INC:         return "inc";
-      case DEC:         return "dec";
       case CALL:        return "call";
       case PUSH:        return "push";
       case POP:         return "pop";
@@ -51,8 +38,9 @@ string GetCmd(OpCode opCode)
       case IMUL:        return "imul";
       case MUL:         return "mul";
       case DIV:         return "div";
+      case IDIV:        return "idiv";
       case MOV:         return "mov";
-      case MOVZB:       return "movzb";
+      case MOVZX:       return "movzx";
       case ADD:         return "add";
       case SUB:         return "sub";
       case SETG:        return "setg";
@@ -134,25 +122,6 @@ void AsmDataStr::Print() const
    cout << "\t" << _name << " db \"" << _value << "\", 0";
 }
 
-AsmLabel::AsmLabel(AsmStrImmediate* ALabel):
-   _label(ALabel)
-{}
-
-AsmLabel::AsmLabel(AsmStrImmediate ALabel):
-   _label(new AsmStrImmediate(ALabel))
-{}
-
-AsmLabel::AsmLabel(string ALabel):
-   _label(new AsmStrImmediate(ALabel))
-{}
-
-void AsmLabel::Print() const
-{
-   cout << "  ";
-   _label->PrintBase();
-   cout << ':';
-}
-
 AsmRawCmd::AsmRawCmd(string cmd):
    _str(cmd)
 {}
@@ -203,10 +172,6 @@ AsmIntImmediate::AsmIntImmediate(int AValue):
    _value(AValue)
 {}
 
-AsmIntImmediate::AsmIntImmediate(const AsmIntImmediate& ASrc) :
-   _value(ASrc._value)
-{}
-
 int AsmIntImmediate::GetIntValue() const
 {
    return _value;
@@ -241,15 +206,8 @@ void AsmVarDword::PrintBase() const
    oper->PrintBase();
 }
 
-AsmStrImmediate::AsmStrImmediate()
-{}
-
 AsmStrImmediate::AsmStrImmediate(const string& AValue):
    _value(AValue)
-{}
-
-AsmStrImmediate::AsmStrImmediate(const AsmStrImmediate& ASrc):
-   _value(ASrc._value)
 {}
 
 void AsmStrImmediate::PrintBase() const
@@ -264,16 +222,6 @@ string AsmStrImmediate::GetStrValue() const
 
 AsmMemory::AsmMemory(AsmOperand* AOper, int AOffset):
    _oper(AOper),
-   _offset(AOffset)
-{}
-
-AsmMemory::AsmMemory(AsmStrImmediate AOper, int AOffset):
-   _oper(new AsmStrImmediate(AOper)),
-   _offset(AOffset)
-{}
-
-AsmMemory::AsmMemory(AsmIntImmediate AOper, int AOffset):
-   _oper(new AsmIntImmediate(AOper)),
    _offset(AOffset)
 {}
 
@@ -294,48 +242,11 @@ void AsmMemory::Print() const
 
 AsmCode::AsmCode():
    functWrite(AsmStrImmediate("crt_printf")),
-   label_counter(0),
    hasIntFormat(false),
    hasRealFormat(false),
    hasStrFormat(false),
    hasNewLineFormat(false)
 {}
-
-string AsmCode::GenStrLabel()
-{
-   stringstream s;
-   s << label_counter++;
-   return s.str();
-}
-
-AsmStrImmediate AsmCode::GenLabel(string prefix)
-{
-   stringstream s;
-   s << prefix << '_' << label_counter++;
-   return AsmStrImmediate(s.str());
-}
-
-string AsmCode::GenStrLabel(string prefix)
-{
-   stringstream s;
-   s << prefix << '_' << label_counter++;
-   return s.str();
-}
-
-AsmStrImmediate AsmCode::LabelByStr(string str)
-{
-   return AsmStrImmediate(str);
-}
-
-void AsmCode::AddCmd(AsmCmd* cmd)
-{
-   commands.push_back(cmd);
-}
-
-void AsmCode::AddCmd(AsmLabel label)
-{
-   commands.push_back(new AsmLabel(label));
-}
 
 void AsmCode::AddCmd(string raw_cmd)
 {
@@ -357,11 +268,6 @@ void AsmCode::AddCmd(OpCode cmd, Register dest, Register src)
    commands.push_back(new AsmCmd2(cmd, new AsmRegister(dest), new AsmRegister(src)));
 }
 
-void AsmCode::AddCmd(OpCode cmd, AsmOperand* oper)
-{
-   commands.push_back(new AsmCmd1(cmd, oper));
-}
-
 void AsmCode::AddCmd(OpCode cmd, AsmVarAddr oper)
 {
    commands.push_back(new AsmCmd1(cmd, new AsmVarAddr(oper)));
@@ -375,16 +281,6 @@ void AsmCode::AddCmd(OpCode cmd, AsmVarDword oper)
 void AsmCode::AddCmd(OpCode cmd, Register reg)
 {
    commands.push_back(new AsmCmd1(cmd, new AsmRegister(reg)));
-}
-
-void AsmCode::AddCmd(OpCode cmd, AsmMemory* mem)
-{
-   commands.push_back(new AsmCmd1(cmd, mem));
-}
-
-void AsmCode::AddCmd(OpCode cmd, AsmImmediate* imm)
-{
-   commands.push_back(new AsmCmd1(cmd, imm));
 }
 
 void AsmCode::AddCmd(OpCode cmd, AsmStrImmediate str_imm)
@@ -416,61 +312,14 @@ void AsmCode::AddCmd(OpCode cmd, Register reg, int intImm)
    commands.push_back(new AsmCmd2(cmd, new AsmRegister(reg), imm));
 }
 
-void AsmCode::AddCmd(OpCode cmd, Register reg, AsmImmediate* src)
-{
-   commands.push_back(new AsmCmd2(cmd, new AsmRegister(reg), src));
-}
-
-void AsmCode::AddCmd(OpCode cmd, Register reg, AsmStrImmediate src)
-{
-   AsmStrImmediate* imm = new AsmStrImmediate(src);
-   commands.push_back(new AsmCmd2(cmd, new AsmRegister(reg), imm));
-}
-
-void AsmCode::AddCmd(OpCode cmd, Register reg, AsmIntImmediate src)
-{
-   AsmIntImmediate* imm = new AsmIntImmediate(src);
-   commands.push_back(new AsmCmd2(cmd, new AsmRegister(reg), imm));
-}
-
-void AsmCode::AddCmd(OpCode cmd, AsmMemory* mem, Register reg)
-{
-   commands.push_back(new AsmCmd2(cmd, mem, new AsmRegister(reg)));
-}
-
 void AsmCode::AddCmd(OpCode cmd, AsmMemory mem, Register reg)
 {
    commands.push_back(new AsmCmd2(cmd, new AsmMemory(mem), new AsmRegister(reg)));
 }
 
-void AsmCode::AddCmd(OpCode cmd, Register reg, AsmMemory* mem)
-{
-   commands.push_back(new AsmCmd2(cmd, new AsmRegister(reg), mem));
-}
-
 void AsmCode::AddCmd(OpCode cmd, Register reg, AsmMemory mem)
 {
    commands.push_back(new AsmCmd2(cmd, new AsmRegister(reg), new AsmMemory(mem)));
-}
-
-void AsmCode::AddCmd(OpCode cmd, AsmImmediate* src, AsmMemory* mem)
-{
-   commands.push_back(new AsmCmd2(cmd, src, mem));
-}
-
-void AsmCode::AddCmd(OpCode cmd, AsmMemory mem, AsmStrImmediate src)
-{
-   AddCmd(cmd, new AsmMemory(mem), new AsmStrImmediate(src));
-}
-
-void AsmCode::AddCmd(OpCode cmd, AsmMemory mem, AsmIntImmediate intImm)
-{
-   AddCmd(cmd, new AsmMemory(mem), new AsmIntImmediate(intImm));
-}
-
-void AsmCode::AddData(AsmData* newData)
-{
-   data.push_back(newData);
 }
 
 AsmStrImmediate* AsmCode::AddData(string name, size_t size)
@@ -485,21 +334,6 @@ AsmStrImmediate* AsmCode::AddData(string name, string value)
    name = "format_str_" + name;
    data.push_back(new AsmDataStr(name, value));
    return new AsmStrImmediate(name);
-}
-
-void AsmCode::AddLabel(AsmStrImmediate* label)
-{
-   commands.push_back(new AsmLabel(label));
-}
-
-void AsmCode::AddLabel(AsmStrImmediate label)
-{
-   commands.push_back(new AsmLabel(label));
-}
-
-void AsmCode::AddLabel(string label)
-{
-   commands.push_back(new AsmLabel(label));
 }
 
 void AsmCode::Print() const
@@ -527,22 +361,6 @@ void AsmCode::PushMemory(unsigned size)
       AddCmd(MOV, EAX, AsmMemory(EBX, size - i - 4));
       AddCmd(PUSH, EAX);
    }
-}
-
-void AsmCode::MoveMemory(unsigned size)
-{
-   AddCmd(POP, EBX);
-   AddCmd(POP, EDX);
-   AddCmd(SUB, ESP, size);
-   for (size_t i = 0; i < size; i += 4) {
-      AddCmd(MOV, AsmMemory(EBX, i), EAX);
-      AddCmd(MOV, EAX, AsmMemory(EDX, size - i - 4));
-   }
-}
-
-void AsmCode::AddMainFunctionLabel()
-{
-   AddCmd("main:\n");
 }
 
 void AsmCode::GenCallWriteForInt()
@@ -581,7 +399,7 @@ void AsmCode::GenWriteNewLine()
       formatStrNewLine = AddData("new_line", "\\n");
       hasNewLineFormat = true;
    }
-   AddCmd(PUSH, formatStrNewLine);
+   AddCmd(PUSH, AsmVarAddr(formatStrNewLine));
    AddCmd(CALL, functWrite);
    AddCmd(ADD, ESP, 4);
 }

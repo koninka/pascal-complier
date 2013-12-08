@@ -1,0 +1,14 @@
+var
+   a: array[1..2, 1..2] of integer;
+   tmp: integer;
+begin
+   a[1, 2] := 3;
+   a[1, 1] := 4;
+   writeln(a[1, 1]);
+   writeln(a[1, 2]);
+   tmp := a[1, 1];
+   a[1, 1] := a[1, 2];
+   a[1, 2] := tmp;
+   writeln(a[1, 1]);
+   writeln(a[1, 2]);
+end.

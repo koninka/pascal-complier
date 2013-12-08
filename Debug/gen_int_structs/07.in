@@ -1,0 +1,10 @@
+type
+   int = integer;
+var
+   a: integer;
+   b: int;
+begin
+   b := 29;
+   a := b;
+   write(a);
+end.

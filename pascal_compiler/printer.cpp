@@ -79,6 +79,15 @@ void Printer::printDeclarationTable(Parser& parser, bool toFile)
 	parser.PrintSymTable();
 }
 
+void Printer::printAsmCode(Parser& parser)
+{
+   string tmp = parser.scanner.fname.substr(0, parser.scanner.fname.find('.') + 1) + "asm";
+   freopen(tmp.c_str(), "w", stdout);
+   parser.isDeclarationParse = false;
+   parser.ParseProgram();
+   parser.Generate();
+}
+
 void Printer::printProgramParseTree(Parser& parser)
 {
 	string tmp = parser.scanner.fname.substr(0, parser.scanner.fname.find('.') + 1) + "comp";

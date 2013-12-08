@@ -1,0 +1,10 @@
+type
+   rec = record
+      x, y: integer;
+   end;
+var
+   a: rec;
+begin
+   a.y := 5;
+   write(a.y);
+end.

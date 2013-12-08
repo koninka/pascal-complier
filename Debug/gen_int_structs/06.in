@@ -1,0 +1,7 @@
+var
+   a, b: integer;
+begin
+   a := 5;
+   b := a mod 3;
+   write(a + b);
+end.

@@ -16,8 +16,7 @@ for my $f (@files) {
    if ($tmp =~/.*FC\:/) {
       $ok++;
       print "TEST: $k : OK\n";
-   }
-   else{
+   } else {
       print "TEST: $k : FAIL\n$tmp";
    }
 }

@@ -161,6 +161,8 @@ public:
 	string getSubrangeStr();
 	bool IsEqualType(Symbol*) override;
    size_t GetSize() override;
+   int GetLow() const;
+   int GetHigh() const;
 };
 
 struct SymTypeArry: public SymType {
@@ -183,6 +185,8 @@ struct SymTypeArray: public SymTypeArry {
 	bool IsEqualType(Symbol*) override;
 	string getTypeValue() override;
    size_t GetSize() override;
+   int GetLow() const;
+   int GetHigh() const;
 };
 
 struct SymTypeScalar: public SymType {

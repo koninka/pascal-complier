@@ -1,0 +1,8 @@
+var
+   r: record
+      a: integer;
+   end;
+begin
+   r.a := -25;
+   Write(r.a);
+end.

@@ -1,0 +1,7 @@
+var
+   i: integer;
+begin
+   i := 20;
+   i := 5 + i * 20;
+   write(25 mod i);
+end.

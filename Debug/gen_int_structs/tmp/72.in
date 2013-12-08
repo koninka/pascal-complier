@@ -1,0 +1,15 @@
+const
+   A = 25;
+   procedure foo();
+      const
+         B = -A;
+      function serv(): char;
+      type
+         A = integer;
+      begin
+
+      end;
+
+   begin
+
+   end;

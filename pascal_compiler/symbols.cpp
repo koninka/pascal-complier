@@ -342,6 +342,16 @@ size_t SymTypeSubrange::GetSize()
    return _size = ub - lb + 1;
 }
 
+int SymTypeSubrange::GetLow() const
+{
+   return lb;
+}
+
+int SymTypeSubrange::GetHigh() const
+{
+   return ub;
+}
+
 SymTypeArry::SymTypeArry(SymbolType AType): SymType(AType)
 {
 	name = "array";
@@ -399,6 +409,16 @@ string SymTypeArray::getTypeValue()
 size_t SymTypeArray::GetSize()
 {
    return _size = elemType->GetSize() * subrange->GetSize();
+}
+
+int SymTypeArray::GetLow() const
+{
+   return dynamic_cast<SymTypeSubrange*>(GetReferenceType(subrange))->GetLow();
+}
+
+int SymTypeArray::GetHigh() const
+{
+   return dynamic_cast<SymTypeSubrange*>(GetReferenceType(subrange))->GetHigh();
 }
 
 SymTypeScalar::SymTypeScalar(SymbolType AType): SymType(AType) {}

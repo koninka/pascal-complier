@@ -15,5 +15,6 @@ public:
    void printLexicalTable(Scanner&, bool = true);
    void printTestToFile(Scanner&, bool = true);
 	void printDeclarationTable(Parser&, bool = false);
+   void printAsmCode(Parser&);
 	void printProgramParseTree(Parser&);
 };

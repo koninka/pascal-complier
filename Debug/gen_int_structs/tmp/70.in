@@ -1,0 +1,9 @@
+var
+   tt: integer;
+
+   procedure foo();
+   const
+      tt = 25;
+   begin
+
+   end;

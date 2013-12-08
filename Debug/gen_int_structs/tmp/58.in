@@ -1,0 +1,8 @@
+type
+   arr = array[0..2] of integer;
+var
+   a,b,c: integer;
+var
+   g: char;
+var
+   abc: arr;

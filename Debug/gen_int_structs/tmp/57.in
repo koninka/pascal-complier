@@ -1,0 +1,18 @@
+const
+   aa = 20;
+type
+   range1 = 1..2;
+const
+   ggg = 4;
+type
+   range2 = range1;
+const
+   bb = 400;
+type
+   arr = array[aa..25] of integer;
+type
+   TRec = record
+      a, b, c: integer;
+      ch: char;
+      tr: arr;
+   end;

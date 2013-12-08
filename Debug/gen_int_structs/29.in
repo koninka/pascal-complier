@@ -1,0 +1,10 @@
+type
+   rec = record
+      i, j, k: integer;
+   end;
+var
+   a: array[0..4] of rec;
+begin
+   a[2].j := 77;
+   Write(a[2].j);
+end.
