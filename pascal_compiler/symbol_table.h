@@ -7,8 +7,6 @@ typedef unordered_map<string, int> SymbolNames;
 typedef vector<Symbol*> Symbols;
 typedef void* Handle;
 
-//Symbol* FindSymbolByName(string, bool);
-
 class SymInterface {
 public:
 	virtual bool FindSymbol(string&) abstract;
@@ -16,6 +14,7 @@ public:
 };
 
 class SymTable: public SymInterface {
+   size_t _tableSize;
 	SymbolNames symNames;
 public:
 	SyntaxNode* block;
@@ -25,11 +24,13 @@ public:
 	void Add(Symbol*, string);
 	void Delete(string&);
 	void SetBlock(NodeBlock*, string);
+   void GenerateDeclarations(AsmCode&) const;
 	void Print(int);
 	void PrintBlock(int d);
 	bool FindSymbol(string&) override;
 	Symbol* GetSymbol(string&) override;
 	size_t Size() const;
+   size_t GetSize() const;
 };
 
 typedef stack<SymTable*> TableStack;
@@ -54,6 +55,7 @@ public:
 	void PrintSymbol(int) override;
 	SymTable* GetFields() const;
 	bool IsEqualType(Symbol*) override;
+   size_t GetSize() override;
 };
 
 class SymSubroutine: public Symbol {
@@ -63,6 +65,7 @@ public:
 	SymSubroutine(string&, SymbolType);
 	void SetParams(SymTable*);
 	void SetVars(SymTable*);
+   void GenerateDeclaration(AsmCode&);
 	void PrintSymbol(int) override;
 	SymTable* getLocalVars() const;
 	SymTable* GetParams() const;

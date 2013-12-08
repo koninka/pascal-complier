@@ -17,7 +17,10 @@ static void printPart(string str, int len)
 }
 
 
-Symbol::Symbol(SymbolType AType): symType(AType) {}
+Symbol::Symbol(SymbolType AType):
+   symType(AType),
+   _size(0)
+{}
 
 bool Symbol::operator ==(const SymbolType type)
 {
@@ -44,14 +47,40 @@ void Symbol::PrintSymbol(int d)
 	printPart(name, NAME_LEN);
 }
 
+void Symbol::Generate(AsmCode&) const
+{}
+
+void Symbol::GenerateLValue(AsmCode&) const
+{}
+
 bool Symbol::IsType()
 {
 	return false;
 }
 
+bool Symbol::IsVar()
+{
+   return false;
+}
+
 Symbol* Symbol::GetType()
 {
 	return nullptr;
+}
+
+string Symbol::getTypeValue()
+{
+   return "";
+}
+
+size_t Symbol::GetSize()
+{
+   return 0;
+}
+
+size_t Symbol::GetOffset() const
+{
+   return 0;
 }
 
 Symbol* GetReferenceType(Symbol* symbol)
@@ -92,6 +121,16 @@ Symbol* SymConstInteger::GetType()
 	return typeInteger;
 }
 
+size_t SymConstInteger::GetSize()
+{
+   return _size = typeInteger->GetSize();
+}
+
+void SymConstInteger::Generate(AsmCode& asmCode) const
+{
+   asmCode.AddCmd(PUSH, value);
+}
+
 SymConstFloat::SymConstFloat(double AValue): SymConst(stConstFloat), value(AValue) {}
 
 double SymConstFloat::getValue() const
@@ -104,9 +143,24 @@ Symbol* SymConstFloat::GetType()
 	return typeFloat;
 }
 
+size_t SymConstFloat::GetSize()
+{
+   return _size = typeFloat->GetSize();
+}
+
+void SymConstFloat::Generate(AsmCode& asmCode) const
+{
+
+}
+
 void SymConstFloat::PrintSymbol(int d)
 {
 	SymConst::printScalar(d, "double scalar", to_string(value));
+}
+
+void SymConstCharacterString::Generate(AsmCode& asmCode) const
+{
+
 }
 
 SymConstCharacterString::SymConstCharacterString(string& val): SymConst(stConstCharacterString), value(val) {}
@@ -150,26 +204,84 @@ void SymType::PrintSymbol(int d)
 	printPart(to_string(d), TABLE_IDX_LEN);
 }
 
-SymVar::SymVar(SymbolPtr AVarType): Symbol(stVar), type(AVarType) {}
-
-SymVar::SymVar(SymbolPtr AVarType, SymbolType AType): Symbol(AType), type(AVarType) {}
-
-void SymVar::PrintSymbol(int d)
-{
-	Symbol::PrintSymbol(d);
-	printPart("variable", TYPE_LEN);
-	printPart("", VALUE_LEN);
-	printPart(type->getTypeValue(), COLUMN_LEN);
-	printPart(to_string(d), TABLE_IDX_LEN);
-	type->PrintType(d);
-}
+SymVar::SymVar(SymbolPtr AVarType, size_t AOffset, SymbolType AType):
+   Symbol(AType),
+   _offset(AOffset),
+   type(AVarType)
+{}
 
 Symbol* SymVar::GetType()
 {
 	return GetReferenceType(type.get());
 }
 
-SymParam::SymParam(SymbolPtr AType): SymVar(AType, stParam) {}
+bool SymVar::IsVar()
+{
+   return true;
+}
+
+size_t SymVar::GetSize()
+{
+   return _size = type.get()->GetSize();
+}
+
+size_t SymVar::GetOffset() const
+{
+   return _offset;
+}
+
+SymVarGlobal::SymVarGlobal(SymbolPtr AType, size_t AOffset):
+   SymVar(AType, AOffset, stVarGlobal),
+   varLabel(nullptr)
+{}
+
+void SymVarGlobal::GenerateDeclaration(AsmCode& asmCode)
+{
+   varLabel = asmCode.AddData(name, type->GetSize());
+}
+
+void SymVarGlobal::Generate(AsmCode& asmCode) const
+{
+   if (type->GetSize() > 4) {
+      GenerateLValue(asmCode);
+      asmCode.PushMemory(type->GetSize());
+   } else {
+      asmCode.AddCmd(PUSH, AsmVarDword(new AsmMemory(varLabel)));
+   }
+}
+
+void SymVarGlobal::GenerateLValue(AsmCode& asmCode) const
+{
+   asmCode.AddCmd(PUSH, AsmVarAddr(varLabel));
+}
+
+void SymVarGlobal::PrintSymbol(int d)
+{
+   Symbol::PrintSymbol(d);
+   printPart("variable", TYPE_LEN);
+   printPart("", VALUE_LEN);
+   printPart(type->getTypeValue(), COLUMN_LEN);
+   printPart(to_string(d), TABLE_IDX_LEN);
+   type->PrintType(d);
+}
+
+SymVarLocal::SymVarLocal(SymbolPtr AType, size_t AOffset):
+   SymVar(AType, AOffset, stVarLocal)
+{}
+
+void SymVarLocal::PrintSymbol(int d)
+{
+   Symbol::PrintSymbol(d);
+   printPart("local variable", TYPE_LEN);
+   printPart("", VALUE_LEN);
+   printPart(type->getTypeValue(), COLUMN_LEN);
+   printPart(to_string(d), TABLE_IDX_LEN);
+   type->PrintType(d);
+}
+
+SymParam::SymParam(SymbolPtr AType):
+   SymVar(AType, 0, stParam)
+{}
 
 void SymParam::PrintSymbol(int d)
 {
@@ -180,7 +292,9 @@ void SymParam::PrintSymbol(int d)
 	printPart(to_string(d), TABLE_IDX_LEN);
 }
 
-SymVarParam::SymVarParam(SymbolPtr AType): SymVar(AType, stVarParam) {}
+SymVarParam::SymVarParam(SymbolPtr AType):
+   SymVar(AType, 0, stVarParam)
+{}
 
 void SymVarParam::PrintSymbol(int d)
 {
@@ -221,6 +335,11 @@ bool SymTypeSubrange::IsEqualType(Symbol* symbol)
 {
 	SymTypeSubrange* subrange = dynamic_cast<SymTypeSubrange*>(symbol);
 	return subrange != nullptr && lb == subrange->lb && ub == subrange->ub;
+}
+
+size_t SymTypeSubrange::GetSize()
+{
+   return _size = ub - lb + 1;
 }
 
 SymTypeArry::SymTypeArry(SymbolType AType): SymType(AType)
@@ -277,21 +396,37 @@ string SymTypeArray::getTypeValue()
 	return result;
 }
 
+size_t SymTypeArray::GetSize()
+{
+   return _size = elemType->GetSize() * subrange->GetSize();
+}
+
 SymTypeScalar::SymTypeScalar(SymbolType AType): SymType(AType) {}
 
-SymTypeInteger::SymTypeInteger(): SymTypeScalar(stTypeInteger)
+size_t SymTypeScalar::GetSize()
 {
-	name = "integer";
+   return _size;
 }
 
-SymTypeFloat::SymTypeFloat(): SymTypeScalar(stTypeFloat)
+SymTypeInteger::SymTypeInteger():
+   SymTypeScalar(stTypeInteger)
 {
-	name = "double";
+   _size = 4;
+	name  = "integer";
 }
 
-SymTypeChar::SymTypeChar(): SymTypeScalar(stTypeChar)
+SymTypeFloat::SymTypeFloat():
+   SymTypeScalar(stTypeFloat)
 {
-	name = "char";
+   _size = 4;
+	name  = "double";
+}
+
+SymTypeChar::SymTypeChar(): 
+   SymTypeScalar(stTypeChar)
+{
+   _size = 1;
+	name  = "char";
 }
 
 SymTypeAlias::SymTypeAlias(Symbol* ARefType): SymType(stTypeAlias), refType(ARefType) {}
@@ -305,4 +440,9 @@ void SymTypeAlias::PrintSymbol(int d)
 	printPart(refType->getTypeValue(), COLUMN_LEN);
 	printPart(to_string(d), TABLE_IDX_LEN);
 	refType->PrintType(d);
+}
+
+size_t SymTypeAlias::GetSize()
+{
+   return _size = refType->GetSize();
 }

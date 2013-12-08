@@ -8,6 +8,7 @@
 #include "symbol_table.h"
 #include "syntax_node.h"
 #include "syntax_nodes.h"
+#include "CodeGen.h"
 
 const int PRIORITIES_NUMBER = 4;
 
@@ -36,6 +37,8 @@ class Parser {
 	typedef unordered_map<int, computeBinaryFunc> ComputableBinaryFuncs;
 
 	int _line;	
+   bool _isGlobalNamespace;
+   AsmCode asmCode;
 	SyntaxNode* root;
 	SymTable* symTable;
 	queue<TokenPtr> tokens;
@@ -130,16 +133,17 @@ class Parser {
 
 	NodeArrIdx* CreateArrIdxNode(NodeExpr*, Args);
 
-   NodeWrite* CreateWriteNode();
+   NodeWriteBase* CreateWriteNode(TokenPtr);
 
 	NodeAssignOp* CreateAssignmentStatement(TokenPtr, NodeExpr*, NodeExpr*);
 public:
 	bool isDeclarationParse;
 	Scanner scanner;
 	Parser(const Scanner&);
-	void Parse();
+   void Generate();
 	void ParseProgram();
 	void PrintTree();
 	void PrintBlock();
 	void PrintSymTable();
+   
 };

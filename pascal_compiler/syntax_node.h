@@ -1,6 +1,7 @@
 #pragma once
 
 #include "scanner.h"
+#include "CodeGen.h"
 
 #define FACTOR   6
 #define TAIL_LEN 4
@@ -17,6 +18,7 @@ enum NodeType {
 	ntRecordAccess,
 	ntCall,
    ntWrite,
+   ntWriteln,
 	ntOrd,
 	ntChr,
 	ntArrIdx,
@@ -40,8 +42,9 @@ struct SyntaxNode {
 	SyntaxNode(NodeType);
 	virtual ~SyntaxNode() {};
 	virtual void PrintNode(int) {};
+   virtual void Generate(AsmCode&) const {};
+   virtual void GenerateLValue(AsmCode&) const {};
 	void PrintText(int, string);
 	bool operator == (NodeType);
 	bool operator != (NodeType);
-
 };

@@ -19,14 +19,18 @@ int main(int argc, char *argv[])
 		//SimpleParser parser(scanner);
 		//printer.printParseTree(parser);
 		//printer.printLexicalTable(scanner, true);
-		//Scanner scanner1("test.tree");
-		//Parser parser(scanner1);
-		//parser.isDeclarationParse = false;
-		//parser.ParseProgram();
-		//cout << "-----------BLOCK-----------" << endl << endl;
-		//parser.PrintBlock();
+		Scanner scanner1("test.tree");
+		Parser parser(scanner1);
+		parser.isDeclarationParse = false;
+		parser.ParseProgram();
 		//cout << "-----------TABLE-----------" << endl << endl;
 		//parser.PrintSymTable();
+      cout << endl << endl << "-----------ASM-----------" << endl << endl;
+      //parser.Generate();
+      freopen("tree.asm", "w", stdout);
+      parser.Generate();
+      //cout << "-----------BLOCK-----------" << endl << endl;
+      //parser.PrintBlock();
 		//parser.Parse();
 		//printer.printLexicalTable(scanner1, true);
 		//printer.printParseTree(parser);
@@ -47,30 +51,6 @@ int main(int argc, char *argv[])
 								break;
 							case 'L':
 								printer.printTestToFile(scanner, true);
-								break;
-							case 's':
-								{
-									SimpleParser parser(scanner);
-									printer.printParseTree(parser, true);
-								}
-								break;
-							case 'S':
-								{
-									SimpleParser parser(scanner);
-									printer.printParseTree(parser, false);
-								}
-								break;
-							case 'e':
-								{
-									Parser parser(scanner);
-									printer.printParseTree(parser, true);
-								}
-								break;
-							case 'E':
-								{
-									Parser parser(scanner);
-									printer.printParseTree(parser, false);
-								}
 								break;
 							case 'd':
 								{

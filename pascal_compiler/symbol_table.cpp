@@ -12,10 +12,16 @@ static void printPart(string str, int len)
    int c = tmp.length() + str.length() + 1;
 }
 
-SymTable::SymTable(): block(nullptr), symbols(Symbols()), symNames(SymbolNames()) {}
+SymTable::SymTable():
+   block(nullptr),
+   symbols(Symbols()),
+   symNames(SymbolNames()),
+   _tableSize(0)
+{}
 
 void SymTable::Add(Symbol* symbol)
 {
+   _tableSize = symbol->IsVar() ? _tableSize + symbol->GetSize() : _tableSize;
 	symbols.push_back(symbol);
 	symNames.insert(make_pair(symbol->name, symbols.size() - 1));
 }
@@ -41,6 +47,20 @@ void SymTable::SetBlock(NodeBlock* ABlock, string AName)
 {
 	block = ABlock;
 	dynamic_cast<NodeBlock*>(block)->name = AName;
+}
+
+void SymTable::GenerateDeclarations(AsmCode& asmCode) const
+{
+   for (auto &symbol : symbols) {
+      if (*symbol == stVarGlobal) {
+         dynamic_cast<SymVarGlobal*>(symbol)->GenerateDeclaration(asmCode);
+      }
+   }
+   for (auto &symbol : symbols) {
+      if (*symbol == stProcedure || *symbol == stFunction) {
+         dynamic_cast<SymSubroutine*>(symbol)->GenerateDeclaration(asmCode);
+      }
+   }
 }
 
 void SymTable::Print(int d)
@@ -76,6 +96,11 @@ Symbol* SymTable::GetSymbol(string& name)
 size_t SymTable::Size() const
 {
 	return symbols.size();
+}
+
+size_t SymTable::GetSize() const
+{
+   return _tableSize;
 }
 
 void SymTableStack::Add(SymTable* table)
@@ -170,6 +195,11 @@ bool SymTypeRecord::IsEqualType(Symbol* symbol)
 	return result;
 }
 
+size_t SymTypeRecord::GetSize()
+{
+   return _size = fields->GetSize();
+}
+
 SymSubroutine::SymSubroutine(string& AName, SymbolType AType): Symbol(AType)
 {
 	name = AName;
@@ -183,6 +213,19 @@ void SymSubroutine::SetParams(SymTable* AParams)
 void SymSubroutine::SetVars(SymTable* AVars)
 {
 	localVariables = AVars;
+}
+
+void SymSubroutine::GenerateDeclaration(AsmCode& asmCode)
+{
+   //asmCode.AddLabel(label);
+   //asmCode.AddCmd(ASM_PUSH, REG_EBP);
+   //asmCode.AddCmd(ASM_MOV, REG_ESP, REG_EBP);
+   //if (sym_table->GetLocalsSize()) asm_code.AddCmd(ASM_SUB, sym_table->GetLocalsSize(), REG_ESP);
+   //body->Generate(asm_code);
+   //asmCode.AddLabel(exit_label);
+   //asmCode.AddCmd(ASM_MOV, REG_EBP, REG_ESP);
+   //asmCode.AddCmd(ASM_POP, REG_EBP);
+   //asmCode.AddCmd(ASM_RET, sym_table->GetParamsSize() - GetResultType()->GetSize());
 }
 
 void SymSubroutine::PrintSymbol(int d)

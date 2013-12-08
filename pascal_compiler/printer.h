@@ -14,8 +14,6 @@ class Printer {
 public:
    void printLexicalTable(Scanner&, bool = true);
    void printTestToFile(Scanner&, bool = true);
-	void printParseTree(SimpleParser&, bool = false);
-	void printParseTree(Parser&, bool = false);
 	void printDeclarationTable(Parser&, bool = false);
 	void printProgramParseTree(Parser&);
 };

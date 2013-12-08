@@ -9,7 +9,9 @@ double getFrac(double value)
 }
 
 Parser::Parser(const Scanner& AScanner): scanner(AScanner), _priorities(PRIORITIES_NUMBER),
-		symTable(new SymTable), tableStack(SymTableStack())
+		symTable(new SymTable),
+      tableStack(SymTableStack()),
+      _isGlobalNamespace(true)
 {
 	symTable->Add(typeChar);
 	symTable->Add(typeFloat);
@@ -68,20 +70,19 @@ Parser::Parser(const Scanner& AScanner): scanner(AScanner), _priorities(PRIORITI
 	computable_binary_op.insert(make_pair(Tag::GT,				  &Parser::ComputeBinaryGt));
 	computable_binary_op.insert(make_pair(Tag::LE,				  &Parser::ComputeBinaryLe));
 	computable_binary_op.insert(make_pair(Tag::GE,				  &Parser::ComputeBinaryGe));
-
-	//int_op.push_back(Tag::DIV);
-	//int_op.push_back(Tag::MOD);
-	//int_op.push_back(Tag::AND);
-	//int_op.push_back(Tag::SHL);
-	//int_op.push_back(Tag::SHR);
-	//int_op.push_back(Tag::OR);
-	//int_op.push_back(Tag::XOR);
-	//int_op.push_back(Tag::NEGATION);
 }
 
-void Parser::Parse()
+void Parser::Generate()
 {
-	root = ParseExpression(0);
+   symTable->GenerateDeclarations(asmCode);
+   asmCode.AddCmd("main:");
+   //asmCode.AddCmd(MOV, ESP, EBP);
+   symTable->block->Generate(asmCode);
+   //asmCode.AddCmd(MOV, EBP, ESP);
+   //asmCode.AddCmd(MOV, EAX, 0);
+   asmCode.AddCmd(RET);
+   asmCode.AddCmd("end main");
+   asmCode.Print();
 }
 
 void Parser::ParseProgram()
@@ -293,7 +294,11 @@ void Parser::ParseVariableDeclaration()
 		CheckExpectedToken(Tag::SEMICOLON);
 		for (auto &id: list) {
 			CheckNameForUnique(id.name, id.line);
-			symTable->Add(new SymVar(type), id.name);
+         if (_isGlobalNamespace) {
+            symTable->Add(new SymVarGlobal(type, symTable->GetSize()), id.name);
+         } else {
+            symTable->Add(new SymVarLocal(type, symTable->GetSize()), id.name);
+         }
 		}
 	}
 }
@@ -704,9 +709,11 @@ SymTable* Parser::ParseProcFuncBlock(SymTable* params, string& name, Symbol* res
 		symTable->Add(symbol);
 	}
 	if (resultType != nullptr) {
-		symTable->Add(new SymVar(SymbolPtr(resultType)), "result");
+      symTable->Add(new SymVarLocal(SymbolPtr(resultType), symTable->GetSize()), "result");
 	}
+   _isGlobalNamespace = false;
 	ParseBlock(name);
+   _isGlobalNamespace = true;
 	if (!isDeclarationParse) {
 		CheckExpectedToken(Tag::SEMICOLON);
 	}
@@ -815,8 +822,8 @@ SyntaxNode* Parser::ParseStatement()
 	if (*token == Tag::BEGIN) {
 		PutToken(token);
 		statement = ParseCompoundStatement("inner block");
-   } else if (*token == Tag::WRITE) {
-      statement = CreateWriteNode();
+   } else if (*token == Tag::WRITE || *token == Tag::WRITELN) {
+      statement = CreateWriteNode(token);
 	} else if (*token == Tag::IF) {
 		statement = ParseIfStatement();
 	} else if (*token == Tag::WHILE) {
@@ -890,7 +897,7 @@ SyntaxNode* Parser::ParseForStatement()
 	if (var == nullptr) {
 		throw IdentifierNotFoundException(scanner.fname, token->text, _line);
 	}
-	if (*var != stVar || *(var->GetType()) != stTypeInteger) {
+	if ((*var != stVar && *var != stVarLocal) || *(var->GetType()) != stTypeInteger) {
 		throw SimpleException(scanner.fname, _line, "Integer variable identifier expected");
 	}
 	CheckVariableForLoopUsage(var);
@@ -979,7 +986,7 @@ NodeArrIdx* Parser::CreateArrIdxNode(NodeExpr* name, Args args)
 	return new NodeArrIdx(name, args);
 }
 
-NodeWrite* Parser::CreateWriteNode()
+NodeWriteBase* Parser::CreateWriteNode(TokenPtr token)
 {
    CheckExpectedToken(Tag::LPARENTHESIS);
    Args args = ParseCommaSeparated();
@@ -993,7 +1000,10 @@ NodeWrite* Parser::CreateWriteNode()
       }
    }
    CheckExpectedToken(Tag::RPARENTHESIS);
-   return new NodeWrite(args);
+   return
+      *token == Tag::WRITE
+      ? (NodeWriteBase*) new NodeWrite(args)
+      : (NodeWriteBase*) new NodeWriteln(args);
 }
 
 NodeAssignOp* Parser::CreateAssignmentStatement(TokenPtr token, NodeExpr* stmt, NodeExpr* expr)

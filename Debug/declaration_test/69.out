@@ -5,16 +5,16 @@
  foo     procedure                                                            0
  foo params:
  foo locals:
- a       variable                        integer                              1
+ a       local variable                  integer                              1
  foo     procedure                                                            1
  foo params:
  foo locals:
- a       variable                        integer                              2
+ a       local variable                  integer                              2
  foo     function                        integer                              2
  foo params:
  foo locals:
  result  variable                        integer                              3
- a       variable                        integer                              3
+ a       local variable                  integer                              3
 
 
 

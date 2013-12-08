@@ -78,6 +78,7 @@ namespace Tag {
 		VAR,
 		WHILE,
 		WRITE,
+      WRITELN,
 		XOR 
    };
 

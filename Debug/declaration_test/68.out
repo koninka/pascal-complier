@@ -4,6 +4,6 @@
  foo     procedure                                                            0
  foo params:
  foo locals:
- a       variable                        integer                              1
+ a       local variable                  integer                              1
  tt      int scalar     45                                                    1
 

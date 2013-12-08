@@ -10,5 +10,5 @@
  foo params:
  a       func var param                  tpoint                               1
  foo locals:
- b       variable                        char                                 1
+ b       local variable                  char                                 1
 

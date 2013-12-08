@@ -68,26 +68,6 @@ void Printer::printLexicalTable(Scanner& scanner, bool withTable)
    }
 }
 
-void Printer::printParseTree(SimpleParser& parser, bool toFile)
-{
-	if (toFile) {
-		string tmp = parser.scanner.fname.substr(0, parser.scanner.fname.find('.') + 1) + "comp";
-		freopen(tmp.c_str(), "w", stdout);
-	}
-	parser.Parse();
-	parser.PrintTree();
-}
-
-void Printer::printParseTree(Parser& parser, bool toFile)
-{
-	if (toFile) {
-		string tmp = parser.scanner.fname.substr(0, parser.scanner.fname.find('.') + 1) + "comp";
-		freopen(tmp.c_str(), "w", stdout);
-	}
-	parser.Parse();
-	parser.PrintTree();
-}
-
 void Printer::printDeclarationTable(Parser& parser, bool toFile)
 {
 	if (toFile) {

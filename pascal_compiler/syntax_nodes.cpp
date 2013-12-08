@@ -17,6 +17,13 @@ void NodeBlock::AddStatement(SyntaxNode* statement)
 	}
 }
 
+void NodeBlock::Generate(AsmCode& asmCode) const
+{
+   for (auto &statement : statements) {
+      statement->Generate(asmCode);
+   }
+}
+
 void NodeBlock::PrintNode(int d)
 {
 	for (size_t i = 0; i < statements.size(); i++) {
@@ -81,6 +88,25 @@ Symbol* NodeNumber::GetType()
 	return symbol;
 }
 
+void NodeNumber::Generate(AsmCode& asmCode) const
+{
+   if (*token == ttIntegerNumber) {
+      GenerateForInt(asmCode);
+   } else {
+      GenerateForFloat(asmCode);
+   }
+}
+
+void NodeNumber::GenerateForInt(AsmCode& asmCode) const
+{
+   asmCode.AddCmd(PUSH, dynamic_cast<IntegerNumber*>(token.get())->value);
+}
+
+void NodeNumber::GenerateForFloat(AsmCode& asmCode) const
+{
+
+}
+
 NodeCharacterString::NodeCharacterString(TokenPtr ptr): NodeExpr(ptr, ntCharacterString) {}
 
 Symbol* NodeCharacterString::GetType()
@@ -116,6 +142,16 @@ bool NodeVar::IsLValue()
 	&& *symbol != stConstCharacterString;
 }
 
+void NodeVar::Generate(AsmCode& asmCode) const
+{
+   symbol->Generate(asmCode);
+}
+
+void NodeVar::GenerateLValue(AsmCode& asmCode) const
+{
+   symbol->GenerateLValue(asmCode);
+}
+
 NodeUnaryOp::NodeUnaryOp(TokenPtr ptr, NodeExpr* NodeExpr_child): NodeExpr(ptr, ntUnaryOp), arg(NodeExpr_child) {}
 
 NodeUnaryOp::NodeUnaryOp(TokenPtr ptr, NodeExpr* NodeExpr_child, NodeType AType): NodeExpr(ptr, AType), arg(NodeExpr_child) {}
@@ -129,10 +165,43 @@ Symbol* NodeUnaryOp::GetType()
 	return result;
 }
 
+void NodeUnaryOp::Generate(AsmCode& asmCode) const
+{
+   arg->Generate(asmCode);
+   if (*(arg->GetType()) == stTypeInteger) {
+      GenerateForInt(asmCode);
+   } else {
+      GenerateForReal(asmCode);
+   }
+}
+
 void NodeUnaryOp::PrintNode(int d)
 {
 	arg->PrintNode(d + 1);
 	NodeExpr::PrintNode(d);
+}
+
+void NodeUnaryOp::GenerateForInt(AsmCode& asmCode) const
+{
+   asmCode.AddCmd(POP, EAX);
+   switch (token->tag) {
+      case Tag::NEGATION:
+         asmCode.AddCmd(TEST, EAX, EAX);
+         asmCode.AddCmd(SETE, AL);
+         asmCode.AddCmd(MOVZB, AL, EAX);
+         break;
+      case Tag::ADDITION:
+         break;
+      case Tag::SUBTRACTION:
+         asmCode.AddCmd(NEG, EAX);
+         break;
+   }
+   asmCode.AddCmd(PUSH, EAX);
+}
+
+void NodeUnaryOp::GenerateForReal(AsmCode& asmCode) const
+{
+
 }
 
 NodeInt2Float::NodeInt2Float(NodeExpr* AArg): NodeUnaryOp(nullptr, AArg, ntInt2Float) {}
@@ -211,7 +280,116 @@ void NodeBinary::PrintNode(int d)
 
 NodeBinaryOp::NodeBinaryOp(TokenPtr ptr, NodeExpr* l, NodeExpr* r): NodeBinary(ptr, l, r, ntBinaryOp) {}
 
+void NodeBinaryOp::Generate(AsmCode& asmCode) const
+{
+   left->Generate(asmCode);
+   right->Generate(asmCode);
+   if (*(left->GetType()) == stTypeInteger) {
+      GenerateForInt(asmCode);
+   } else {
+      GenerateForReal(asmCode);
+   }
+}
+
+void NodeBinaryOp::GenerateForInt(AsmCode& asmCode) const
+{
+   asmCode.AddCmd(POP, EBX);
+   asmCode.AddCmd(POP, EAX);
+   switch (token->tag) {
+      case Tag::ADDITION:
+         asmCode.AddCmd(ADD, EAX, EBX);
+         break;
+      case Tag::SUBTRACTION:
+         asmCode.AddCmd(SUB, EAX, EBX);
+         break;
+      case Tag::MULTIPLICATION:
+         asmCode.AddCmd(IMUL, EBX);
+         break;
+      case Tag::DIVISION:
+         asmCode.AddCmd(XOR, EDX, EDX);
+         asmCode.AddCmd(IDIV, EBX);
+         break;
+      case Tag::MOD:
+         asmCode.AddCmd(XOR, EDX, EDX);
+         asmCode.AddCmd(IDIV, EBX);
+         asmCode.AddCmd(PUSH, EDX);
+         return;
+      case Tag::AND:
+         asmCode.AddCmd(AND, EAX, EBX);
+         break;
+      case Tag::OR:
+         asmCode.AddCmd(OR, EAX, EBX);
+         break;
+      case Tag::XOR:
+         asmCode.AddCmd(XOR, EAX, EBX);
+         break;
+      case Tag::SHR:
+         asmCode.AddCmd(SAR, EAX, EBX);
+         //asmCode.AddCmd(SAR, EBX, EAX);
+         //asmCode.AddCmd(PUSH, EBX);
+         //return;
+         break;
+      case Tag::SHL:
+         asmCode.AddCmd(SAL, EAX, EBX);
+         //asmCode.AddCmd(PUSH, EBX);
+         //return;
+         break;
+      case Tag::NEGATION:
+         asmCode.AddCmd(NOT, EAX, EBX);
+         break;
+      default:
+         GenerateForIntRelationalOp(asmCode);
+   }
+   asmCode.AddCmd(PUSH, EAX);
+}
+
+void NodeBinaryOp::GenerateForReal(AsmCode& asmCode) const
+{
+
+}
+
+void NodeBinaryOp::GenerateForIntRelationalOp(AsmCode& asmCode) const
+{
+   asmCode.AddCmd(CMP, EAX, EBX);
+   switch (token->tag) {
+      case Tag::GT:
+         asmCode.AddCmd(SETG, AL);
+         break;
+      case Tag::GE:
+         asmCode.AddCmd(SETGE, AL);
+         break;
+      case Tag::LT:
+         asmCode.AddCmd(SETL, AL);
+         break;
+      case Tag::LE:
+         asmCode.AddCmd(SETLE, AL);
+         break;
+      case Tag::EQ:
+         asmCode.AddCmd(SETE, AL);
+         break;
+      case Tag::NE:
+         asmCode.AddCmd(SETNE, AL);
+   }
+   asmCode.AddCmd(MOVZB, EAX, AL);
+}
+
+void NodeBinaryOp::GenerateForRealRelationalOp(AsmCode& asmCode) const
+{
+
+}
+
 NodeAssignOp::NodeAssignOp(TokenPtr ptr, NodeExpr* l, NodeExpr* r): NodeBinary(ptr, l, r, ntAssignOp) {}
+
+void NodeAssignOp::Generate(AsmCode& asmCode) const
+{
+   right->Generate(asmCode);
+   left->GenerateLValue(asmCode);
+   asmCode.AddCmd(POP, EBX);
+   for (size_t i = 0, size = left->GetType()->GetSize(); i < size; i += 4) {
+      asmCode.AddCmd(POP, EAX);
+      asmCode.AddCmd(MOV, AsmMemory(EBX, i), EAX);
+   }
+}
 
 NodeRecordAccess::NodeRecordAccess(TokenPtr ptr, NodeExpr* l, NodeExpr* r): NodeBinary(ptr, l, r, ntRecordAccess) {}
 
@@ -230,6 +408,20 @@ bool NodeRecordAccess::IsLValue()
 	return true;
 }
 
+void NodeRecordAccess::Generate(AsmCode& asmCode) const
+{
+   GenerateLValue(asmCode);
+   asmCode.PushMemory(dynamic_cast<NodeVar*>(right)->symbol->GetType()->GetSize());
+}
+
+void NodeRecordAccess::GenerateLValue(AsmCode& asmCode) const
+{
+   left->GenerateLValue(asmCode);
+   asmCode.AddCmd(POP, EAX);
+   asmCode.AddCmd(LEA, EAX, AsmMemory(EAX, dynamic_cast<NodeVar*>(right)->symbol->GetOffset()));
+   asmCode.AddCmd(PUSH, EAX);
+}
+
 NodeArgs::NodeArgs(Args AArgs, NodeType AType): args(AArgs), NodeExpr(nullptr, AType)  {}
 
 void NodeArgs::PrintNode(int d)
@@ -239,12 +431,53 @@ void NodeArgs::PrintNode(int d)
 	}
 }
 
-NodeWrite::NodeWrite(Args AArgs): NodeArgs(AArgs, ntWrite) {}
+NodeWriteBase::NodeWriteBase(Args AArgs, NodeType AType): NodeArgs(AArgs, AType) {}
+
+void NodeWriteBase::Generate(AsmCode& asmCode) const
+{
+   for (auto &arg : args) {
+      if (arg->IsLValue()) {
+         arg->GenerateLValue(asmCode);
+         asmCode.AddCmd(POP, EAX);
+         asmCode.AddCmd(PUSH, AsmVarDword(new AsmMemory(Register(EAX))));
+      } else {
+         arg->Generate(asmCode);
+      }
+      Symbol* type = arg->GetType();
+      if (*type == stTypeInteger) {
+         asmCode.GenCallWriteForInt();
+      } else if (*type == stTypeFloat) {
+         asmCode.GenCallWriteForReal();
+      } else {
+         asmCode.GenCallWriteForStr();
+      }
+   }
+}
+
+NodeWrite::NodeWrite(Args AArgs):
+   NodeWriteBase(AArgs, ntWrite)
+{}
 
 void NodeWrite::PrintNode(int d)
 {
    NodeArgs::PrintNode(d + 1);
    SyntaxNode::PrintText(d, "write");
+}
+
+NodeWriteln::NodeWriteln(Args AArgs):
+   NodeWriteBase(AArgs, ntWriteln)
+{}
+
+void NodeWriteln::PrintNode(int d)
+{
+   NodeArgs::PrintNode(d + 1);
+   SyntaxNode::PrintText(d, "writeln");
+}
+
+void NodeWriteln::Generate(AsmCode& asmCode) const
+{
+   NodeWriteBase::Generate(asmCode);
+   asmCode.GenWriteNewLine();
 }
 
 NodeCall::NodeCall(NodeExpr* ACallName, Args AArgs, Symbol* AResultType):
@@ -265,6 +498,11 @@ bool NodeCall::IsSubroutineCall()
 Symbol* NodeCall::GetType()
 {
 	return resultType != nullptr ? GetReferenceType(resultType) : typeDefault;
+}
+
+Symbol* NodeCall::GetSymbol()
+{
+   return callName->GetSymbol();
 }
 
 NodeArrIdx::NodeArrIdx(NodeExpr* AArrName, Args AArgs): NodeArgs(AArgs, ntArrIdx), arrName(AArrName) {}
@@ -288,6 +526,40 @@ Symbol* NodeArrIdx::GetType()
 bool NodeArrIdx::IsLValue()
 {
 	return arrName->IsLValue();
+}
+
+void NodeArrIdx::Generate(AsmCode& asmCode) const
+{
+   ComputeIndexToEax(asmCode);
+   size_t size = dynamic_cast<SymTypeArray*>(arrName->GetSymbol()->GetType())->elemType->GetSize();
+   if (size > 4) {
+      asmCode.PushMemory(size);
+   } else {
+      asmCode.AddCmd(POP, EAX);
+      asmCode.AddCmd(PUSH, AsmMemory(EAX));
+   }
+}
+
+void NodeArrIdx::GenerateLValue(AsmCode& asmCode) const
+{
+   ComputeIndexToEax(asmCode);
+}
+
+void NodeArrIdx::ComputeIndexToEax(AsmCode& asmCode) const
+{
+   arrName->GenerateLValue(asmCode);
+   Symbol* type = dynamic_cast<SymTypeArray*>(arrName->GetSymbol()->GetType())->elemType;
+   for (auto &arg : args) {
+      arg->Generate(asmCode);
+      asmCode.AddCmd(MOV, EBX, type->GetSize());
+      asmCode.AddCmd(POP, EAX);
+      asmCode.AddCmd(IMUL, EAX, EBX);
+      asmCode.AddCmd(POP, EBX);
+      asmCode.AddCmd(ADD, EAX, EBX);
+      asmCode.AddCmd(PUSH, EAX);
+      SymTypeArray* arry = dynamic_cast<SymTypeArray*>(type);
+      type = arry != nullptr ? arry->elemType : type;
+   }
 }
 
 NodeStmt::NodeStmt(NodeType AType): SyntaxNode(AType) {}

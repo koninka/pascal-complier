@@ -4,28 +4,31 @@
 #include <string>
 #include <memory>
 #include <unordered_map>
+#include "CodeGen.h"
 
 using namespace std;
 
 enum SymbolType {
-	stSymbol,
-	stConst,
-	stConstFloat,
-	stConstInteger,
-	stConstChar,
-	stConstCharacterString,
-	stType,
-	stTypeScalar,
-	stTypeFloat,
-	stTypeInteger,
-	stTypeChar,
-	stTypeSubrange,
-	stTypeArry,
-	stTypeArray,
-	stTypeOpenArray,
-	stTypeRecord,
-	stTypeAlias,
-	stVar,
+   stSymbol,
+   stConst,
+   stConstFloat,
+   stConstInteger,
+   stConstChar,
+   stConstCharacterString,
+   stType,
+   stTypeScalar,
+   stTypeFloat,
+   stTypeInteger,
+   stTypeChar,
+   stTypeSubrange,
+   stTypeArry,
+   stTypeArray,
+   stTypeOpenArray,
+   stTypeRecord,
+   stTypeAlias,
+   stVar,
+   stVarGlobal,
+   stVarLocal,
 	stVarParam,
 	stParam,
 	stSubroutine,
@@ -40,6 +43,8 @@ const int TYPE_LEN = 15;
 const int TABLE_IDX_LEN = 2;
 
 class Symbol {
+protected:
+   size_t _size;
 public:
 	string name;
 	SymbolType symType;
@@ -47,10 +52,15 @@ public:
 	virtual ~Symbol() {};
 	virtual void PrintType(int) {};
 	virtual void PrintSymbol(int);
+   virtual void Generate(AsmCode&) const;
+   virtual void GenerateLValue(AsmCode&) const;
 	virtual bool IsType();
+   virtual bool IsVar();
+   virtual bool IsEqualType(Symbol*);
 	virtual Symbol* GetType();
-	virtual string getTypeValue() { return ""; }
-	virtual bool IsEqualType(Symbol*);
+   virtual string getTypeValue();
+   virtual size_t GetSize();
+   virtual size_t GetOffset() const;
 	bool operator ==(const Symbol);
 	bool operator !=(const Symbol);
 	bool operator ==(const SymbolType);
@@ -71,6 +81,8 @@ public:
 	int getValue() const;
 	void PrintSymbol(int) override;
 	Symbol* GetType() override;
+   size_t GetSize() override;
+   void Generate(AsmCode&) const override;
 };
 
 class SymConstFloat: public SymConst {
@@ -80,6 +92,8 @@ public:
 	double getValue() const;
 	void PrintSymbol(int) override;
 	Symbol* GetType() override;
+   size_t GetSize() override;
+   void Generate(AsmCode&) const override;
 };
 
 class SymConstCharacterString: public SymConst {
@@ -88,6 +102,7 @@ public:
 	SymConstCharacterString(string&);
 	void PrintSymbol(int) override;
 	Symbol* GetType() override;
+   void Generate(AsmCode&) const override;
 };
 
 typedef shared_ptr<Symbol> SymbolPtr;
@@ -101,22 +116,38 @@ struct SymType: public Symbol {
 };
 
 class SymVar: public Symbol {
+protected:
+   size_t _offset;
 public:
 	SymbolPtr type;
-	SymVar(SymbolPtr);
-	SymVar(SymbolPtr, SymbolType);
-	void PrintSymbol(int) override;
+   SymVar(SymbolPtr, size_t, SymbolType);
 	Symbol* GetType() override;
+   bool IsVar() override;
+   size_t GetSize() override;
+   size_t GetOffset() const override;
 };
 
-class SymParam: public SymVar {
+class SymVarGlobal: public SymVar {
+   AsmStrImmediate* varLabel;
 public:
+   SymVarGlobal(SymbolPtr, size_t);
+   void GenerateDeclaration(AsmCode&);
+   void Generate(AsmCode&) const override;
+   void GenerateLValue(AsmCode&) const override;
+   void PrintSymbol(int) override;
+};
+
+struct SymVarLocal: public SymVar {
+   SymVarLocal(SymbolPtr, size_t);
+   void PrintSymbol(int) override;
+};
+
+struct SymParam: public SymVar {
 	SymParam(SymbolPtr);
 	void PrintSymbol(int) override;
 };
 
-class SymVarParam: public SymVar {
-public:
+struct SymVarParam: public SymVar {
 	SymVarParam(SymbolPtr);
 	void PrintSymbol(int) override;
 };
@@ -129,13 +160,14 @@ public:
 	string getTypeValue() override;
 	string getSubrangeStr();
 	bool IsEqualType(Symbol*) override;
+   size_t GetSize() override;
 };
 
 struct SymTypeArry: public SymType {
 	Symbol* elemType;
 	SymTypeArry(SymbolType);
 	void SetElementType(Symbol*);
-	void PrintSymbol(int) override;
+   void PrintSymbol(int) override;
 };
 
 struct SymTypeOpenArray: public SymTypeArry {
@@ -150,10 +182,12 @@ struct SymTypeArray: public SymTypeArry {
 	SymTypeArray(Symbol*);
 	bool IsEqualType(Symbol*) override;
 	string getTypeValue() override;
+   size_t GetSize() override;
 };
 
 struct SymTypeScalar: public SymType {
 	SymTypeScalar(SymbolType);
+   size_t GetSize() override;
 };
 
 struct SymTypeInteger: public SymTypeScalar {
@@ -172,6 +206,7 @@ struct SymTypeAlias: public SymType {
 	Symbol* refType;
 	SymTypeAlias(Symbol*);
 	void PrintSymbol(int) override;
+   size_t GetSize() override;
 };
 
 extern Symbol* typeChar;
