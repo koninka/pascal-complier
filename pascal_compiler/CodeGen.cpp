@@ -122,6 +122,15 @@ void AsmDataStr::Print() const
    cout << "\t" << _name << " db \"" << _value << "\", 0";
 }
 
+AsmDataNewLine::AsmDataNewLine(string AName):
+   AsmDataBase(AName)
+{}
+
+void AsmDataNewLine::Print() const
+{
+   cout << '\t' << _name << " db 10";
+}
+
 AsmRawCmd::AsmRawCmd(string cmd):
    _str(cmd)
 {}
@@ -322,6 +331,13 @@ void AsmCode::AddCmd(OpCode cmd, Register reg, AsmMemory mem)
    commands.push_back(new AsmCmd2(cmd, new AsmRegister(reg), new AsmMemory(mem)));
 }
 
+AsmStrImmediate* AsmCode::AddData(string name)
+{
+   name = "fmt_str_" + name;
+   data.push_back(new AsmDataNewLine(name));
+   return new AsmStrImmediate(name);
+}
+
 AsmStrImmediate* AsmCode::AddData(string name, size_t size)
 {
    name = "v_" + name;
@@ -396,7 +412,7 @@ void AsmCode::GenCallWriteForStr()
 void AsmCode::GenWriteNewLine()
 {
    if (!hasNewLineFormat) {
-      formatStrNewLine = AddData("new_line", "\\n");
+      formatStrNewLine = AddData("new_line");
       hasNewLineFormat = true;
    }
    AddCmd(PUSH, AsmVarAddr(formatStrNewLine));

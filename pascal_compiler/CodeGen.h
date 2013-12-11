@@ -105,6 +105,12 @@ public:
    void Print() const override;
 };
 
+struct AsmDataNewLine: public AsmDataBase {
+public:
+   AsmDataNewLine(string);
+   void Print() const override;
+};
+
 class AsmRawCmd: public Asm {
    string _str;
 public:
@@ -206,6 +212,7 @@ public:
    void AddCmd(OpCode, Register, int);
    void AddCmd(OpCode, AsmMemory, Register);
    void AddCmd(OpCode, Register, AsmMemory);
+   AsmStrImmediate* AddData(string);
    AsmStrImmediate* AddData(string, size_t);
    AsmStrImmediate* AddData(string, string);
    void Print() const;

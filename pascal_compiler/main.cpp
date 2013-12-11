@@ -118,5 +118,5 @@ int main(int argc, char *argv[])
 	if (isErr) {
 		cout << errMsg << endl;
 	}
-   return 0;
+	return 0;
 }
