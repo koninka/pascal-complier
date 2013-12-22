@@ -1,0 +1,6 @@
+begin
+   if 5 > 0 then
+      write('true')
+   else
+      write('false');
+end.    

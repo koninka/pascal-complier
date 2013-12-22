@@ -31,6 +31,7 @@ enum SymbolType {
    stVarLocal,
 	stVarParam,
 	stParam,
+   stParamResult,
 	stSubroutine,
 	stProcedure,
 	stFunction
@@ -50,10 +51,11 @@ public:
 	SymbolType symType;
 	Symbol(SymbolType);
 	virtual ~Symbol() {};
+   virtual void SetOffset(size_t);
 	virtual void PrintType(int) {};
 	virtual void PrintSymbol(int);
-   virtual void Generate(AsmCode&) const;
-   virtual void GenerateLValue(AsmCode&) const;
+   virtual void Generate(AsmCode&, unsigned) const;
+   virtual void GenerateLValue(AsmCode&, unsigned) const;
 	virtual bool IsType();
    virtual bool IsVar();
    virtual bool IsEqualType(Symbol*);
@@ -82,7 +84,7 @@ public:
 	void PrintSymbol(int) override;
 	Symbol* GetType() override;
    size_t GetSize() override;
-   void Generate(AsmCode&) const override;
+   void Generate(AsmCode&, unsigned) const override;
 };
 
 class SymConstFloat: public SymConst {
@@ -93,7 +95,7 @@ public:
 	void PrintSymbol(int) override;
 	Symbol* GetType() override;
    size_t GetSize() override;
-   void Generate(AsmCode&) const override;
+   void Generate(AsmCode&, unsigned) const override;
 };
 
 class SymConstCharacterString: public SymConst {
@@ -102,7 +104,7 @@ public:
 	SymConstCharacterString(string&);
 	void PrintSymbol(int) override;
 	Symbol* GetType() override;
-   void Generate(AsmCode&) const override;
+   void Generate(AsmCode&, unsigned) const override;
 };
 
 typedef shared_ptr<Symbol> SymbolPtr;
@@ -121,6 +123,8 @@ protected:
 public:
 	SymbolPtr type;
    SymVar(SymbolPtr, size_t, SymbolType);
+   void SetOffset(size_t) override;
+   virtual bool IsByRef() const;
 	Symbol* GetType() override;
    bool IsVar() override;
    size_t GetSize() override;
@@ -132,24 +136,9 @@ class SymVarGlobal: public SymVar {
 public:
    SymVarGlobal(SymbolPtr, size_t);
    void GenerateDeclaration(AsmCode&);
-   void Generate(AsmCode&) const override;
-   void GenerateLValue(AsmCode&) const override;
+   void Generate(AsmCode&, unsigned) const override;
+   void GenerateLValue(AsmCode&, unsigned) const override;
    void PrintSymbol(int) override;
-};
-
-struct SymVarLocal: public SymVar {
-   SymVarLocal(SymbolPtr, size_t);
-   void PrintSymbol(int) override;
-};
-
-struct SymParam: public SymVar {
-	SymParam(SymbolPtr);
-	void PrintSymbol(int) override;
-};
-
-struct SymVarParam: public SymVar {
-	SymVarParam(SymbolPtr);
-	void PrintSymbol(int) override;
 };
 
 class SymTypeSubrange: public SymType {
@@ -170,6 +159,7 @@ struct SymTypeArry: public SymType {
 	SymTypeArry(SymbolType);
 	void SetElementType(Symbol*);
    void PrintSymbol(int) override;
+   virtual int GetLow() const;
 };
 
 struct SymTypeOpenArray: public SymTypeArry {
@@ -185,7 +175,7 @@ struct SymTypeArray: public SymTypeArry {
 	bool IsEqualType(Symbol*) override;
 	string getTypeValue() override;
    size_t GetSize() override;
-   int GetLow() const;
+   int GetLow() const override;
    int GetHigh() const;
 };
 

@@ -12,8 +12,8 @@
  a       local variable                  integer                              2
  foo     function                        integer                              2
  foo params:
+ result  func result                     integer                              3
  foo locals:
- result  local variable                  integer                              3
  a       local variable                  integer                              3
 
 

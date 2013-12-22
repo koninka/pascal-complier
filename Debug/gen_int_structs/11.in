@@ -1,8 +1,8 @@
 begin
-   writeln(5 > 3);
-   writeln(5 >= 3);
-   writeln(5 < 3);
-   writeln(5 <= 3);
-   writeln(5 = 3);
-   writeln(5 <> 3);
+   writeln(integer(5 > 3));
+   writeln(integer(5 >= 3));
+   writeln(integer(5 < 3));
+   writeln(integer(5 <= 3));
+   writeln(integer(5 = 3));
+   writeln(integer(5 <> 3));
 end.

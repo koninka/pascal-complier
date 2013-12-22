@@ -3,10 +3,11 @@
 include c:\masm32\include\msvcrt.inc
 includelib c:\masm32\lib\msvcrt.lib
 .data
-	format_str_int db "%d", 0
-	fmt_str_new_line db 10
+	fmt_int db "%d", 0
+	fmt_str_new_line db 10, 0
 .code
 main:
+	mov	ebp, esp
 	push	dword ptr 3
 	push	dword ptr 3
 	pop	ebx
@@ -15,7 +16,7 @@ main:
 	setg	al
 	movzx	eax, al
 	push	eax
-	push	offset format_str_int
+	push	offset fmt_int
 	call	crt_printf
 	add	esp, dword ptr 8
 	push	offset fmt_str_new_line
@@ -29,7 +30,7 @@ main:
 	setge	al
 	movzx	eax, al
 	push	eax
-	push	offset format_str_int
+	push	offset fmt_int
 	call	crt_printf
 	add	esp, dword ptr 8
 	push	offset fmt_str_new_line
@@ -43,7 +44,7 @@ main:
 	setl	al
 	movzx	eax, al
 	push	eax
-	push	offset format_str_int
+	push	offset fmt_int
 	call	crt_printf
 	add	esp, dword ptr 8
 	push	offset fmt_str_new_line
@@ -57,7 +58,7 @@ main:
 	setle	al
 	movzx	eax, al
 	push	eax
-	push	offset format_str_int
+	push	offset fmt_int
 	call	crt_printf
 	add	esp, dword ptr 8
 	push	offset fmt_str_new_line
@@ -71,7 +72,7 @@ main:
 	sete	al
 	movzx	eax, al
 	push	eax
-	push	offset format_str_int
+	push	offset fmt_int
 	call	crt_printf
 	add	esp, dword ptr 8
 	push	offset fmt_str_new_line
@@ -85,11 +86,14 @@ main:
 	setne	al
 	movzx	eax, al
 	push	eax
-	push	offset format_str_int
+	push	offset fmt_int
 	call	crt_printf
 	add	esp, dword ptr 8
 	push	offset fmt_str_new_line
 	call	crt_printf
 	add	esp, dword ptr 4
+@exit_0:
+	mov	esp, ebp
+	mov	eax, dword ptr 0
 	ret
 end main

@@ -6,6 +6,6 @@
  foo params:
  b       func var param                  array of integer                     1
  c       func param                      array of char                        1
+ result  func result                     integer                              1
  foo locals:
- result  local variable                  integer                              1
 

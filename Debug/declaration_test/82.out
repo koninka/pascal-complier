@@ -8,7 +8,7 @@
  b       func var param                  integer                              1
  c       func param                      double                               1
  d       func var param                  char                                 1
+ result  func result                     integer                              1
  foo locals:
- result  local variable                  integer                              1
  loc     local variable                  integer                              1
 

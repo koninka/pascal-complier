@@ -2,28 +2,20 @@
 
 #include "syntax_node.h"
 #include "symbols.h"
+#include "symbol_table.h"
 
-typedef vector<SyntaxNode*> Statements;
-
-struct NodeBlock: public SyntaxNode {
-	string name;
-	Statements statements;
-	NodeBlock(string);
-	NodeBlock(NodeType);
-	NodeBlock(Statements, string, NodeType);
-	void AddStatement(SyntaxNode*);
-   void Generate(AsmCode&) const override;
-	void PrintNode(int) override;
-};
-
-struct NodeSubroutineBlock: public NodeBlock {
-	NodeSubroutineBlock();
+class NodeSubroutineBlock: public NodeBlock {
+   AsmStrImmediate* exitLabel;
+public:
+   NodeSubroutineBlock();
 	void AddBody(NodeBlock*);
+   void Generate(AsmCode&)override;
+   AsmStrImmediate* GetExitLabel() const;
 };
 
 struct NodeExpr: public SyntaxNode {
 	TokenPtr token;
-	NodeExpr(TokenPtr, NodeType);
+	NodeExpr(TokenPtr, NodeType, unsigned);
 	void PrintNode(int) override;
 	virtual Symbol* GetType();
 	virtual Symbol* GetSymbol();
@@ -37,23 +29,24 @@ class NodeNumber: public NodeExpr {
    void GenerateForInt(AsmCode&) const;
    void GenerateForFloat(AsmCode&) const;
 public:
-	NodeNumber(TokenPtr);
+	NodeNumber(TokenPtr, unsigned);
 	Symbol* GetType() override;
-   void Generate(AsmCode&) const override;
+   void Generate(AsmCode&) override;
 };
 
 struct NodeCharacterString: public NodeExpr {
-	NodeCharacterString(TokenPtr);
+	NodeCharacterString(TokenPtr, unsigned);
 	Symbol* GetType() override;
+   void Generate(AsmCode&) override;
 };
 
 struct NodeVar: public NodeExpr {
 	Symbol* symbol;
-	NodeVar(TokenPtr, Symbol*);
+	NodeVar(TokenPtr, Symbol*, unsigned);
 	Symbol* GetType() override;
 	Symbol* GetSymbol();   
 	bool IsLValue() override;
-   void Generate(AsmCode&) const override;
+   void Generate(AsmCode&) override;
    void GenerateLValue(AsmCode&) const override;
 };
 
@@ -62,39 +55,49 @@ class NodeUnaryOp: public NodeExpr {
    void GenerateForReal(AsmCode&) const;
 public:
 	NodeExpr* arg;
-	NodeUnaryOp(TokenPtr, NodeExpr*);
-	NodeUnaryOp(TokenPtr, NodeExpr*, NodeType);
+	NodeUnaryOp(TokenPtr, NodeExpr*, unsigned);
+	NodeUnaryOp(TokenPtr, NodeExpr*, NodeType, unsigned);
    Symbol* GetType() override;
-   void Generate(AsmCode&) const override;
+   void Generate(AsmCode&) override;
 	void PrintNode(int) override;
 };
 
+struct NodeIntTypecast: public NodeUnaryOp {
+   NodeIntTypecast(NodeExpr*);
+   Symbol* GetType() override;
+   void Generate(AsmCode&) override;
+};
+
 struct NodeInt2Float: public NodeUnaryOp {
-	NodeInt2Float(NodeExpr*);
+   NodeInt2Float(NodeExpr*);
 	void PrintNode(int) override;
 	Symbol* GetType() override;
 };
 
 struct NodeFloat2Int: public NodeUnaryOp {
-	NodeFloat2Int(NodeExpr*);
+   NodeFloat2Int(NodeExpr*);
 	void PrintNode(int) override;
 	Symbol* GetType() override;
 };
 
 struct NodeOrd: public NodeUnaryOp {
-	NodeOrd(TokenPtr, NodeExpr*);
+   NodeOrd(TokenPtr, NodeExpr*, unsigned);
 	Symbol* GetType() override;
 };
 
 struct NodeChr: public NodeUnaryOp {
-	NodeChr(TokenPtr, NodeExpr*);
+   NodeChr(TokenPtr, NodeExpr*, unsigned);
 	Symbol* GetType() override;
 };
 
-struct NodeBinary: public NodeExpr {
+class NodeBinary: public NodeExpr {
+protected:
 	NodeExpr* left;
 	NodeExpr* right;
-	NodeBinary(TokenPtr, NodeExpr*, NodeExpr*, NodeType);
+public:
+   NodeBinary(TokenPtr, NodeExpr*, NodeExpr*, NodeType, unsigned);
+   NodeExpr* GetLeft() const;
+   NodeExpr* GetRight() const;
 	Symbol* GetType() override;
 	void PrintNode(int) override;
 };
@@ -105,70 +108,72 @@ class NodeBinaryOp: public NodeBinary {
    void GenerateForIntRelationalOp(AsmCode&) const;
    void GenerateForRealRelationalOp(AsmCode&) const;
 public:
-	NodeBinaryOp(TokenPtr, NodeExpr*, NodeExpr*);
-   void Generate(AsmCode&) const override;
+   NodeBinaryOp(TokenPtr, NodeExpr*, NodeExpr*, unsigned);
+   void Generate(AsmCode&) override;
 };
 
 struct NodeAssignOp: public NodeBinary {
-	NodeAssignOp(TokenPtr, NodeExpr*, NodeExpr*);
-   void Generate(AsmCode&) const override;
+   NodeAssignOp(TokenPtr, NodeExpr*, NodeExpr*);
+   void Generate(AsmCode&) override;
 };
 
 struct NodeRecordAccess: public NodeBinary {
-	NodeRecordAccess(TokenPtr, NodeExpr*, NodeExpr*);
+   NodeRecordAccess(TokenPtr, NodeExpr*, NodeExpr*, unsigned);
 	Symbol* GetType() override;
 	Symbol* GetSymbol() override;
 	bool IsLValue() override;
-   void Generate(AsmCode&) const override;
+   void Generate(AsmCode&) override;
    void GenerateLValue(AsmCode&) const override;
 };
 
 struct NodeArgs: public NodeExpr {
 	Args args;
-	NodeArgs(Args, NodeType);
+	NodeArgs(Args, NodeType, unsigned);
 	void PrintNode(int) override;
 };
 
 struct NodeWriteBase: public NodeArgs {
-   NodeWriteBase(Args, NodeType);
-   void Generate(AsmCode&) const override;
+   NodeWriteBase(Args, NodeType, unsigned);
+   void Generate(AsmCode&) override;
 };
 
 struct NodeWrite: public NodeWriteBase {
-   NodeWrite(Args);
+   NodeWrite(Args, unsigned);
    void PrintNode(int) override;
 };
 
 struct NodeWriteln: public NodeWriteBase {
-   NodeWriteln(Args);
+   NodeWriteln(Args, unsigned);
    void PrintNode(int) override;
-   void Generate(AsmCode&) const override;
+   void Generate(AsmCode&) override;
 };
 
-struct NodeCall: public NodeArgs {
-	Symbol* resultType;
-	NodeExpr* callName;
-	NodeCall(NodeExpr*, Args, Symbol*);
+class NodeCall: public NodeArgs {
+   NodeExpr* callName;
+public:
+   NodeCall(NodeExpr*, Args, unsigned);
 	void PrintNode(int) override;
 	bool IsSubroutineCall() override;
 	Symbol* GetType() override;
    Symbol* GetSymbol() override;
+   void Generate(AsmCode&) override;
 };
 
 class NodeArrIdx: public NodeArgs {
    void ComputeIndexToEax(AsmCode&) const;
 public:
 	NodeExpr* arrName;
-	NodeArrIdx(NodeExpr*, Args);
+   NodeArrIdx(NodeExpr*, Args, unsigned);
 	void PrintNode(int) override;
 	Symbol* GetType() override;
+   Symbol* GetSymbol() override;
 	bool IsLValue() override;
-   void Generate(AsmCode&) const override;
+   void Generate(AsmCode&) override;
    void GenerateLValue(AsmCode&) const override;
 };
 
 struct NodeStmt: public SyntaxNode {
-	NodeStmt(NodeType);
+   NodeStmt(NodeType, unsigned);
 	bool virtual IsForLoop();
 };
 
@@ -176,6 +181,7 @@ struct NodeExitStmt: public NodeStmt {
 	SyntaxNode* block;
 	NodeExitStmt(SyntaxNode*);
 	void PrintNode(int) override;
+   void Generate(AsmCode&) override;
 };
 
 struct NodeJumpStmt: public NodeStmt {
@@ -186,37 +192,57 @@ struct NodeJumpStmt: public NodeStmt {
 struct NodeBreakStmt: public NodeJumpStmt {
 	NodeBreakStmt(NodeStmt*);
 	void PrintNode(int) override;
+   void Generate(AsmCode&) override;
 };
 
 struct NodeContinueStmt: public NodeJumpStmt {
 	NodeContinueStmt(NodeStmt*);
 	void PrintNode(int) override;
+   void Generate(AsmCode&) override;
 };
 
-struct NodeExprStmt: public NodeStmt {
+class NodeExprStmt: public NodeStmt {
+protected:
 	NodeExpr* expr;
-	NodeExprStmt(NodeExpr*, NodeType);
+public:
+   NodeExprStmt(NodeExpr*, NodeType, unsigned);
 };
 
-struct NodeIfStmt: public NodeExprStmt {
-	SyntaxNode* then_stmt;
-	SyntaxNode* else_stmt;
-	NodeIfStmt(NodeExpr*, SyntaxNode*, SyntaxNode*);
+class NodeIfStmt: public NodeExprStmt {
+	SyntaxNode* thenStmt;
+	SyntaxNode* elseStmt;
+public:
+   NodeIfStmt(NodeExpr*, SyntaxNode*, SyntaxNode*, unsigned);
 	void PrintNode(int) override;
+   void Generate(AsmCode&) override;
 };
 
-struct NodeWhileStmt: public NodeExprStmt {
+class NodeLoopStmtBase {
+protected:
+   AsmStrImmediate* breakLabel;
+   AsmStrImmediate* continueLabel;
+   void GenerateLoopLabels(AsmCode&);
+public:
+   AsmStrImmediate* GetBreakLabel() const;
+   AsmStrImmediate* GetContinueLabel() const;
+};
+
+class NodeWhileStmt: public NodeLoopStmtBase, public NodeExprStmt {
 	SyntaxNode* stmt;
-	NodeWhileStmt(NodeExpr*);
+public:
+   NodeWhileStmt(NodeExpr*, unsigned);
 	void SetStatement(SyntaxNode*);
 	void PrintNode(int) override;
+   void Generate(AsmCode&) override;
 };
 
-struct NodeRepeateStmt: public NodeExprStmt {
-	NodeBlock* stmt_seq;
-	NodeRepeateStmt();
+class NodeRepeateStmt: public NodeLoopStmtBase, public NodeExprStmt {
+	NodeBlock* stmtSeq;
+public:
+   NodeRepeateStmt(unsigned);
 	void SetLoopInfo(NodeBlock*, NodeExpr*);
 	void PrintNode(int) override;
+   void Generate(AsmCode&) override;
 };
 
 enum LoopForType {
@@ -224,14 +250,16 @@ enum LoopForType {
 	loopDownto
 };
 
-struct NodeForStmt: public NodeStmt {
+class NodeForStmt: public NodeLoopStmtBase, public NodeStmt {
+   LoopForType loopType;
+   NodeExpr* initialExpr;
+   NodeExpr* finalExpr;
+   SyntaxNode* stmt;
+public:
 	Symbol* var;
-	LoopForType loopType;
-	NodeExpr* initialExpr;
-	NodeExpr* finalExpr;
-	SyntaxNode* stmt;
-	NodeForStmt(Symbol*, NodeExpr*, NodeExpr*, LoopForType);
+   NodeForStmt(Symbol*, NodeExpr*, NodeExpr*, LoopForType, unsigned);
 	void SetStatement(SyntaxNode*);
 	void PrintNode(int) override;
-	bool IsForLoop() override;
+   void Generate(AsmCode&) override;
+	bool IsForLoop() override;   
 };

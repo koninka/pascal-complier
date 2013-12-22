@@ -1,0 +1,46 @@
+var
+   arr: array[1..5] of integer;
+
+   procedure foo(pp: integer);
+   var
+      a: integer;
+
+      procedure bar(param: array of integer; d: integer);
+      var
+         c: integer;
+
+         procedure last();
+         begin
+            a := 150 + c;
+         end;
+
+         procedure last1();
+
+            function ll(): integer;
+            begin
+               result := pp + d;
+            end;
+
+         begin
+            c := 137 + ll() + param[3];
+         end;
+
+      begin
+         last1();
+         last();
+      end;
+
+   begin
+      pp := 1000;
+      bar(arr, 300);
+      write(a);
+   end;
+
+begin
+   arr[1] := -30;
+   arr[2] := 290;
+   arr[3] := 417;
+   arr[4] := -562;
+   arr[5] := 29;
+   foo(1000);
+end.

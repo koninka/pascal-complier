@@ -76,10 +76,10 @@ void Parser::Generate()
 {
    symTable->GenerateDeclarations(asmCode);
    asmCode.AddCmd("main:");
-   //asmCode.AddCmd(MOV, ESP, EBP);
+   asmCode.AddCmd(MOV, EBP, ESP);
    symTable->block->Generate(asmCode);
-   //asmCode.AddCmd(MOV, EBP, ESP);
-   //asmCode.AddCmd(MOV, EAX, 0);
+   asmCode.AddCmd(MOV, ESP, EBP);
+   asmCode.AddCmd(MOV, EAX, 0);
    asmCode.AddCmd(RET);
    asmCode.AddCmd("end main");
    asmCode.Print();
@@ -88,18 +88,18 @@ void Parser::Generate()
 void Parser::ParseProgram()
 {
 	if (isDeclarationParse) {
-		ParseBlock("");
+		ParseBlock();
 	} else {
-		string program_name = "main";
+		string programName = "main";
 		TokenPtr token = GetToken();
 		if (*token == Tag::PROGRAM) {
 			CheckExpectedToken(Tag::IDENTIFICATOR, false);
-			program_name = GetToken()->text;
+			programName = GetToken()->text;
 			CheckExpectedToken(Tag::SEMICOLON);
 		} else {
 			PutToken(token);
 		}
-		ParseBlock("program " + program_name);
+		ParseBlock("program " + programName);
 		CheckExpectedToken(Tag::DOT);
 	}
 }
@@ -163,7 +163,6 @@ void Parser::CheckExpectedType(Symbol* symbol, SymbolType type)
 
 void Parser::CheckExpectedVarType(Symbol* symbol, SymbolType type)
 {
-	//Symbol* varType = symbol->GetVarType();
 	if (symbol != nullptr && *symbol != type) {
 		throw IllegalExprException(scanner.fname, _line);
 	}
@@ -211,29 +210,29 @@ void Parser::ReserveOperationPriority(priorityType type, int tag)
 	_priorities[type].push_back(tag);
 }
 
-void Parser::ParseBlock(string name)
+void Parser::ParseBlock(string name, unsigned depth)
 {
-	ParseDeclarationPart();
+	ParseDeclarationPart(depth);
 	if (!isDeclarationParse) {
 		NodeSubroutineBlock* block = new NodeSubroutineBlock;
 		symTable->block = block;
-		block->AddBody(ParseCompoundStatement(name));
+		block->AddBody(ParseCompoundStatement(name, depth));
 	}
 }
 
-void Parser::ParseDeclarationPart()
+void Parser::ParseDeclarationPart(unsigned depth)
 {
 	DeclarationParseList::iterator it;
 	TokenPtr token = GetToken();
 	while ((it = declParseList.find(token->tag)) != declParseList.end()) {
-		(this->*(it->second))();
+		(this->*(it->second))(depth);
 		token = GetToken();
 	}
 	PutToken(token);
 }
 
 
-void Parser::ParseConstantDefinition()
+void Parser::ParseConstantDefinition(unsigned depth)
 {
 	CheckExpectedToken(Tag::IDENTIFICATOR, false);
 	while (CheckNextTokenTag(Tag::IDENTIFICATOR)) {
@@ -245,7 +244,7 @@ void Parser::ParseConstantDefinition()
 	}
 }
 
-void Parser::ParseTypeDefinition()
+void Parser::ParseTypeDefinition(unsigned depth)
 {
 	CheckExpectedToken(Tag::IDENTIFICATOR, false);
 	while (CheckNextTokenTag(Tag::IDENTIFICATOR)) {
@@ -258,33 +257,40 @@ void Parser::ParseTypeDefinition()
 	}
 }
 
-void Parser::ParseProcedureDefinition()
+void Parser::ParseProcedureDefinition(unsigned depth)
 {
 	string name = GetSubroutineName();
 	CheckNameForUnique(name);
 	SymProcedure* proc = new SymProcedure(name);
+   proc->GenerateLabel(asmCode);
 	symTable->Add(proc);
-	SymTable* params = ParseFormalParameterList();
+   _isGlobalNamespace = false;
+	SymTable* params = ParseFormalParameterList(proc, depth + 1);
 	CheckExpectedToken(Tag::SEMICOLON);
 	proc->SetParams(params);
-	proc->SetVars(ParseProcFuncBlock(params, name));
+	proc->SetVars(ParseProcFuncBlock(params, name, depth + 1));
+   _isGlobalNamespace = true;
 }
 
-void Parser::ParseFunctionDefinition()
+void Parser::ParseFunctionDefinition(unsigned depth)
 {
 	string name = GetSubroutineName();
 	CheckNameForUnique(name);
 	SymFunction* func = new SymFunction(name);
+   func->GenerateLabel(asmCode);
 	symTable->Add(func);
-	SymTable* params = ParseFormalParameterList();
+   _isGlobalNamespace = false;
+	SymTable* params = ParseFormalParameterList(func, depth + 1);
 	CheckExpectedToken(Tag::COLON);
 	Symbol* resultType = ParseType();
 	CheckExpectedToken(Tag::SEMICOLON);
+   params->Add(new SymParamResult(SymbolPtr(resultType), params->GetSize(), func, depth + 1), "result");
 	func->SetParams(params, resultType);
-	func->SetVars(ParseProcFuncBlock(params, name, resultType));
+	func->SetVars(ParseProcFuncBlock(params, name, depth + 1));
+   _isGlobalNamespace = true;
 }
 
-void Parser::ParseVariableDeclaration()
+void Parser::ParseVariableDeclaration(unsigned depth)
 {
 	CheckExpectedToken(Tag::IDENTIFICATOR, false);
 	while (CheckNextTokenTag(Tag::IDENTIFICATOR)) {
@@ -297,17 +303,17 @@ void Parser::ParseVariableDeclaration()
          if (_isGlobalNamespace) {
             symTable->Add(new SymVarGlobal(type, symTable->GetSize()), id.name);
          } else {
-            symTable->Add(new SymVarLocal(type, symTable->GetSize()), id.name);
+            symTable->Add(new SymVarLocal(type, symTable->GetSize(), depth), id.name);
          }
 		}
 	}
 }
 
-void Parser::ParseStatementSequence(NodeBlock* block)
+void Parser::ParseStatementSequence(NodeBlock* block, unsigned depth)
 {
 	TokenPtr token(nullptr);
 	do {
-		block->AddStatement(ParseStatement());
+		block->AddStatement(ParseStatement(depth));
 	} while (*(token = GetToken()) == Tag::SEMICOLON);
 	PutToken(token);
 }
@@ -464,8 +470,8 @@ double Parser::ComputeConstantExpression(NodeExpr* node, int line)
 	} else if (*node == ntBinaryOp) {
 		auto it = computable_binary_op.find(node->token->tag);
 		result = (this->*(it->second))(
-					ComputeConstantExpression(dynamic_cast<NodeBinaryOp*>(node)->left, line),
-					ComputeConstantExpression(dynamic_cast<NodeBinaryOp*>(node)->right, line));
+					ComputeConstantExpression(dynamic_cast<NodeBinaryOp*>(node)->GetLeft(), line),
+					ComputeConstantExpression(dynamic_cast<NodeBinaryOp*>(node)->GetRight(), line));
 	} else if (*node == ntNumber) {
 		result =
 			*(node->token) == ttIntegerNumber
@@ -517,26 +523,22 @@ Parser::IdentifierList Parser::ParseIdentifierList()
 	return list;
 }
 
-Args Parser::ParseFuncArgs()
+Args Parser::ParseFuncArgs(unsigned depth)
 {
 	Args result;
-	TokenPtr token = GetToken();
-	int tag = token->tag;
-	PutToken(token);
-	if (tag != Tag::RPARENTHESIS) {
-		result = ParseCommaSeparated();
+   if (!CheckNextTokenTag(Tag::RPARENTHESIS)) {
+		result = ParseCommaSeparated(depth);
 	}
 	return result;
 }
 
-Args Parser::ParseCommaSeparated()
+Args Parser::ParseCommaSeparated(unsigned depth)
 {
 	Args result;
 	TokenPtr token;
 	 do {
-		result.push_back(ParseExpression(0));
-		token = GetToken();
-	} while (*token == Tag::COMMA);
+		result.push_back(ParseExpression(0, depth));
+	} while (*(token = GetToken()) == Tag::COMMA);
 	PutToken(token);
 	return result;
 }
@@ -568,7 +570,7 @@ Symbol* Parser::ParseConstantExpression()
 		return new SymConstCharacterString(token->getValue());
 	}
 	PutToken(token);
-	return CreateConstExprSymbol(ParseExpression(), _line);
+	return CreateConstExprSymbol(ParseExpression(0, 0), _line);
 }
 
 Symbol* Parser::ParseArrayDeclaration(bool isOpenArray)
@@ -596,9 +598,9 @@ Symbol* Parser::ParseArrayDeclaration(bool isOpenArray)
 	}
 	CheckExpectedToken(Tag::OF);
 	if (!isOpenArray) {
-		arry->SetElementType(ParseType());
+		arry->SetElementType(ParseType(isOpenArray));
 	} else {
-		result->SetElementType(ParseType());
+		result->SetElementType(ParseType(isOpenArray));
 	}
 	return result;
 }
@@ -607,7 +609,7 @@ Symbol* Parser::ParseRecordDeclaration()
 {
 	symTable = new SymTable();
 	tableStack.Add(symTable);
-	ParseVariableDeclaration();
+	ParseVariableDeclaration(0);
 	CheckExpectedToken(Tag::END);
 	Symbol* result = new SymTypeRecord(tableStack.Top());
 	tableStack.Pop();
@@ -660,7 +662,7 @@ Symbol* Parser::ParseType(bool isOpenArray)
 	return symbol;
 }
 
-SymTable* Parser::ParseFormalParameterList()
+SymTable* Parser::ParseFormalParameterList(SymSubroutine* subroutine, unsigned depth)
 {
 	CheckExpectedToken(Tag::LPARENTHESIS);
 	SymTable* symArgs = new SymTable();
@@ -680,9 +682,9 @@ SymTable* Parser::ParseFormalParameterList()
 		}
 		for (auto &id: list) {
 			if (isVar) {
-				symArgs->Add(new SymVarParam(type), id.name);
+				symArgs->Add(new SymVarParam(type, symArgs->GetSize(), subroutine, depth), id.name);
 			} else {
-				symArgs->Add(new SymParam(type), id.name);
+            symArgs->Add(new SymParam(type, symArgs->GetSize(), subroutine, depth), id.name);
 			}
 		}
 		if (CheckNextTokenTag(Tag::SEMICOLON)) {
@@ -701,19 +703,14 @@ SymTable* Parser::ParseFormalParameterList()
 	return symArgs;
 }
 
-SymTable* Parser::ParseProcFuncBlock(SymTable* params, string& name, Symbol* resultType)
+SymTable* Parser::ParseProcFuncBlock(SymTable* params, string& name, unsigned depth)
 {
 	symTable = new SymTable();
 	tableStack.Add(symTable);
 	for (auto &symbol: params->symbols) {
 		symTable->Add(symbol);
 	}
-	if (resultType != nullptr) {
-      symTable->Add(new SymVarLocal(SymbolPtr(resultType), symTable->GetSize()), "result");
-	}
-   _isGlobalNamespace = false;
-	ParseBlock(name);
-   _isGlobalNamespace = true;
+	ParseBlock(name, depth);
 	if (!isDeclarationParse) {
 		CheckExpectedToken(Tag::SEMICOLON);
 	}
@@ -721,18 +718,18 @@ SymTable* Parser::ParseProcFuncBlock(SymTable* params, string& name, Symbol* res
 	tableStack.Pop();
 	symTable = tableStack.Top();
 	for (auto &symbol: params->symbols) {
-		result->Delete(symbol->name);
+		result->DeleteParam(symbol->name);
 	}
 	return result;
 }
 
-NodeExpr* Parser::ParseExpression(int priority)
+NodeExpr* Parser::ParseExpression(int priority, unsigned depth)
 {
-	if (priority == PRIORITIES_NUMBER - 1) return ParseFactor();
-	NodeExpr* result = ParseExpression(priority + 1);
+	if (priority == PRIORITIES_NUMBER - 1) return ParseFactor(depth);
+	NodeExpr* result = ParseExpression(priority + 1, depth);
 	TokenPtr token = GetToken();
 	while (CheckPriorityByTag(priority, token->tag)) {
-		result = new NodeBinaryOp(token, result, ParseExpression(priority + 1));
+		result = new NodeBinaryOp(token, result, ParseExpression(priority + 1, depth), depth);
 		token = GetToken();
 	}
 	if (!token->isEndOfFile()) {
@@ -741,7 +738,7 @@ NodeExpr* Parser::ParseExpression(int priority)
 	return result;
 }
 	
-NodeExpr* Parser::ParseFactor()
+NodeExpr* Parser::ParseFactor(unsigned depth)
 {
 	NodeExpr* result = nullptr;
 	TokenPtr token = GetToken();
@@ -752,26 +749,30 @@ NodeExpr* Parser::ParseFactor()
 			throw CompilerException(scanner.fname, token->line, errorSyntax);
 		}
 		PutToken(token);
-		result = new NodeUnaryOp(tmp_token, ParseFactor());
+		result = new NodeUnaryOp(tmp_token, ParseFactor(depth), depth);
 	} else if (*token == ttIntegerNumber || *token == ttRealNumber) {
-		result = new NodeNumber(token);
+		result = new NodeNumber(token, depth);
 	} else if (*token == ttCharacterString) {
-		result = new NodeCharacterString(token);
-	} else if (*token == Tag::LPARENTHESIS) {
-		result = ParseExpression(0);
+		result = new NodeCharacterString(token, depth);
+   } else if (*token == Tag::IDENTIFICATOR && token->text == "integer") {
+      CheckExpectedToken(Tag::LPARENTHESIS);
+      result = new NodeIntTypecast(ParseExpression(0, depth));
+      CheckExpectedToken(Tag::RPARENTHESIS);
+   } else if (*token == Tag::LPARENTHESIS) {
+		result = ParseExpression(0, depth);
 		CheckExpectedToken(Tag::RPARENTHESIS);
 	} else if (*token == ttIdentificator) {
-		result = ParseIdentifier(token);
+		result = ParseIdentifier(token, depth);
 	} else if (*token == ttKeyWord && (*token == Tag::ORD || *token == Tag::CHR)) {
 		CheckExpectedToken(Tag::LPARENTHESIS);
-		NodeExpr* arg = ParseExpression();
+		NodeExpr* arg = ParseExpression(0, depth);
 		CheckExpectedToken(Tag::RPARENTHESIS);
 		if (*token == Tag::ORD) {
 			CheckExpectedExpressionType(arg->GetType(), stTypeChar);
-			result = new NodeOrd(token, arg);
+			result = new NodeOrd(token, arg, depth);
 		} else if (*token == Tag::CHR) {
 			CheckExpectedExpressionType(arg->GetType(), stTypeInteger);
-			result = new NodeChr(token, arg);
+			result = new NodeChr(token, arg, depth);
 		}
 	} else {
 		throw IllegalExprException(scanner.fname, _line);
@@ -779,7 +780,7 @@ NodeExpr* Parser::ParseFactor()
 	return result;
 }
 
-NodeExpr* Parser::ParseIdentifier(TokenPtr token, bool isLookAhead, bool findInCurTable)
+NodeExpr* Parser::ParseIdentifier(TokenPtr token, unsigned depth, bool isLookAhead, bool findInCurTable)
 {
 	token = token == nullptr ? GetToken() : token;
 	Symbol* symbol = FindSymbolByName(token->text, findInCurTable);
@@ -789,23 +790,26 @@ NodeExpr* Parser::ParseIdentifier(TokenPtr token, bool isLookAhead, bool findInC
 	if (symbol->IsType()) {
 		throw SimpleException(scanner.fname, _line, "Variable identifier expected");
 	}
-	NodeExpr* result = new NodeVar(token, symbol);
+	NodeExpr* result = new NodeVar(token, symbol, depth);
 	while (isLookAhead) {
 		token = GetToken();
 		if (*token == Tag::LPARENTHESIS) {
 			CheckExpectedSubroutineType(result->GetType());
-			result = CreateCallNode(result, ParseFuncArgs());
+			result = CreateCallNode(result, ParseFuncArgs(depth), depth);
 			CheckExpectedToken(Tag::RPARENTHESIS);
 		} else if (*token == Tag::LBRACKET) {
-			CheckExpectedVarType(result->GetType(), stTypeArray);
-			result = CreateArrIdxNode(result, ParseCommaSeparated());
+         Symbol* type = result->GetType();
+         if (*type != stTypeArray && *type != stTypeOpenArray) {
+            CheckExpectedVarType(result->GetType(), stTypeArray);
+         }
+			result = CreateArrIdxNode(result, depth);
 			CheckExpectedToken(Tag::RBRACKET);
 		} else if (*token == Tag::DOT) {
 			CheckExpectedVarType(result->GetType(), stTypeRecord);
 			CheckExpectedToken(Tag::IDENTIFICATOR, false);
 			SymTable* tmpTable = symTable;
 			symTable = dynamic_cast<SymTypeRecord*>(result->GetType())->GetFields();
-			result =	new NodeRecordAccess(token, result, ParseIdentifier(nullptr, false, true));
+			result =	new NodeRecordAccess(token, result, ParseIdentifier(nullptr, depth, false, true), depth);
 			symTable = tmpTable;
 		} else {
 			PutToken(token);
@@ -815,36 +819,36 @@ NodeExpr* Parser::ParseIdentifier(TokenPtr token, bool isLookAhead, bool findInC
 	return result;
 }
 
-SyntaxNode* Parser::ParseStatement()
+SyntaxNode* Parser::ParseStatement(unsigned depth)
 {
 	TokenPtr token = GetToken();
 	SyntaxNode* statement(nullptr);
 	if (*token == Tag::BEGIN) {
 		PutToken(token);
-		statement = ParseCompoundStatement("inner block");
+		statement = ParseCompoundStatement("inner block", depth);
    } else if (*token == Tag::WRITE || *token == Tag::WRITELN) {
-      statement = CreateWriteNode(token);
+      statement = CreateWriteNode(token, depth);
 	} else if (*token == Tag::IF) {
-		statement = ParseIfStatement();
+		statement = ParseIfStatement(depth);
 	} else if (*token == Tag::WHILE) {
-		statement = ParseWhileStatement();
+		statement = ParseWhileStatement(depth);
 	} else if (*token == Tag::FOR) {
-		statement = ParseForStatement();
+		statement = ParseForStatement(depth);
 	} else if (*token == Tag::REPEAT) {
-		statement = ParseRepeatStatement();
+		statement = ParseRepeatStatement(depth);
 	} else if (*token == Tag::EXIT) {
 		statement = new NodeExitStmt(symTable->block);
 	} else if (*token == Tag::BREAK || *token == Tag::CONTINUE) {
 		statement = ParseJumpStatement(token);
 	} else if (*token != ttKeyWord && *token != ttEndOfFile) {
 		PutToken(token);
-		NodeExpr* stmt = ParseExpression(0);
+		NodeExpr* stmt = ParseExpression(0, depth);
 		if (CheckNextTokenTag(Tag::ASSIGNMENT)) {
 			if (!stmt->IsLValue()) {
 				throw SimpleException(scanner.fname, _line, "Argument can't be assigned to");
 			}
 			token = GetToken();
-			statement = CreateAssignmentStatement(token, stmt, ParseExpression(0));
+			statement = CreateAssignmentStatement(token, stmt, ParseExpression(0, depth));
 		} else {
 			if (!stmt->IsSubroutineCall()) {
 				throw IllegalExprException(scanner.fname, _line);
@@ -857,39 +861,39 @@ SyntaxNode* Parser::ParseStatement()
 	return statement;
 }
 
-NodeBlock* Parser::ParseCompoundStatement(string name)
+NodeBlock* Parser::ParseCompoundStatement(string name, unsigned depth)
 {
 	NodeBlock* result = new NodeBlock(name);
 	CheckExpectedToken(Tag::BEGIN);
-	ParseStatementSequence(result);
+	ParseStatementSequence(result, depth);
 	CheckExpectedToken(Tag::END);
 	return result;
 }
 
-SyntaxNode* Parser::ParseIfStatement()
+SyntaxNode* Parser::ParseIfStatement(unsigned depth)
 {
-	NodeExpr* expr = ParseExpression(0);
+	NodeExpr* expr = ParseExpression(0, depth);
 	CheckExpectedToken(Tag::THEN);
-	SyntaxNode* then_stmt = ParseStatement();
-	SyntaxNode* else_stmt(nullptr);
+	SyntaxNode* thenStmt = ParseStatement(depth);
+	SyntaxNode* elseStmt(nullptr);
 	if (CheckNextTokenTag(Tag::ELSE)) {
 		GetToken();
-		else_stmt = ParseStatement();
+		elseStmt = ParseStatement(depth);
 	}
-	return new NodeIfStmt(expr, then_stmt, else_stmt);
+	return new NodeIfStmt(expr, thenStmt, elseStmt, depth);
 }
 
-SyntaxNode* Parser::ParseWhileStatement()
+SyntaxNode* Parser::ParseWhileStatement(unsigned depth)
 {
-	NodeWhileStmt* whileStmt = new NodeWhileStmt(ParseExpression(0));
+	NodeWhileStmt* whileStmt = new NodeWhileStmt(ParseExpression(0, depth), depth);
 	loopStack.push_back(whileStmt);
 	CheckExpectedToken(Tag::DO);
-	whileStmt->SetStatement(ParseStatement());
+	whileStmt->SetStatement(ParseStatement(depth));
 	loopStack.pop_back();
 	return whileStmt;
 }
 
-SyntaxNode* Parser::ParseForStatement()
+SyntaxNode* Parser::ParseForStatement(unsigned depth)
 {
 	CheckExpectedToken(Tag::IDENTIFICATOR, false);
 	TokenPtr token = GetToken();
@@ -902,31 +906,30 @@ SyntaxNode* Parser::ParseForStatement()
 	}
 	CheckVariableForLoopUsage(var);
 	CheckExpectedToken(Tag::ASSIGNMENT);
-	NodeExpr* initialExpr = ParseExpression(0);
-	token = GetToken();
-	if (*token != Tag::TO && *token != Tag::DOWNTO) {
+	NodeExpr* initialExpr = ParseExpression(0, depth);
+	if (*(token = GetToken()) != Tag::TO && *token != Tag::DOWNTO) {
 		throw SyntaxException(scanner.fname, token->text, _line, token->tag);	
 	}
 	LoopForType type = *token == Tag::TO ? loopTo : loopDownto;
-	NodeExpr* finalExpr = ParseExpression(0);
+	NodeExpr* finalExpr = ParseExpression(0, depth);
 	CheckExpectedExpressionType(initialExpr->GetType(), stTypeInteger);
 	CheckExpectedExpressionType(finalExpr->GetType(), stTypeInteger);
 	CheckExpectedToken(Tag::DO);
-	NodeForStmt* forStmt = new NodeForStmt(var, initialExpr, finalExpr, type);
+	NodeForStmt* forStmt = new NodeForStmt(var, initialExpr, finalExpr, type, depth);
 	loopStack.push_back(forStmt);
-	forStmt->SetStatement(ParseStatement());
+	forStmt->SetStatement(ParseStatement(depth));
 	loopStack.pop_back();
 	return forStmt;
 }
 
-SyntaxNode* Parser::ParseRepeatStatement()
+SyntaxNode* Parser::ParseRepeatStatement(unsigned depth)
 {
-	NodeRepeateStmt* repeateStmt = new NodeRepeateStmt;
+	NodeRepeateStmt* repeateStmt = new NodeRepeateStmt(depth);
 	loopStack.push_back(repeateStmt);
-	NodeBlock* stmt_seq = new NodeBlock("repeate");
-	ParseStatementSequence(stmt_seq);
+	NodeBlock* stmtSeq = new NodeBlock("repeate");
+	ParseStatementSequence(stmtSeq, depth);
 	CheckExpectedToken(Tag::UNTIL);
-	repeateStmt->SetLoopInfo(stmt_seq, ParseExpression(0));
+	repeateStmt->SetLoopInfo(stmtSeq, ParseExpression(0, depth));
 	loopStack.pop_back();
 	return repeateStmt;
 }
@@ -942,11 +945,11 @@ SyntaxNode* Parser::ParseJumpStatement(TokenPtr token)
 		: (SyntaxNode*) new NodeContinueStmt(loopStack.back());
 }
 
-NodeCall* Parser::CreateCallNode(NodeExpr* name, Args args)
+NodeCall* Parser::CreateCallNode(NodeExpr* name, Args args, unsigned depth)
 {
 	SymSubroutine* symbol = dynamic_cast<SymSubroutine*>(FindSymbolByName(name->token->text));
 	SymTable* params = symbol->GetParams();
-	if (args.size() != params->Size()) {
+	if (args.size() != params->Size() - (*symbol == stFunction)) {
 		throw WrongParametersException(scanner.fname, _line, name->token->text);
 	}
 	for (size_t i = 0; i < args.size(); i++) {
@@ -963,7 +966,7 @@ NodeCall* Parser::CreateCallNode(NodeExpr* name, Args args)
 			if (!args[i]->IsLValue()) {
 				throw SimpleException(scanner.fname, _line, "Variable identifier expected");
 			}
-		} else {
+      } else if (*(params->symbols[i]) == stParam) {
 			DoRight2LeftSimpleTypecast(paramType, &args[i]);
 			Symbol* argType = args[i]->GetType();
 			if (!paramType->IsEqualType(argType)) {
@@ -971,39 +974,42 @@ NodeCall* Parser::CreateCallNode(NodeExpr* name, Args args)
 			}
 		}
 	}
-	SymFunction* symFunc = dynamic_cast<SymFunction*>(symbol);
-	return new NodeCall(name, args, symFunc != nullptr ? symFunc->GetResultType() : nullptr);
+	return new NodeCall(name, args, depth);
 }
 
-NodeArrIdx* Parser::CreateArrIdxNode(NodeExpr* name, Args args)
+NodeArrIdx* Parser::CreateArrIdxNode(NodeExpr* name, unsigned depth)
 {
+   Args args = ParseCommaSeparated(depth);
 	for (auto &arg: args) {
 		Symbol* type = arg->GetType();
 		if (*type != stTypeInteger) {
 			throw IncompatibleTypesException(scanner.fname, _line, stTypeInteger);
 		}
 	}
-	return new NodeArrIdx(name, args);
+	return new NodeArrIdx(name, args, depth);
 }
 
-NodeWriteBase* Parser::CreateWriteNode(TokenPtr token)
+NodeWriteBase* Parser::CreateWriteNode(TokenPtr token, unsigned depth)
 {
+   Args args;
    CheckExpectedToken(Tag::LPARENTHESIS);
-   Args args = ParseCommaSeparated();
+   if (!CheckNextTokenTag(Tag::RPARENTHESIS)) {
+      args = ParseCommaSeparated(depth);
+   }
    for (auto &arg : args) {
       bool isPossibleType = false;
       for (auto type : {stTypeChar, stConstCharacterString, stTypeInteger, stTypeFloat}) {
          isPossibleType = isPossibleType || *(GetReferenceType(arg->GetType())) == type;
       }
       if (!isPossibleType) {
-         throw SimpleException(scanner.fname, _line, "Can't read or write variables of this type");
+         throw SimpleException(scanner.fname, _line, "Can't write variables of this type");
       }
    }
    CheckExpectedToken(Tag::RPARENTHESIS);
    return
       *token == Tag::WRITE
-      ? (NodeWriteBase*) new NodeWrite(args)
-      : (NodeWriteBase*) new NodeWriteln(args);
+      ? (NodeWriteBase*) new NodeWrite(args, depth)
+      : (NodeWriteBase*) new NodeWriteln(args, depth);
 }
 
 NodeAssignOp* Parser::CreateAssignmentStatement(TokenPtr token, NodeExpr* stmt, NodeExpr* expr)

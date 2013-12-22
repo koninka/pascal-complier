@@ -29,7 +29,7 @@ struct Identifier {
 
 class Parser {
 	typedef vector<Identifier> IdentifierList;
-	typedef void (Parser::* parseFunc)();
+	typedef void (Parser::* parseFunc)(unsigned);
 	typedef double (Parser::* computeUnFunc)(double);
 	typedef double (Parser::* computeBinaryFunc)(double, double);
 	typedef unordered_map<int, parseFunc> DeclarationParseList;
@@ -60,14 +60,14 @@ class Parser {
 	void CheckVariableForLoopUsage(Symbol*);
 	void CheckSubrangeBoundType(Symbol*, int);
 	void ReserveOperationPriority(priorityType, int);
-	void ParseBlock(string);
-	void ParseDeclarationPart();
-	void ParseConstantDefinition();
-	void ParseTypeDefinition(); 
-	void ParseProcedureDefinition();
-	void ParseFunctionDefinition();
-	void ParseVariableDeclaration();
-	void ParseStatementSequence(NodeBlock*);
+	void ParseBlock(string = "", unsigned = 0);
+	void ParseDeclarationPart(unsigned);
+   void ParseConstantDefinition(unsigned);
+   void ParseTypeDefinition(unsigned);
+   void ParseProcedureDefinition(unsigned);
+   void ParseFunctionDefinition(unsigned);
+   void ParseVariableDeclaration(unsigned);
+	void ParseStatementSequence(NodeBlock*, unsigned);
 
 	bool IsTokenVariable();
 	bool CheckPriorityByTag(int, int);
@@ -102,38 +102,38 @@ class Parser {
 
 	IdentifierList ParseIdentifierList();
 
-	Args ParseFuncArgs();
-	Args ParseCommaSeparated();
+	Args ParseFuncArgs(unsigned);
+	Args ParseCommaSeparated(unsigned);
 
 	Symbol* FindSymbolByName(string, bool = false);
 	Symbol* CreateConstExprSymbol(NodeExpr*, int);
 	Symbol* ParseConstantExpression();
 	Symbol* ParseArrayDeclaration(bool);
-	Symbol* ParseRecordDeclaration();
+   Symbol* ParseRecordDeclaration();
 	Symbol* ParseSubrangeType();
 	Symbol* ParseType(bool = false);
 
-	SymTable* ParseFormalParameterList();
-	SymTable* ParseProcFuncBlock(SymTable*, string&, Symbol* = nullptr);
+	SymTable* ParseFormalParameterList(SymSubroutine*, unsigned);
+   SymTable* ParseProcFuncBlock(SymTable*, string&, unsigned);
 
-	NodeExpr* ParseExpression(int = 0);
-	NodeExpr* ParseFactor();
-	NodeExpr* ParseIdentifier(TokenPtr = nullptr, bool = true, bool = false);
+	NodeExpr* ParseExpression(int, unsigned);
+	NodeExpr* ParseFactor(unsigned);
+	NodeExpr* ParseIdentifier(TokenPtr, unsigned, bool = true, bool = false);
 	
-	SyntaxNode* ParseStatement();
-	SyntaxNode* ParseIfStatement();
-	SyntaxNode* ParseWhileStatement();
-	SyntaxNode* ParseForStatement();
-	SyntaxNode* ParseRepeatStatement();
+	SyntaxNode* ParseStatement(unsigned);
+	SyntaxNode* ParseIfStatement(unsigned);
+   SyntaxNode* ParseWhileStatement(unsigned);
+   SyntaxNode* ParseForStatement(unsigned);
+   SyntaxNode* ParseRepeatStatement(unsigned);
 	SyntaxNode* ParseJumpStatement(TokenPtr);
 
-	NodeBlock* ParseCompoundStatement(string);
+	NodeBlock* ParseCompoundStatement(string, unsigned);
 
-	NodeCall* CreateCallNode(NodeExpr*, Args);
+	NodeCall* CreateCallNode(NodeExpr*, Args, unsigned);
 
-	NodeArrIdx* CreateArrIdxNode(NodeExpr*, Args);
+	NodeArrIdx* CreateArrIdxNode(NodeExpr*, unsigned);
 
-   NodeWriteBase* CreateWriteNode(TokenPtr);
+   NodeWriteBase* CreateWriteNode(TokenPtr, unsigned);
 
 	NodeAssignOp* CreateAssignmentStatement(TokenPtr, NodeExpr*, NodeExpr*);
 public:

@@ -1,0 +1,22 @@
+   procedure foo();
+   var
+      a: integer;
+      procedure foo1();
+
+         procedure foo2();
+         begin
+            a := 123;
+         end;
+
+      begin
+         foo2();
+      end;
+
+   begin
+      foo1();
+      write(a);
+   end;
+
+begin
+   foo();
+end.

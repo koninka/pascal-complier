@@ -1,0 +1,17 @@
+type
+   rec = record
+      x, y, z: integer;
+   end;
+var
+   d: integer;
+   rr: rec;
+   arr: array[1..5] of integer;
+   procedure foo(c: integer; var r: rec; b: integer; arr1: array of integer; var b1: integer; var arr2: array of integer; c1: integer);
+   begin
+      arr2[3] := 20;
+   end;
+begin
+   arr[4] := -562;
+   foo(4, rr, 5, arr, d, arr, 3 + 5);
+   writeln(arr[4]);
+end.

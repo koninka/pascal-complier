@@ -4,7 +4,7 @@
  a       type alias                      integer                              0
  f       function                        a                                    0
  f params:
+ result  func result                     a                                    1
  f locals:
- result  local variable                  a                                    1
  a       int scalar     45                                                    1
 

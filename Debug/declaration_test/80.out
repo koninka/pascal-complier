@@ -5,7 +5,7 @@
  foo     function                        tt                                   0
  foo params:
  tt1     func param                      char                                 1
+ result  func result                     tt                                   1
  foo locals:
- result  local variable                  tt                                   1
  tt      int scalar     25                                                    1
 

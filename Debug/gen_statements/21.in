@@ -1,0 +1,15 @@
+type
+   rec = record
+      x, y, z: integer;
+   end;
+var
+   c: integer;
+   rr: rec;
+   procedure foo(c: integer; r: rec; b: integer);
+   begin
+      c := b + c;
+      write(c);
+   end;
+begin
+   foo(4, rr, 5);
+end.

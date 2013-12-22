@@ -1,0 +1,8 @@
+function sum(a, b: integer): integer;
+begin
+   result := a + b;
+end;
+
+begin
+   write(sum(5, 1));
+end.

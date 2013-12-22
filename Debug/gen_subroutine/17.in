@@ -1,0 +1,14 @@
+var
+   arr: array[1..5] of integer;
+
+   procedure foo(var a: array of integer);
+   var
+      a1: integer;
+   begin
+      a1 := arr[3];
+      write(a1);
+   end;
+begin
+   arr[4] := -562;
+   foo(arr);
+end.

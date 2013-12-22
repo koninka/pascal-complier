@@ -12,3 +12,4 @@ tree.asm
 *.vcxproj
 *.vcxproj.filters
 *.comp
+tree.*

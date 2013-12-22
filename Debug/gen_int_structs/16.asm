@@ -4,31 +4,35 @@ include c:\masm32\include\msvcrt.inc
 includelib c:\masm32\lib\msvcrt.lib
 .data
 	v_r db 4 dup(0)
-	format_str_int db "%d", 0
+	fmt_int db "%d", 0
 .code
 main:
+	mov	ebp, esp
 	push	dword ptr 193
 	push	offset v_r
 	pop	eax
-	lea	eax, [eax]
+	add	eax, dword ptr 0
 	push	eax
 	pop	eax
-	lea	eax, [eax]
+	add	eax, dword ptr 0
 	push	eax
+	pop	eax
 	pop	ebx
-	pop	eax
-	mov	[ebx], eax
+	mov	[eax], ebx
 	push	offset v_r
 	pop	eax
-	lea	eax, [eax]
+	add	eax, dword ptr 0
 	push	eax
 	pop	eax
-	lea	eax, [eax]
+	add	eax, dword ptr 0
 	push	eax
 	pop	eax
 	push	dword ptr [eax]
-	push	offset format_str_int
+	push	offset fmt_int
 	call	crt_printf
 	add	esp, dword ptr 8
+@exit_0:
+	mov	esp, ebp
+	mov	eax, dword ptr 0
 	ret
 end main

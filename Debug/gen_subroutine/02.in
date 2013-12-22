@@ -1,0 +1,6 @@
+   procedure proc(a, b: integer);
+   begin
+   end;
+
+begin
+end.

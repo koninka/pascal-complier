@@ -33,18 +33,35 @@ enum NodeType {
 	ntWhileStmt,
 	ntForStmt,
 	ntRepeateStmt,
+   ntIntTypeCast,
 	ntInt2Float,
 	ntFloat2Int
 };
 
-struct SyntaxNode {
+class SyntaxNode {
+protected:
 	NodeType type;
-	SyntaxNode(NodeType);
+public:
+   unsigned depth;
+	SyntaxNode(NodeType, unsigned);
 	virtual ~SyntaxNode() {};
 	virtual void PrintNode(int) {};
-   virtual void Generate(AsmCode&) const {};
+   virtual void Generate(AsmCode&) {};
    virtual void GenerateLValue(AsmCode&) const {};
 	void PrintText(int, string);
 	bool operator == (NodeType);
 	bool operator != (NodeType);
+};
+
+typedef vector<SyntaxNode*> Statements;
+
+struct NodeBlock: public SyntaxNode {
+   string name;
+   Statements statements;
+   NodeBlock(string);
+   NodeBlock(NodeType);
+   NodeBlock(Statements, string, NodeType);
+   void AddStatement(SyntaxNode*);
+   void Generate(AsmCode&) override;
+   void PrintNode(int) override;
 };

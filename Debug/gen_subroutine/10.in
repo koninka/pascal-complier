@@ -1,0 +1,20 @@
+type
+   T = record
+      a, b: Integer;
+   end;
+
+function Swap(rec: T; scale: integer): T;
+begin
+   result.a := rec.b * scale;
+   result.b := rec.a + scale;
+end;
+
+var
+   a, b: T;
+
+begin
+   a.a := 4;
+   a.b := 11;
+   b := Swap(a, 3);
+   write(b.a, ' ', b.b);
+end.

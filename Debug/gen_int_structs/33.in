@@ -1,0 +1,11 @@
+var
+   a, b: array[1..4] of integer;
+begin
+   a[4] := 23432;
+   b[4] := 20;
+   writeln(a[4]);
+   writeln(b[4]);
+   a := b;
+   writeln(a[4]);
+   writeln(b[4]);
+end.

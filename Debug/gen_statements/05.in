@@ -1,0 +1,12 @@
+var
+   i: Integer;
+   a: array[0..10] of integer;
+begin
+   for i := 9 downto 1 do 
+      a[i] := (10 - i) * 2;
+   i := 10;
+   repeat
+      i := i - 1;
+      Write(a[i], ' ');
+   until a[i] = 0;
+end.    

@@ -1,0 +1,11 @@
+var
+   arr: array[1..5] of integer;
+
+   function foo(a: array of integer): integer;
+   begin
+      result := a[3];
+   end;
+begin
+   arr[4] := -562;
+   write(foo(arr));
+end.

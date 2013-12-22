@@ -1,0 +1,39 @@
+begin
+   if (5 > 4) then Writeln('good')
+   else Writeln('bad');
+   if (3 > 4) then Writeln('bad')
+   else Writeln('good');
+   if (4 > 4) then Writeln('bad')
+   else Writeln('good');
+
+   if (3 < 4) then Writeln('good')
+   else Writeln('bad');
+   if (5 < 4) then Writeln('bad')
+   else Writeln('good');
+   if (4 < 4) then Writeln('bad')
+   else Writeln('good');
+
+   if (4 <= 4) then Writeln('good')
+   else Writeln('bad');
+   if (4 <= 5) then Writeln('good')
+   else Writeln('bad');
+   if (5 <= 4) then Writeln('bad')
+   else Writeln('good');
+
+   if (4 >= 4) then Writeln('good')
+   else Writeln('bad');
+   if (6 >= 5) then Writeln('good')
+   else Writeln('bad');
+   if (3 >= 4) then Writeln('bad')
+   else Writeln('good');
+
+   if (4 = 4) then Writeln('good')
+   else Writeln('bad');
+   if (4 = 5) then Writeln('bad')
+   else Writeln('good');
+
+   if (4 <> 5) then Writeln('good')
+   else Writeln('bad');
+   if (4 <> 4) then Writeln('bad')
+   else Writeln('good');
+end.

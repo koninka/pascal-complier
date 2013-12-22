@@ -1,0 +1,19 @@
+.686
+.model flat, stdcall
+include c:\masm32\include\msvcrt.inc
+includelib c:\masm32\lib\msvcrt.lib
+.data
+	fmt_int db "%d", 0
+.code
+main:
+	mov	ebp, esp
+	jmp	@exit_0
+	push	dword ptr 30
+	push	offset fmt_int
+	call	crt_printf
+	add	esp, dword ptr 8
+@exit_0:
+	mov	esp, ebp
+	mov	eax, dword ptr 0
+	ret
+end main

@@ -1,0 +1,11 @@
+var
+   i: integer;
+begin
+   i := 0;
+   repeat
+      write(i);
+      i := i + 1;
+      if i = 5 then continue
+      else if i = 8 then break;
+   until i > 100;
+end.

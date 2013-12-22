@@ -1,0 +1,19 @@
+procedure swap(var a, b: integer);
+var
+   i: integer;
+begin
+   i := a;
+   a := b;
+   b := i;
+end;
+
+var
+   a, b: integer;
+
+begin
+   a := 5;
+   b := 10;
+   writeln(a, ' ', b);
+   swap(a, b);
+   writeln(a, ' ', b);
+end.

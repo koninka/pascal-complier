@@ -1,0 +1,10 @@
+procedure Proc(a: integer);
+begin
+   writeln(a);
+   a := 500;
+   writeln(a);
+end;
+
+begin
+   proc(10);
+end.

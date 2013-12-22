@@ -1,0 +1,7 @@
+var
+   a, b: array[1..400] of integer;
+begin
+   a[4] := 23432;
+   b[4] := 20;
+   a := b;
+end.

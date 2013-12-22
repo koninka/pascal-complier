@@ -1,0 +1,14 @@
+   function foo(): integer;
+
+      procedure bar(a: integer);
+      begin
+         result := a;
+      end;
+      
+   begin
+      bar(500);
+   end;
+
+begin
+   write(foo());
+end.

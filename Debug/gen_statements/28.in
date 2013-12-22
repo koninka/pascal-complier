@@ -1,0 +1,38 @@
+   procedure foo();
+   var
+      a: integer;
+
+      procedure bar();
+      var
+         c: integer;
+
+         procedure last();
+         begin
+            a := 150 + c;
+         end;
+
+         procedure last1();
+
+            procedure last2();
+            begin
+               c := 59;
+            end;
+
+         begin
+            last2();
+            c := c + 137;
+         end;
+
+      begin
+         last1();
+         last();
+      end;
+
+   begin
+      bar();
+      write(a);
+   end;
+
+begin
+   foo();
+end.

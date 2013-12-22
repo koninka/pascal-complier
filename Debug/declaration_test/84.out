@@ -4,23 +4,23 @@
  foo     function                        integer                              0
  foo params:
  b       func var param                  integer                              1
+ result  func result                     integer                              1
  foo locals:
- result  local variable                  integer                              1
  foo     function                        integer                              1
  foo params:
  b       func var param                  integer                              2
+ result  func result                     integer                              2
  foo locals:
- result  local variable                  integer                              2
  foo     function                        integer                              2
  foo params:
  b       func param                      integer                              3
+ result  func result                     integer                              3
  foo locals:
- result  local variable                  integer                              3
  foo     function                        double                               3
  foo params:
  b       func var param                  char                                 4
+ result  func result                     double                               4
  foo locals:
- result  local variable                  double                               4
 
 
 

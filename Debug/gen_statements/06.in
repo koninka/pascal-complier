@@ -1,0 +1,9 @@
+var
+   i: Integer;
+begin
+   while (i < 20) do
+   begin
+      break;
+      write(i);
+   end;
+end.    

@@ -1,0 +1,19 @@
+type
+   T = array[1..2, 1..2] of Integer;
+
+function Copy(a: T): T;
+begin
+   result := a;
+end;
+
+var
+   a, b: T;
+    
+begin
+   a[1,1] := 11;
+   a[1,2] := 12;
+   a[2,1] := 21;
+   a[2,2] := 22;
+   b := Copy(a);
+   Write(b[1,1], ' ', b[1,2], ' ', b[2,1], ' ', b[2,2]);
+end.

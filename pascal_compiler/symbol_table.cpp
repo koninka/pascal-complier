@@ -32,11 +32,17 @@ void SymTable::Add(Symbol* symbol, string name)
 	Add(symbol);
 }
 
-void SymTable::Delete(string& name)
+void SymTable::DeleteParam(string& name)
 {
 	symNames.erase(symNames.find(name));
 	for (auto it = symbols.begin(); it != symbols.end(); it++) {
 		if ((*it)->name == name) {
+         _tableSize = (*it)->IsVar() ? _tableSize - (*it)->GetSize() : _tableSize;
+         for (auto i = it + 1; i != symbols.end(); i++) {
+            if (**i == stVarLocal) {
+               (*i)->SetOffset((*i)->GetOffset() - (*it)->GetSize());
+            }
+         }
 			symbols.erase(it);
 			break;
 		}
@@ -200,7 +206,9 @@ size_t SymTypeRecord::GetSize()
    return _size = fields->GetSize();
 }
 
-SymSubroutine::SymSubroutine(string& AName, SymbolType AType): Symbol(AType)
+SymSubroutine::SymSubroutine(string& AName, SymbolType AType):
+   Symbol(AType),
+   _label(nullptr)
 {
 	name = AName;
 }
@@ -217,15 +225,22 @@ void SymSubroutine::SetVars(SymTable* AVars)
 
 void SymSubroutine::GenerateDeclaration(AsmCode& asmCode)
 {
-   //asmCode.AddLabel(label);
-   //asmCode.AddCmd(ASM_PUSH, REG_EBP);
-   //asmCode.AddCmd(ASM_MOV, REG_ESP, REG_EBP);
-   //if (sym_table->GetLocalsSize()) asm_code.AddCmd(ASM_SUB, sym_table->GetLocalsSize(), REG_ESP);
-   //body->Generate(asm_code);
-   //asmCode.AddLabel(exit_label);
-   //asmCode.AddCmd(ASM_MOV, REG_EBP, REG_ESP);
-   //asmCode.AddCmd(ASM_POP, REG_EBP);
-   //asmCode.AddCmd(ASM_RET, sym_table->GetParamsSize() - GetResultType()->GetSize());
+   asmCode.AddSubroutineBegin(_label);
+   asmCode.AddCmd(PUSH, EBP);
+   asmCode.AddCmd(MOV, EBP, ESP);
+   if (localVariables->GetSize() > 0) {
+      asmCode.AddCmd(SUB, ESP, localVariables->GetSize());
+   }
+   localVariables->block->Generate(asmCode);
+   asmCode.AddCmd(MOV, ESP, EBP);
+   asmCode.AddCmd(POP, EBP);
+   asmCode.AddCmd(RET, 4, szBYTE);
+   asmCode.AddSubroutineEnd(_label);
+   for (auto &symbol : localVariables->symbols) {
+      if (*symbol == stProcedure || *symbol == stFunction) {
+         dynamic_cast<SymSubroutine*>(symbol)->GenerateDeclaration(asmCode);
+      }
+   }
 }
 
 void SymSubroutine::PrintSymbol(int d)
@@ -235,6 +250,11 @@ void SymSubroutine::PrintSymbol(int d)
 	params->Print(d + 1);
 	cout << fname << " locals:" << endl;
 	localVariables->Print(d + 1);
+}
+
+void SymSubroutine::GenerateLabel(AsmCode& asmCode)
+{
+   _label = asmCode.GenLabel(name);
 }
 
 SymTable* SymSubroutine::getLocalVars() const
@@ -252,7 +272,28 @@ Symbol* SymSubroutine::GetType()
 	return this;
 }
 
-SymProcedure::SymProcedure(string& AName): SymSubroutine(AName, stProcedure) {}
+SymVar* SymSubroutine::GetArg(unsigned argNum) const
+{
+   return dynamic_cast<SymVar*>(params->symbols[argNum]);
+}
+
+AsmStrImmediate* SymSubroutine::GetLabel() const
+{
+   return _label;
+}
+
+size_t SymSubroutine::GetParamsSize()
+{
+   size_t result = 0;
+   for (auto &symbol : params->symbols) {
+      result += *symbol == stParam ? symbol->GetType()->GetSize() : 4;
+   }
+   return result;
+}
+
+SymProcedure::SymProcedure(string& AName):
+   SymSubroutine(AName, stProcedure)
+{}
 
 void SymProcedure::PrintSymbol(int d)
 {
@@ -265,7 +306,9 @@ void SymProcedure::PrintSymbol(int d)
 	SymSubroutine::PrintSymbol(d);
 }
 
-SymFunction::SymFunction(string& AName): SymSubroutine(AName, stFunction) {}
+SymFunction::SymFunction(string& AName):
+   SymSubroutine(AName, stFunction)
+{}
 
 void SymFunction::SetParams(SymTable* AParams, Symbol* AResultType)
 {
@@ -287,4 +330,166 @@ void SymFunction::PrintSymbol(int d)
 Symbol* SymFunction::GetResultType() const
 {
 	return resultType;
+}
+
+
+SymSubroutineVar::SymSubroutineVar(SymbolPtr AType, size_t AOffset, unsigned ADepth, SymbolType ASymbolType):
+   SymVar(AType, AOffset, ASymbolType),
+   _depth(ADepth)
+{}
+
+void SymSubroutineVar::ComputeSubroutineEBPToEBX(AsmCode& asmCode, unsigned stmtDepth) const
+{
+   asmCode.AddCmd(MOV, EBX, EBP);
+   for (size_t i = 0; i < stmtDepth - _depth; i++) {
+      asmCode.AddCmd(MOV, EBX, AsmMemory(EBX, 8));
+   }
+}
+
+SymVarLocal::SymVarLocal(SymbolPtr AType, size_t AOffset, unsigned ADepth):
+   SymSubroutineVar(AType, AOffset, ADepth, stVarLocal)
+{}
+
+void SymVarLocal::PrintSymbol(int d)
+{
+   Symbol::PrintSymbol(d);
+   printPart("local variable", TYPE_LEN);
+   printPart("", VALUE_LEN);
+   printPart(type->getTypeValue(), COLUMN_LEN);
+   printPart(to_string(_depth), TABLE_IDX_LEN);
+   type->PrintType(d);
+}
+
+void SymVarLocal::Generate(AsmCode& asmCode, unsigned stmtDepth) const
+{
+   ComputeSubroutineEBPToEBX(asmCode, stmtDepth);
+   asmCode.AddCmd(PUSH, AsmMemory(EBX, -int(_offset) - 4));
+}
+
+void SymVarLocal::GenerateLValue(AsmCode& asmCode, unsigned stmtDepth) const
+{
+   ComputeSubroutineEBPToEBX(asmCode, stmtDepth);
+   asmCode.AddCmd(ADD, EBX, -int(_offset) - 4);
+   asmCode.AddCmd(PUSH, EBX);
+   //asmCode.AddCmd(LEA, EAX, AsmMemory(EBP, -int(_offset) - 4));
+   //asmCode.AddCmd(PUSH, EAX);
+}
+
+SymParamBase::SymParamBase(SymbolPtr AType, size_t AOffset, SymSubroutine* ASubroutine, unsigned ADepth, SymbolType ASymType):
+   SymSubroutineVar(AType, AOffset, ADepth, ASymType),
+   subroutine(ASubroutine)
+{}
+
+void SymParamBase::GetParamSize(AsmCode& asmCode) const
+{
+
+}
+
+void SymParamBase::GenerateOffsetInStack(AsmCode& asmCode, unsigned stmtDepth) const
+{
+   ComputeSubroutineEBPToEBX(asmCode, stmtDepth);
+   asmCode.AddCmd(ADD, EBX, 12); //eax point to the first arg
+   Symbols params = subroutine->GetParams()->symbols;
+   // можно этот цикл сделать на ассемблере
+   bool needBreak = false;
+   for (auto &param : params) {
+      needBreak = name == param->name;
+      if (*param == stParam) {
+         if (*(param->GetType()) == stTypeOpenArray || *(param->GetType()) == stTypeArray) {
+            asmCode.AddCmd(MOV, EAX, AsmMemory(EBX)); //array size of byte
+            asmCode.AddCmd(ADD, EBX, 4);
+            if (!needBreak) {
+               asmCode.AddCmd(ADD, EBX, EAX);
+            }
+         } else if (!needBreak) {
+            asmCode.AddCmd(ADD, EBX, param->GetSize());
+         }
+      } else if (!needBreak) {
+         asmCode.AddCmd(ADD, EBX, 4);
+      }
+      if (needBreak) break;
+   }
+}
+
+SymParam::SymParam(SymbolPtr AType, size_t AOffset, SymSubroutine* ASubroutine, unsigned ADepth) :
+   SymParamBase(AType, AOffset, ASubroutine, ADepth, stParam)
+{}
+
+SymParam::SymParam(SymbolPtr AType, size_t AOffset, SymSubroutine* ASubroutine, unsigned ADepth, SymbolType ASymType) :
+   SymParamBase(AType, AOffset, ASubroutine, ADepth, ASymType)
+{}
+
+void SymParam::Generate(AsmCode& asmCode, unsigned stmtDepth) const
+{
+   if (type->GetSize() == 4) {
+      GenerateOffsetInStack(asmCode, stmtDepth);
+      asmCode.AddCmd(PUSH, AsmMemory(EBX));
+   } else {
+      GenerateLValue(asmCode, stmtDepth);
+      asmCode.PushMemory(type->GetSize());
+   }
+}
+
+void SymParam::GenerateLValue(AsmCode& asmCode, unsigned stmtDepth) const
+{
+   GenerateOffsetInStack(asmCode, stmtDepth);
+   asmCode.AddCmd(PUSH, EBX);
+}
+
+void SymParam::PrintSymbol(int d)
+{
+   Symbol::PrintSymbol(d);
+   printPart("func param", TYPE_LEN);
+   printPart("", VALUE_LEN);
+   printPart(type->getTypeValue(), COLUMN_LEN);
+   printPart(to_string(d), TABLE_IDX_LEN);
+}
+
+
+SymParamResult::SymParamResult(SymbolPtr AType, size_t AOffset, SymSubroutine* ASubroutine, unsigned ADepth):
+SymParam(AType, AOffset, ASubroutine, ADepth, stParamResult)
+{}
+
+void SymParamResult::PrintSymbol(int d)
+{
+   Symbol::PrintSymbol(d);
+   printPart("func result", TYPE_LEN);
+   printPart("", VALUE_LEN);
+   printPart(type->getTypeValue(), COLUMN_LEN);
+   printPart(to_string(d), TABLE_IDX_LEN);
+}
+
+SymVarParam::SymVarParam(SymbolPtr AType, size_t AOffset, SymSubroutine* ASubroutine, unsigned ADepth):
+SymParamBase(AType, AOffset, ASubroutine, ADepth, stVarParam)
+{}
+
+void SymVarParam::PrintSymbol(int d)
+{
+   Symbol::PrintSymbol(d);
+   printPart("func var param", TYPE_LEN);
+   printPart("", VALUE_LEN);
+   printPart(type->getTypeValue(), COLUMN_LEN);
+   printPart(to_string(d), TABLE_IDX_LEN);
+}
+
+void SymVarParam::Generate(AsmCode& asmCode, unsigned stmtDepth) const
+{
+   GenerateLValue(asmCode, stmtDepth);
+   asmCode.PushMemory(type->GetSize());
+}
+
+void SymVarParam::GenerateLValue(AsmCode& asmCode, unsigned stmtDepth) const
+{
+   GenerateOffsetInStack(asmCode, stmtDepth);
+   asmCode.AddCmd(PUSH, AsmMemory(EBX));
+}
+
+bool SymVarParam::IsByRef() const
+{
+   return true;
+}
+
+size_t SymVarParam::GetSize()
+{
+   return 4;
 }

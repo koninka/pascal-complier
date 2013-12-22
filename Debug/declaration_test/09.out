@@ -1,1 +1,1 @@
-declaration_test\09.in(2) Error: Variable identifier expected
+declaration_test\09.in(2) Fatal: Syntax error, "(" expected but ";" found

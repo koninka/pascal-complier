@@ -1,0 +1,12 @@
+var
+   arr: array[1..5] of integer;
+
+   procedure bar(var a: array of integer);
+   begin
+      a[2] := 38;
+   end;
+begin
+   arr[3] := 20;
+   bar(arr);
+   writeln(arr[3]);
+end.

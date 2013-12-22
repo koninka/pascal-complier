@@ -8,8 +8,8 @@
  b       int scalar     -25                                                   1
  serv    function                        char                                 1
  serv params:
+ result  func result                     char                                 2
  serv locals:
- result  local variable                  char                                 2
  a       type alias                      integer                              2
 
 

@@ -1,0 +1,4 @@
+begin
+   exit;
+   write(30);
+end.

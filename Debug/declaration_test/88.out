@@ -6,6 +6,6 @@
  a       function                        int1                                 0
  a params:
  c       func var param                  int                                  1
+ result  func result                     int1                                 1
  a locals:
- result  local variable                  int1                                 1
 

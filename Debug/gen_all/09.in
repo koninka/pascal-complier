@@ -1,0 +1,8 @@
+const
+   h3 = 20;
+var
+   a: integer;
+begin
+   a := -((h3 - 28) * 3);
+   write(a);
+end.

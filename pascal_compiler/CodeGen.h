@@ -6,6 +6,11 @@
 
 using namespace std;
 
+enum SizeType {
+   szBYTE,
+   szDWORD
+};
+
 enum Register {
    EAX,
    EBX,
@@ -17,6 +22,12 @@ enum Register {
 };
 
 enum OpCode {
+   JMP,
+   JNE,
+   JGE,
+   JE,
+   JG,
+   JL,
    TEST,
 	CALL,
 	PUSH,
@@ -83,6 +94,39 @@ public:
    void Print() const override;
 };
 
+class AsmLabel: public Asm {
+   AsmStrImmediate* _label;
+public:
+   AsmLabel(AsmStrImmediate*);
+   AsmLabel(AsmStrImmediate);
+   AsmLabel(string);
+   void Print() const override;
+};
+
+class AsmRawCmd: public Asm {
+   string _str;
+public:
+   AsmRawCmd(string);
+   void Print() const override;
+};
+
+class AsmSubroutineBase: public Asm {
+protected:
+   AsmStrImmediate* _label;
+public:
+   AsmSubroutineBase(AsmStrImmediate*);
+};
+
+struct AsmSubroutineBegin: public AsmSubroutineBase {
+   AsmSubroutineBegin(AsmStrImmediate*);
+   void Print() const override;
+};
+
+struct AsmSubroutineEnd: public AsmSubroutineBase {
+   AsmSubroutineEnd(AsmStrImmediate*);
+   void Print() const override;
+};
+
 class AsmDataBase {
 protected:
    string _name;
@@ -111,13 +155,6 @@ public:
    void Print() const override;
 };
 
-class AsmRawCmd: public Asm {
-   string _str;
-public:
-   AsmRawCmd(string);
-   void Print() const override;
-};
-
 struct AsmOperand {
    virtual void Print() const;
    virtual void PrintBase() const;
@@ -139,8 +176,9 @@ struct AsmImmediate: public AsmOperand {
 
 class AsmIntImmediate: public AsmImmediate {
    int _value;
+   SizeType _sizeType;
 public:
-   AsmIntImmediate(int);
+   AsmIntImmediate(int, SizeType = szDWORD);
    int GetIntValue() const override;
    void PrintBase() const override;
 };
@@ -165,7 +203,7 @@ struct AsmVarDword: public AsmVarBase {
 class AsmStrImmediate: public AsmImmediate {
    string _value;
 public:
-   AsmStrImmediate(const string&);
+   AsmStrImmediate(string);
    string GetStrValue() const override;
    void PrintBase() const override;
 };
@@ -183,13 +221,9 @@ typedef vector<Asm*> Commands;
 typedef vector<AsmDataBase*> Data;
 
 class AsmCode {
-   bool hasIntFormat;
-   bool hasRealFormat;
-   bool hasStrFormat;
-   bool hasNewLineFormat;
+   size_t labelCounter;
    AsmStrImmediate* formatStrReal;
    AsmStrImmediate* formatStrInt;
-   AsmStrImmediate* formatStrStr;
    AsmStrImmediate* formatStrNewLine;
 
    AsmStrImmediate functWrite;
@@ -204,17 +238,26 @@ public:
    void AddCmd(OpCode, AsmVarDword);
    void AddCmd(OpCode, Register);
    void AddCmd(OpCode, AsmMemory);
+   void AddCmd(OpCode, AsmStrImmediate*);
    void AddCmd(OpCode, AsmStrImmediate);
    void AddCmd(OpCode, AsmIntImmediate);
-   void AddCmd(OpCode, int);
+   void AddCmd(OpCode, int, SizeType = szDWORD);
    void AddCmd(OpCode, AsmOperand*, AsmOperand*);
    void AddCmd(OpCode, Register, Register);
-   void AddCmd(OpCode, Register, int);
+   void AddCmd(OpCode, Register, int, SizeType = szDWORD);
+   void AddCmd(OpCode, AsmMemory, AsmIntImmediate);
    void AddCmd(OpCode, AsmMemory, Register);
    void AddCmd(OpCode, Register, AsmMemory);
    AsmStrImmediate* AddData(string);
    AsmStrImmediate* AddData(string, size_t);
    AsmStrImmediate* AddData(string, string);
+   void AddLabel(AsmStrImmediate*);
+   void AddLabel(AsmStrImmediate);
+   void AddLabel(string);
+   void AddSubroutineBegin(AsmStrImmediate*);
+   void AddSubroutineEnd(AsmStrImmediate*);
+   AsmStrImmediate* GenLabel(string);
+   string GenStrLabel(string);
    void Print() const;
    void PushMemory(unsigned);
    void GenCallWriteForInt();

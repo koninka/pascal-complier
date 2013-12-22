@@ -19,6 +19,12 @@ string GetReg(Register reg)
 string GetCmd(OpCode opCode)
 {
    switch (opCode) {
+      case JNE:         return "jne";
+      case JMP:         return "jmp";
+      case JGE:         return "jge";
+      case JE:          return "je";
+      case JG:          return "jg";
+      case JL:          return "jl";
       case SAR:         return "sar";
       case SAL:         return "sal";
       case LEA:         return "lea";
@@ -95,6 +101,57 @@ void AsmCmd2::Print() const
    _src->Print();
 }
 
+AsmLabel::AsmLabel(AsmStrImmediate* ALabel):
+   _label(ALabel)
+ {}
+
+AsmLabel::AsmLabel(AsmStrImmediate ALabel) :
+   _label(new AsmStrImmediate(ALabel))
+ {}
+
+AsmLabel::AsmLabel(string ALabel) :
+   _label(new AsmStrImmediate(ALabel))
+ {}
+
+void AsmLabel::Print() const
+{
+   _label->PrintBase();
+   cout << ':';
+}
+
+AsmRawCmd::AsmRawCmd(string cmd):
+   _str(cmd)
+{}
+
+void AsmRawCmd::Print() const
+{
+   cout << _str;
+}
+
+AsmSubroutineBase::AsmSubroutineBase(AsmStrImmediate* ALabel):
+   _label(ALabel)
+{}
+
+AsmSubroutineBegin::AsmSubroutineBegin(AsmStrImmediate* ALabel) :
+   AsmSubroutineBase(ALabel)
+{}
+
+void AsmSubroutineBegin::Print() const
+{
+   _label->PrintBase();
+   cout << " proc";
+}
+
+AsmSubroutineEnd::AsmSubroutineEnd(AsmStrImmediate* ALabel):
+   AsmSubroutineBase(ALabel)
+{}
+
+void AsmSubroutineEnd::Print() const
+{
+   _label->PrintBase();
+   cout << " endp";
+}
+
 AsmDataBase::AsmDataBase(string AName):
    _name(AName)
 {}
@@ -128,16 +185,7 @@ AsmDataNewLine::AsmDataNewLine(string AName):
 
 void AsmDataNewLine::Print() const
 {
-   cout << '\t' << _name << " db 10";
-}
-
-AsmRawCmd::AsmRawCmd(string cmd):
-   _str(cmd)
-{}
-
-void AsmRawCmd::Print() const
-{
-   cout << _str;
+   cout << '\t' << _name << " db 10, 0";
 }
 
 void AsmOperand::Print() const
@@ -177,8 +225,9 @@ void AsmImmediate::Print() const
    PrintBase();
 }
 
-AsmIntImmediate::AsmIntImmediate(int AValue):
-   _value(AValue)
+AsmIntImmediate::AsmIntImmediate(int AValue, SizeType AType):
+   _value(AValue),
+   _sizeType(AType)
 {}
 
 int AsmIntImmediate::GetIntValue() const
@@ -188,7 +237,12 @@ int AsmIntImmediate::GetIntValue() const
 
 void AsmIntImmediate::PrintBase() const
 {
-   cout << "dword ptr " <<_value;
+   if (_sizeType == szBYTE) {
+      cout << "byte";
+   } else if (_sizeType == szDWORD) {
+      cout << "dword";
+   }
+   cout << " ptr " <<_value;
 }
 
 AsmVarBase::AsmVarBase(AsmOperand* AOper):
@@ -215,7 +269,7 @@ void AsmVarDword::PrintBase() const
    oper->PrintBase();
 }
 
-AsmStrImmediate::AsmStrImmediate(const string& AValue):
+AsmStrImmediate::AsmStrImmediate(string AValue):
    _value(AValue)
 {}
 
@@ -244,17 +298,17 @@ void AsmMemory::Print() const
    cout << '[';
    _oper->PrintBase();
    if (_offset) {
-      cout << " + " << _offset;
+      cout << (_offset > 0 ? " + " : " - ") << abs(_offset);
    }
    cout << ']';
 }
 
 AsmCode::AsmCode():
+   labelCounter(0),
    functWrite(AsmStrImmediate("crt_printf")),
-   hasIntFormat(false),
-   hasRealFormat(false),
-   hasStrFormat(false),
-   hasNewLineFormat(false)
+   formatStrInt(nullptr),
+   formatStrReal(nullptr),
+   formatStrNewLine(nullptr)
 {}
 
 void AsmCode::AddCmd(string raw_cmd)
@@ -292,21 +346,26 @@ void AsmCode::AddCmd(OpCode cmd, Register reg)
    commands.push_back(new AsmCmd1(cmd, new AsmRegister(reg)));
 }
 
-void AsmCode::AddCmd(OpCode cmd, AsmStrImmediate str_imm)
+void AsmCode::AddCmd(OpCode cmd, AsmStrImmediate* strImm)
 {
-   AsmStrImmediate* tmp = new AsmStrImmediate(str_imm);
+   commands.push_back(new AsmCmd1(cmd, strImm));
+}
+
+void AsmCode::AddCmd(OpCode cmd, AsmStrImmediate strImm)
+{
+   AsmStrImmediate* tmp = new AsmStrImmediate(strImm);
    commands.push_back(new AsmCmd1(cmd, tmp));
 }
 
-void AsmCode::AddCmd(OpCode cmd, AsmIntImmediate int_imm)
+void AsmCode::AddCmd(OpCode cmd, AsmIntImmediate intImm)
 {
-   AsmIntImmediate* tmp = new AsmIntImmediate(int_imm);
+   AsmIntImmediate* tmp = new AsmIntImmediate(intImm);
    commands.push_back(new AsmCmd1(cmd, tmp));
 }
 
-void AsmCode::AddCmd(OpCode cmd, int int_imm)
+void AsmCode::AddCmd(OpCode cmd, int intImm, SizeType type)
 {
-   AsmIntImmediate* tmp = new AsmIntImmediate(int_imm);
+   AsmIntImmediate* tmp = new AsmIntImmediate(intImm, type);
    commands.push_back(new AsmCmd1(cmd, tmp));
 }
 
@@ -315,10 +374,15 @@ void AsmCode::AddCmd(OpCode cmd, AsmOperand* oper1, AsmOperand* oper2)
    commands.push_back(new AsmCmd2(cmd, oper1, oper2));
 }
 
-void AsmCode::AddCmd(OpCode cmd, Register reg, int intImm)
+void AsmCode::AddCmd(OpCode cmd, Register reg, int intImm, SizeType type)
 {
-   AsmIntImmediate* imm = new AsmIntImmediate(intImm);
+   AsmIntImmediate* imm = new AsmIntImmediate(intImm, type);
    commands.push_back(new AsmCmd2(cmd, new AsmRegister(reg), imm));
+}
+
+void AsmCode::AddCmd(OpCode cmd, AsmMemory mem, AsmIntImmediate intImm)
+{
+   AddCmd(cmd, new AsmMemory(mem), new AsmIntImmediate(intImm));
 }
 
 void AsmCode::AddCmd(OpCode cmd, AsmMemory mem, Register reg)
@@ -347,9 +411,45 @@ AsmStrImmediate* AsmCode::AddData(string name, size_t size)
 
 AsmStrImmediate* AsmCode::AddData(string name, string value)
 {
-   name = "format_str_" + name;
+   name = "fmt_" + name;
    data.push_back(new AsmDataStr(name, value));
    return new AsmStrImmediate(name);
+}
+
+void AsmCode::AddLabel(AsmStrImmediate* label)
+{
+   commands.push_back(new AsmLabel(label));
+}
+
+void AsmCode::AddLabel(AsmStrImmediate label)
+{
+   commands.push_back(new AsmLabel(label));
+}
+
+void AsmCode::AddLabel(string label)
+{
+   commands.push_back(new AsmLabel(new AsmStrImmediate(label)));
+}
+
+void AsmCode::AddSubroutineBegin(AsmStrImmediate* strImm)
+{
+   commands.push_back(new AsmSubroutineBegin(strImm));
+}
+
+void AsmCode::AddSubroutineEnd(AsmStrImmediate* strImm)
+{
+   commands.push_back(new AsmSubroutineEnd(strImm));
+}
+
+AsmStrImmediate* AsmCode::GenLabel(string prefix)
+{
+   prefix = '@' + prefix + '_' + to_string(labelCounter++);
+   return new AsmStrImmediate(prefix);
+}
+
+string AsmCode::GenStrLabel(string value)
+{
+   return value + to_string(labelCounter++);
 }
 
 void AsmCode::Print() const
@@ -372,19 +472,33 @@ void AsmCode::Print() const
 
 void AsmCode::PushMemory(unsigned size)
 {
-   AddCmd(POP, EBX);
-   for (size_t i = 0; i < size; i += 4) {
-      AddCmd(MOV, EAX, AsmMemory(EBX, size - i - 4));
-      AddCmd(PUSH, EAX);
+   AddCmd(POP, EAX);
+   if (size <= 16) {
+      for (size_t i = 0; i < size; i += 4) {
+         AddCmd(MOV, EBX, AsmMemory(EAX, size - i - 4));
+         AddCmd(PUSH, EBX);
+      }
+   } else {
+      AsmStrImmediate* labelBegin = GenLabel("L");
+      AsmStrImmediate* labelEnd   = GenLabel("L");
+      AddCmd(MOV, ECX, size);
+      AddCmd(ADD, EAX, ECX);
+      AddCmd(MOV, EBX, 0);
+      AddLabel(labelBegin);
+      AddCmd(CMP, EBX, ECX);
+      AddCmd(JGE, labelEnd);
+      AddCmd(SUB, EAX, 4);
+      AddCmd(MOV, EDX, AsmMemory(EAX));
+      AddCmd(PUSH, EDX);
+      AddCmd(ADD, EBX, 4);
+      AddCmd(JMP, labelBegin);
+      AddLabel(labelEnd);
    }
 }
 
 void AsmCode::GenCallWriteForInt()
 {
-   if (!hasIntFormat) {
-      formatStrInt = AddData("int", "%d");
-      hasIntFormat = true;
-   }
+   formatStrInt = formatStrInt == nullptr ? AddData("int", "%d") : formatStrInt;
    AddCmd(PUSH, AsmVarAddr(formatStrInt));
    AddCmd(CALL, functWrite);
    AddCmd(ADD, ESP, 8);
@@ -392,29 +506,18 @@ void AsmCode::GenCallWriteForInt()
 
 void AsmCode::GenCallWriteForReal()
 {
-   if (!hasRealFormat) {
-      formatStrReal = AddData("float", "%f");
-      hasRealFormat = true;
-   }
+   formatStrReal = formatStrReal == nullptr ? AddData("float", "%f") : formatStrReal;
 }
 
 void AsmCode::GenCallWriteForStr()
 {
-   if (!hasStrFormat) {
-      formatStrStr = AddData("string", "%s");
-      hasStrFormat = true;
-   }
-   AddCmd(PUSH, AsmVarAddr(formatStrStr));
    AddCmd(CALL, functWrite);
-   AddCmd(ADD, ESP, 8);
+   AddCmd(ADD, ESP, 4);
 }
 
 void AsmCode::GenWriteNewLine()
 {
-   if (!hasNewLineFormat) {
-      formatStrNewLine = AddData("new_line");
-      hasNewLineFormat = true;
-   }
+   formatStrNewLine = formatStrNewLine == nullptr ? AddData("new_line") : formatStrNewLine;
    AddCmd(PUSH, AsmVarAddr(formatStrNewLine));
    AddCmd(CALL, functWrite);
    AddCmd(ADD, ESP, 4);

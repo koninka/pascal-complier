@@ -5,6 +5,6 @@
  foo     function                        integer                              0
  foo params:
  b       func var param                  arr                                  1
+ result  func result                     integer                              1
  foo locals:
- result  local variable                  integer                              1
 

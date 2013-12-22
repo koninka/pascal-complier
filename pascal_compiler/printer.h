@@ -2,7 +2,6 @@
 
 #include <iostream>
 #include "scanner.h"
-#include "simple_parser.h"
 #include "parser.h"
 
 class Printer {

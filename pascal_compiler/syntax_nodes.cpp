@@ -3,52 +3,33 @@
 
 using namespace std;
 
-NodeBlock::NodeBlock(string AName): SyntaxNode(ntBlock), name(AName) {}
-
-NodeBlock::NodeBlock(NodeType AType): SyntaxNode(AType) {}
-
-NodeBlock::NodeBlock(Statements AStatements, string AName, NodeType AType):
-		SyntaxNode(AType), name(AName), statements(AStatements) {}
-
-void NodeBlock::AddStatement(SyntaxNode* statement)
-{
-	if (statement != nullptr) {
-		statements.push_back(statement);
-	}
-}
-
-void NodeBlock::Generate(AsmCode& asmCode) const
-{
-   for (auto &statement : statements) {
-      statement->Generate(asmCode);
-   }
-}
-
-void NodeBlock::PrintNode(int d)
-{
-	for (size_t i = 0; i < statements.size(); i++) {
-		if (i == statements.size() % 2 + 1) {
-			SyntaxNode::PrintText(d, name);
-		}
-		statements[i]->PrintNode(d + 1);
-	}
-	if (statements.size() == 0) {
-		SyntaxNode::PrintText(d + 1, "empty block");
-		SyntaxNode::PrintText(d, name);
-	} else if (statements.size() == 1) {
-		SyntaxNode::PrintText(d, name);
-	}
-}
-
-NodeSubroutineBlock::NodeSubroutineBlock(): NodeBlock(ntSubroutineBlock) {}
+NodeSubroutineBlock::NodeSubroutineBlock():
+   NodeBlock(ntSubroutineBlock),
+   exitLabel(nullptr)
+{}
 
 void NodeSubroutineBlock::AddBody(NodeBlock* ABlock)
 {
-	name = ABlock->name;
+	name       = ABlock->name;
 	statements = ABlock->statements;
 }
 
-NodeExpr::NodeExpr(TokenPtr ptr, NodeType AType): token(ptr), SyntaxNode(AType) {}
+void NodeSubroutineBlock::Generate(AsmCode& asmCode)
+{
+   exitLabel = asmCode.GenLabel("exit");
+   NodeBlock::Generate(asmCode);
+   asmCode.AddLabel(exitLabel);
+}
+
+AsmStrImmediate* NodeSubroutineBlock::GetExitLabel() const
+{
+   return exitLabel;
+}
+
+NodeExpr::NodeExpr(TokenPtr ptr, NodeType AType, unsigned ADepth):
+   token(ptr),
+   SyntaxNode(AType, ADepth)
+{}
 
 void NodeExpr::PrintNode(int d)
 {
@@ -75,7 +56,9 @@ bool NodeExpr::IsSubroutineCall()
 	return false;
 }
 
-NodeNumber::NodeNumber(TokenPtr ptr): NodeExpr(ptr, ntNumber) {}
+NodeNumber::NodeNumber(TokenPtr ptr, unsigned ADepth):
+   NodeExpr(ptr, ntNumber, ADepth)
+{}
 
 Symbol* NodeNumber::GetType()
 {
@@ -88,7 +71,7 @@ Symbol* NodeNumber::GetType()
 	return symbol;
 }
 
-void NodeNumber::Generate(AsmCode& asmCode) const
+void NodeNumber::Generate(AsmCode& asmCode)
 {
    if (*token == ttIntegerNumber) {
       GenerateForInt(asmCode);
@@ -107,7 +90,9 @@ void NodeNumber::GenerateForFloat(AsmCode& asmCode) const
 
 }
 
-NodeCharacterString::NodeCharacterString(TokenPtr ptr): NodeExpr(ptr, ntCharacterString) {}
+NodeCharacterString::NodeCharacterString(TokenPtr ptr, unsigned ADepth):
+   NodeExpr(ptr, ntCharacterString, ADepth)
+{}
 
 Symbol* NodeCharacterString::GetType()
 {
@@ -120,7 +105,15 @@ Symbol* NodeCharacterString::GetType()
 	return symbol;
 }
 
-NodeVar::NodeVar(TokenPtr ptr, Symbol* ASymbol): NodeExpr(ptr, ntVar), symbol(ASymbol) {}
+void NodeCharacterString::Generate(AsmCode& asmCode)
+{
+   asmCode.AddCmd(PUSH, AsmVarAddr(asmCode.AddData(asmCode.GenStrLabel("str"), token->getValue())));
+}
+
+NodeVar::NodeVar(TokenPtr ptr, Symbol* ASymbol, unsigned ADepth):
+   NodeExpr(ptr, ntVar, ADepth),
+   symbol(ASymbol)
+{}
 
 Symbol* NodeVar::GetType()
 {
@@ -142,19 +135,25 @@ bool NodeVar::IsLValue()
 	&& *symbol != stConstCharacterString;
 }
 
-void NodeVar::Generate(AsmCode& asmCode) const
+void NodeVar::Generate(AsmCode& asmCode)
 {
-   symbol->Generate(asmCode);
+   symbol->Generate(asmCode, depth);
 }
 
 void NodeVar::GenerateLValue(AsmCode& asmCode) const
 {
-   symbol->GenerateLValue(asmCode);
+   symbol->GenerateLValue(asmCode, depth);
 }
 
-NodeUnaryOp::NodeUnaryOp(TokenPtr ptr, NodeExpr* NodeExpr_child): NodeExpr(ptr, ntUnaryOp), arg(NodeExpr_child) {}
+NodeUnaryOp::NodeUnaryOp(TokenPtr ptr, NodeExpr* NodeExpr_child, unsigned ADepth):
+   NodeExpr(ptr, ntUnaryOp, ADepth),
+   arg(NodeExpr_child)
+{}
 
-NodeUnaryOp::NodeUnaryOp(TokenPtr ptr, NodeExpr* NodeExpr_child, NodeType AType): NodeExpr(ptr, AType), arg(NodeExpr_child) {}
+NodeUnaryOp::NodeUnaryOp(TokenPtr ptr, NodeExpr* NodeExpr_child, NodeType AType, unsigned ADepth):
+   NodeExpr(ptr, AType, ADepth),
+   arg(NodeExpr_child)
+{}
 
 Symbol* NodeUnaryOp::GetType()
 {
@@ -165,7 +164,7 @@ Symbol* NodeUnaryOp::GetType()
 	return result;
 }
 
-void NodeUnaryOp::Generate(AsmCode& asmCode) const
+void NodeUnaryOp::Generate(AsmCode& asmCode)
 {
    arg->Generate(asmCode);
    if (*(arg->GetType()) == stTypeInteger) {
@@ -204,7 +203,23 @@ void NodeUnaryOp::GenerateForReal(AsmCode& asmCode) const
 
 }
 
-NodeInt2Float::NodeInt2Float(NodeExpr* AArg): NodeUnaryOp(nullptr, AArg, ntInt2Float) {}
+NodeIntTypecast::NodeIntTypecast(NodeExpr* AArg):
+   NodeUnaryOp(nullptr, AArg, ntIntTypeCast, 0)
+{}
+
+Symbol* NodeIntTypecast::GetType()
+{
+   return typeInteger;
+}
+
+void NodeIntTypecast::Generate(AsmCode& asmCode)
+{
+   arg->Generate(asmCode);
+}
+
+NodeInt2Float::NodeInt2Float(NodeExpr* AArg):
+   NodeUnaryOp(nullptr, AArg, ntInt2Float, 0)
+{}
 
 void NodeInt2Float::PrintNode(int d)
 {
@@ -217,7 +232,9 @@ Symbol* NodeInt2Float::GetType()
 	return typeFloat;
 }
 
-NodeFloat2Int::NodeFloat2Int(NodeExpr* AArg): NodeUnaryOp(nullptr, AArg, ntFloat2Int) {}
+NodeFloat2Int::NodeFloat2Int(NodeExpr* AArg):
+   NodeUnaryOp(nullptr, AArg, ntFloat2Int, 0)
+{}
 
 void NodeFloat2Int::PrintNode(int d)
 {
@@ -230,7 +247,9 @@ Symbol* NodeFloat2Int::GetType()
 	return typeInteger;
 }
 
-NodeOrd::NodeOrd(TokenPtr ptr, NodeExpr* AArg): NodeUnaryOp(ptr, AArg, ntOrd) {}
+NodeOrd::NodeOrd(TokenPtr ptr, NodeExpr* AArg, unsigned ADepth):
+   NodeUnaryOp(ptr, AArg, ntOrd, ADepth)
+{}
 
 Symbol* NodeOrd::GetType()
 {
@@ -241,7 +260,9 @@ Symbol* NodeOrd::GetType()
 	return symbol;
 }
 
-NodeChr::NodeChr(TokenPtr ptr, NodeExpr* AArg): NodeUnaryOp(ptr, AArg, ntChr) {}
+NodeChr::NodeChr(TokenPtr ptr, NodeExpr* AArg, unsigned ADepth):
+   NodeUnaryOp(ptr, AArg, ntChr, ADepth)
+{}
 
 Symbol* NodeChr::GetType()
 {
@@ -252,7 +273,21 @@ Symbol* NodeChr::GetType()
 	return symbol;
 }
 
-NodeBinary::NodeBinary(TokenPtr ptr, NodeExpr* l , NodeExpr* r, NodeType AType): NodeExpr(ptr, AType), left(l), right(r) {}
+NodeBinary::NodeBinary(TokenPtr ptr, NodeExpr* l, NodeExpr* r, NodeType AType, unsigned ADepth):
+   NodeExpr(ptr, AType, ADepth),
+   left(l),
+   right(r)
+{}
+
+NodeExpr* NodeBinary::GetLeft() const
+{
+   return left;
+}
+
+NodeExpr* NodeBinary::GetRight() const
+{
+   return right;
+}
 
 Symbol* NodeBinary::GetType()
 {
@@ -278,9 +313,11 @@ void NodeBinary::PrintNode(int d)
 	left->PrintNode(d + 1);
 }
 
-NodeBinaryOp::NodeBinaryOp(TokenPtr ptr, NodeExpr* l, NodeExpr* r): NodeBinary(ptr, l, r, ntBinaryOp) {}
+NodeBinaryOp::NodeBinaryOp(TokenPtr ptr, NodeExpr* l, NodeExpr* r, unsigned ADepth):
+   NodeBinary(ptr, l, r, ntBinaryOp, ADepth)
+{}
 
-void NodeBinaryOp::Generate(AsmCode& asmCode) const
+void NodeBinaryOp::Generate(AsmCode& asmCode)
 {
    left->Generate(asmCode);
    right->Generate(asmCode);
@@ -378,20 +415,42 @@ void NodeBinaryOp::GenerateForRealRelationalOp(AsmCode& asmCode) const
 
 }
 
-NodeAssignOp::NodeAssignOp(TokenPtr ptr, NodeExpr* l, NodeExpr* r): NodeBinary(ptr, l, r, ntAssignOp) {}
+NodeAssignOp::NodeAssignOp(TokenPtr ptr, NodeExpr* l, NodeExpr* r):
+   NodeBinary(ptr, l, r, ntAssignOp, 0)
+{}
 
-void NodeAssignOp::Generate(AsmCode& asmCode) const
+void NodeAssignOp::Generate(AsmCode& asmCode)
 {
    right->Generate(asmCode);
    left->GenerateLValue(asmCode);
-   asmCode.AddCmd(POP, EBX);
-   for (size_t i = 0, size = left->GetType()->GetSize(); i < size; i += 4) {
-      asmCode.AddCmd(POP, EAX);
-      asmCode.AddCmd(MOV, AsmMemory(EBX, i), EAX);
+   asmCode.AddCmd(POP, EAX);
+   size_t size = left->GetType()->GetSize();
+   if (size <= 16) {
+      for (size_t i = 0; i < size; i += 4) {
+         asmCode.AddCmd(POP, EBX);
+         asmCode.AddCmd(MOV, AsmMemory(EAX, i), EBX);
+      }
+   } else {
+      AsmStrImmediate* labelBegin = asmCode.GenLabel("assignBegin");
+      AsmStrImmediate* labelEnd   = asmCode.GenLabel("assignEnd");
+      asmCode.AddCmd(SUB, EAX, 4);
+      asmCode.AddCmd(MOV, EBX, 0);
+      asmCode.AddCmd(MOV, ECX, size);
+      asmCode.AddLabel(labelBegin);
+      asmCode.AddCmd(CMP, EBX, ECX);
+      asmCode.AddCmd(JGE, labelEnd);
+      asmCode.AddCmd(ADD, EAX, 4);
+      asmCode.AddCmd(POP, EDX);
+      asmCode.AddCmd(MOV, AsmMemory(EAX), EDX);
+      asmCode.AddCmd(ADD, EBX, 4);
+      asmCode.AddCmd(JMP, labelBegin);
+      asmCode.AddLabel(labelEnd);
    }
 }
 
-NodeRecordAccess::NodeRecordAccess(TokenPtr ptr, NodeExpr* l, NodeExpr* r): NodeBinary(ptr, l, r, ntRecordAccess) {}
+NodeRecordAccess::NodeRecordAccess(TokenPtr ptr, NodeExpr* l, NodeExpr* r, unsigned ADepth):
+   NodeBinary(ptr, l, r, ntRecordAccess, ADepth)
+{}
 
 Symbol* NodeRecordAccess::GetType()
 {
@@ -408,7 +467,7 @@ bool NodeRecordAccess::IsLValue()
 	return true;
 }
 
-void NodeRecordAccess::Generate(AsmCode& asmCode) const
+void NodeRecordAccess::Generate(AsmCode& asmCode)
 {
    GenerateLValue(asmCode);
    asmCode.PushMemory(dynamic_cast<NodeVar*>(right)->symbol->GetType()->GetSize());
@@ -418,11 +477,15 @@ void NodeRecordAccess::GenerateLValue(AsmCode& asmCode) const
 {
    left->GenerateLValue(asmCode);
    asmCode.AddCmd(POP, EAX);
-   asmCode.AddCmd(LEA, EAX, AsmMemory(EAX, dynamic_cast<NodeVar*>(right)->symbol->GetOffset()));
+   asmCode.AddCmd(ADD, EAX, dynamic_cast<NodeVar*>(right)->symbol->GetOffset());
+   //asmCode.AddCmd(LEA, EAX, AsmMemory(EAX, ));
    asmCode.AddCmd(PUSH, EAX);
 }
 
-NodeArgs::NodeArgs(Args AArgs, NodeType AType): args(AArgs), NodeExpr(nullptr, AType)  {}
+NodeArgs::NodeArgs(Args AArgs, NodeType AType, unsigned ADepth):
+   args(AArgs),
+   NodeExpr(nullptr, AType, ADepth)
+{}
 
 void NodeArgs::PrintNode(int d)
 {
@@ -431,15 +494,17 @@ void NodeArgs::PrintNode(int d)
 	}
 }
 
-NodeWriteBase::NodeWriteBase(Args AArgs, NodeType AType): NodeArgs(AArgs, AType) {}
+NodeWriteBase::NodeWriteBase(Args AArgs, NodeType AType, unsigned ADepth):
+   NodeArgs(AArgs, AType, ADepth)
+{}
 
-void NodeWriteBase::Generate(AsmCode& asmCode) const
+void NodeWriteBase::Generate(AsmCode& asmCode)
 {
    for (auto &arg : args) {
       if (arg->IsLValue()) {
          arg->GenerateLValue(asmCode);
          asmCode.AddCmd(POP, EAX);
-         asmCode.AddCmd(PUSH, AsmVarDword(new AsmMemory(Register(EAX))));
+         asmCode.AddCmd(PUSH, AsmVarDword(new AsmMemory(EAX)));
       } else {
          arg->Generate(asmCode);
       }
@@ -454,8 +519,8 @@ void NodeWriteBase::Generate(AsmCode& asmCode) const
    }
 }
 
-NodeWrite::NodeWrite(Args AArgs):
-   NodeWriteBase(AArgs, ntWrite)
+NodeWrite::NodeWrite(Args AArgs, unsigned ADepth):
+   NodeWriteBase(AArgs, ntWrite, ADepth)
 {}
 
 void NodeWrite::PrintNode(int d)
@@ -464,8 +529,8 @@ void NodeWrite::PrintNode(int d)
    SyntaxNode::PrintText(d, "write");
 }
 
-NodeWriteln::NodeWriteln(Args AArgs):
-   NodeWriteBase(AArgs, ntWriteln)
+NodeWriteln::NodeWriteln(Args AArgs, unsigned ADepth):
+   NodeWriteBase(AArgs, ntWriteln, ADepth)
 {}
 
 void NodeWriteln::PrintNode(int d)
@@ -474,14 +539,16 @@ void NodeWriteln::PrintNode(int d)
    SyntaxNode::PrintText(d, "writeln");
 }
 
-void NodeWriteln::Generate(AsmCode& asmCode) const
+void NodeWriteln::Generate(AsmCode& asmCode)
 {
    NodeWriteBase::Generate(asmCode);
    asmCode.GenWriteNewLine();
 }
 
-NodeCall::NodeCall(NodeExpr* ACallName, Args AArgs, Symbol* AResultType):
-		NodeArgs(AArgs, ntCall), callName(ACallName), resultType(AResultType) {}
+NodeCall::NodeCall(NodeExpr* ACallName, Args AArgs, unsigned ADepth):
+		NodeArgs(AArgs, ntCall, ADepth),
+      callName(ACallName)
+{}
 
 void NodeCall::PrintNode(int d)
 {
@@ -497,7 +564,8 @@ bool NodeCall::IsSubroutineCall()
 
 Symbol* NodeCall::GetType()
 {
-	return resultType != nullptr ? GetReferenceType(resultType) : typeDefault;
+   Symbol* symbol = GetSymbol();
+   return *symbol == stFunction ? GetReferenceType(dynamic_cast<SymFunction*>(symbol)->GetResultType()) : typeDefault;
 }
 
 Symbol* NodeCall::GetSymbol()
@@ -505,7 +573,37 @@ Symbol* NodeCall::GetSymbol()
    return callName->GetSymbol();
 }
 
-NodeArrIdx::NodeArrIdx(NodeExpr* AArrName, Args AArgs): NodeArgs(AArgs, ntArrIdx), arrName(AArrName) {}
+void NodeCall::Generate(AsmCode& asmCode)
+{
+   SymSubroutine* subroutine = dynamic_cast<SymSubroutine*>(callName->GetSymbol());
+   if (*subroutine == stFunction) {
+      asmCode.AddCmd(SUB, ESP, dynamic_cast<SymFunction*>(subroutine)->GetResultType()->GetSize());
+   }
+   size_t size = 0;
+   for (int i = args.size() - 1; i >= 0; i--) {
+      if (subroutine->GetArg(i)->IsByRef()) {
+         size += 4;
+         args[i]->GenerateLValue(asmCode);
+      } else {
+         Symbol* symbol = args[i]->GetType();
+         args[i]->Generate(asmCode);
+         if (symbol != nullptr && *(symbol) == stTypeArray) {
+            //asmCode.AddCmd(PUSH, symbol->GetType()->GetSize());
+            asmCode.AddCmd(PUSH, symbol->GetSize());
+            size += 4;
+         }
+         size += args[i]->GetType()->GetSize();
+      }
+   }
+   asmCode.AddCmd(PUSH, EBP);
+   asmCode.AddCmd(CALL, subroutine->GetLabel());
+   asmCode.AddCmd(ADD, ESP, size);
+}
+
+NodeArrIdx::NodeArrIdx(NodeExpr* AArrName, Args AArgs, unsigned ADepth):
+   NodeArgs(AArgs, ntArrIdx, ADepth),
+   arrName(AArrName)
+{}
 
 void NodeArrIdx::PrintNode(int d)
 {
@@ -517,10 +615,15 @@ void NodeArrIdx::PrintNode(int d)
 Symbol* NodeArrIdx::GetType()
 {
 	Symbol* arrType = arrName->GetType();
-	for (size_t i = 0; i < args.size() && *(GetReferenceType(arrType)) == stTypeArray; i++) {
-		arrType = dynamic_cast<SymTypeArry*>(arrType)->elemType;
+   for (size_t i = 0; i < args.size() && (*(GetReferenceType(arrType)) == stTypeArray || *(GetReferenceType(arrType)) == stTypeOpenArray); i++) {
+      arrType = dynamic_cast<SymTypeArry*>(GetReferenceType(arrType))->elemType;
 	}
 	return GetReferenceType(arrType);
+}
+
+Symbol* NodeArrIdx::GetSymbol()
+{
+   return arrName->GetSymbol();
 }
 
 bool NodeArrIdx::IsLValue()
@@ -528,16 +631,16 @@ bool NodeArrIdx::IsLValue()
 	return arrName->IsLValue();
 }
 
-void NodeArrIdx::Generate(AsmCode& asmCode) const
+void NodeArrIdx::Generate(AsmCode& asmCode)
 {
    ComputeIndexToEax(asmCode);
-   size_t size = dynamic_cast<SymTypeArray*>(arrName->GetSymbol()->GetType())->elemType->GetSize();
-   //if (size > 4) {
-   //   asmCode.PushMemory(size);
-   //} else {
+   size_t size = dynamic_cast<SymTypeArry*>(arrName->GetSymbol()->GetType())->elemType->GetSize();
+   if (size > 4) {
+      asmCode.PushMemory(size);
+   } else {
       asmCode.AddCmd(POP, EAX);
       asmCode.AddCmd(PUSH, AsmMemory(EAX));
-   //}
+   }
 }
 
 void NodeArrIdx::GenerateLValue(AsmCode& asmCode) const
@@ -548,56 +651,89 @@ void NodeArrIdx::GenerateLValue(AsmCode& asmCode) const
 void NodeArrIdx::ComputeIndexToEax(AsmCode& asmCode) const
 {
    arrName->GenerateLValue(asmCode);
-   SymTypeArray* type = dynamic_cast<SymTypeArray*>(arrName->GetSymbol()->GetType());
+   SymTypeArry* type = dynamic_cast<SymTypeArry*>(arrName->GetSymbol()->GetType());
    for (auto &arg : args) {
       arg->Generate(asmCode);
       asmCode.AddCmd(MOV, EBX, type->elemType->GetSize());
       asmCode.AddCmd(POP, EAX);
       asmCode.AddCmd(SUB, EAX, type->GetLow());
-      asmCode.AddCmd(XOR, EDX, EDX);
       asmCode.AddCmd(IMUL, EAX, EBX);
       asmCode.AddCmd(POP, EBX);
       asmCode.AddCmd(ADD, EAX, EBX);
       asmCode.AddCmd(PUSH, EAX);
-      SymTypeArray* arry = dynamic_cast<SymTypeArray*>(type->elemType);
+      SymTypeArray* arry = dynamic_cast<SymTypeArray*>(GetReferenceType(type->elemType));
       type = arry != nullptr ? arry : type;
    }
 }
 
-NodeStmt::NodeStmt(NodeType AType): SyntaxNode(AType) {}
+NodeStmt::NodeStmt(NodeType AType, unsigned ADepth):
+   SyntaxNode(AType, ADepth)
+{}
 
 bool NodeStmt::IsForLoop()
 {
 	return false;
 }
 
-NodeExitStmt::NodeExitStmt(SyntaxNode* ABlock): NodeStmt(ntExitStmt), block(ABlock) {}
+NodeExitStmt::NodeExitStmt(SyntaxNode* ABlock):
+   NodeStmt(ntExitStmt, 0),
+   block(ABlock)
+{}
 
 void NodeExitStmt::PrintNode(int d)
 {
 	PrintText(d, "exit");
 }
 
-NodeJumpStmt::NodeJumpStmt(NodeStmt* ALoop, NodeType AType): NodeStmt(AType), loop(ALoop) {}
+void NodeExitStmt::Generate(AsmCode& asmCode)
+{
+   asmCode.AddCmd(JMP, dynamic_cast<NodeSubroutineBlock*>(block)->GetExitLabel());
+}
 
-NodeBreakStmt::NodeBreakStmt(NodeStmt* ALoop): NodeJumpStmt(ALoop, ntBreakStmt) {}
+NodeJumpStmt::NodeJumpStmt(NodeStmt* ALoop, NodeType AType):
+   NodeStmt(AType, 0),
+   loop(ALoop)
+{}
+
+
+NodeBreakStmt::NodeBreakStmt(NodeStmt* ALoop):
+   NodeJumpStmt(ALoop, ntBreakStmt)
+{}
 
 void NodeBreakStmt::PrintNode(int d)
 {
 	PrintText(d, "break");
 }
 
-NodeContinueStmt::NodeContinueStmt(NodeStmt* ALoop): NodeJumpStmt(ALoop, ntContinueStmt) {}
+void NodeBreakStmt::Generate(AsmCode& asmCode)
+{
+   asmCode.AddCmd(JMP, dynamic_cast<NodeLoopStmtBase*>(loop)->GetBreakLabel());
+}
+
+NodeContinueStmt::NodeContinueStmt(NodeStmt* ALoop):
+   NodeJumpStmt(ALoop, ntContinueStmt)
+{}
 
 void NodeContinueStmt::PrintNode(int d)
 {
 	PrintText(d, "continue");
 }
 
-NodeExprStmt::NodeExprStmt(NodeExpr* AExpr, NodeType AType): NodeStmt(AType), expr(AExpr) {}
+void NodeContinueStmt::Generate(AsmCode& asmCode)
+{
+   asmCode.AddCmd(JMP, dynamic_cast<NodeLoopStmtBase*>(loop)->GetContinueLabel());
+}
 
-NodeIfStmt::NodeIfStmt(NodeExpr* AExpr, SyntaxNode* AThen_stmt, SyntaxNode* AElse_stmt):
-		NodeExprStmt(AExpr, ntIfStmt), then_stmt(AThen_stmt), else_stmt(AElse_stmt) {}
+NodeExprStmt::NodeExprStmt(NodeExpr* AExpr, NodeType AType, unsigned ADepth):
+   NodeStmt(AType, ADepth),
+   expr(AExpr)
+{}
+
+NodeIfStmt::NodeIfStmt(NodeExpr* AExpr, SyntaxNode* AThenStmt, SyntaxNode* AElseStmt, unsigned ADepth):
+		NodeExprStmt(AExpr, ntIfStmt, ADepth),
+      thenStmt(AThenStmt),
+      elseStmt(AElseStmt)
+{}
 
 void NodeIfStmt::PrintNode(int d)
 {
@@ -607,17 +743,55 @@ void NodeIfStmt::PrintNode(int d)
 	SyntaxNode::PrintText(d, "if block");
 	cout << endl;
 	SyntaxNode::PrintText(d + 1, "then");
-	if (then_stmt != nullptr) {
-		then_stmt->PrintNode(d + 2);
+	if (thenStmt != nullptr) {
+		thenStmt->PrintNode(d + 2);
 	}
-	if (else_stmt != nullptr) {
+	if (elseStmt != nullptr) {
 		SyntaxNode::PrintText(d + 1, "else");
 		cout << endl;
-		else_stmt->PrintNode(d + 2);
+		elseStmt->PrintNode(d + 2);
 	}
 }
 
-NodeWhileStmt::NodeWhileStmt(NodeExpr* AExpr): NodeExprStmt(AExpr, ntWhileStmt) {}
+void NodeIfStmt::Generate(AsmCode& asmCode)
+{
+   expr->Generate(asmCode);
+   bool hasElse = elseStmt != nullptr;
+   AsmStrImmediate* endIfLbl = asmCode.GenLabel("endif");
+   AsmStrImmediate* elseLbl  = hasElse ? asmCode.GenLabel("else") : nullptr;
+   asmCode.AddCmd(POP, EAX);
+   asmCode.AddCmd(MOV, EBX, 0);
+   asmCode.AddCmd(CMP, EAX, EBX);
+   asmCode.AddCmd(JE, hasElse ? elseLbl : endIfLbl);
+   thenStmt->Generate(asmCode);
+   if (hasElse) {
+      asmCode.AddCmd(JMP, endIfLbl);
+      asmCode.AddLabel(elseLbl);
+      elseStmt->Generate(asmCode);
+      asmCode.AddCmd(JMP, endIfLbl);
+   }
+   asmCode.AddLabel(endIfLbl);
+}
+
+void NodeLoopStmtBase::GenerateLoopLabels(AsmCode& asmCode)
+{
+   breakLabel = asmCode.GenLabel("lend");
+   continueLabel = asmCode.GenLabel("lcontinue");
+}
+
+AsmStrImmediate* NodeLoopStmtBase::GetBreakLabel() const
+{
+   return breakLabel;
+}
+
+AsmStrImmediate* NodeLoopStmtBase::GetContinueLabel() const
+{
+   return continueLabel;
+}
+
+NodeWhileStmt::NodeWhileStmt(NodeExpr* AExpr, unsigned ADepth):
+   NodeExprStmt(AExpr, ntWhileStmt, ADepth)
+{}
 
 void NodeWhileStmt::SetStatement(SyntaxNode* AStmt)
 {
@@ -637,17 +811,33 @@ void NodeWhileStmt::PrintNode(int d)
 	}
 }
 
-NodeRepeateStmt::NodeRepeateStmt(): NodeExprStmt(nullptr, ntRepeateStmt) {}
+void NodeWhileStmt::Generate(AsmCode& asmCode)
+{
+   GenerateLoopLabels(asmCode);
+   asmCode.AddLabel(continueLabel);
+   expr->Generate(asmCode);
+   asmCode.AddCmd(POP, EAX);
+   asmCode.AddCmd(MOV, EBX, 0);
+   asmCode.AddCmd(CMP, EAX, EBX);
+   asmCode.AddCmd(JE, breakLabel);
+   stmt->Generate(asmCode);
+   asmCode.AddCmd(JMP, continueLabel);
+   asmCode.AddLabel(breakLabel);
+}
 
-void NodeRepeateStmt::SetLoopInfo(NodeBlock* AStmt_seq, NodeExpr* AExpr)
+NodeRepeateStmt::NodeRepeateStmt(unsigned ADepth):
+   NodeExprStmt(nullptr, ntRepeateStmt, ADepth)
+{}
+
+void NodeRepeateStmt::SetLoopInfo(NodeBlock* AStmtSeq, NodeExpr* AExpr)
 {
 	expr = AExpr;
-	stmt_seq = AStmt_seq;
+	stmtSeq = AStmtSeq;
 }
 
 void NodeRepeateStmt::PrintNode(int d)
 {
-	stmt_seq->PrintNode(d + 1);
+	stmtSeq->PrintNode(d + 1);
 	cout << endl;
 	SyntaxNode::PrintText(d, "repeate block");
 	cout << endl;
@@ -655,8 +845,27 @@ void NodeRepeateStmt::PrintNode(int d)
 	expr->PrintNode(d + 2);
 }
 
-NodeForStmt::NodeForStmt(Symbol* AVar, NodeExpr* AInitialExpr, NodeExpr* AFinalExpr, LoopForType AType):
-	NodeStmt(ntForStmt), var(AVar), initialExpr(AInitialExpr), finalExpr(AFinalExpr), loopType(AType) {}
+void NodeRepeateStmt::Generate(AsmCode& asmCode)
+{
+   GenerateLoopLabels(asmCode);
+   asmCode.AddLabel(continueLabel);
+   stmtSeq->Generate(asmCode);
+   expr->Generate(asmCode);
+   asmCode.AddCmd(POP, EAX);
+   asmCode.AddCmd(MOV, EBX, 0);
+   asmCode.AddCmd(CMP, EAX, EBX);
+   asmCode.AddCmd(JE, continueLabel);
+   asmCode.AddCmd(JMP, breakLabel);
+   asmCode.AddLabel(breakLabel);
+}
+
+NodeForStmt::NodeForStmt(Symbol* AVar, NodeExpr* AInitialExpr, NodeExpr* AFinalExpr, LoopForType AType, unsigned ADepth):
+	NodeStmt(ntForStmt, ADepth),
+   var(AVar),
+   initialExpr(AInitialExpr),
+   finalExpr(AFinalExpr),
+   loopType(AType)
+{}
 
 void NodeForStmt::SetStatement(SyntaxNode* AStmt)
 {
@@ -678,6 +887,31 @@ void NodeForStmt::PrintNode(int d)
 	string toLoop = (loopType == loopTo ? "to" : "downto");
 	SyntaxNode::PrintText(d + 1, toLoop + " do");
 	stmt->PrintNode(d + 2);
+}
+
+void NodeForStmt::Generate(AsmCode& asmCode)
+{   
+   initialExpr->Generate(asmCode);
+   var->GenerateLValue(asmCode, depth);
+   asmCode.AddCmd(POP, EBX);
+   asmCode.AddCmd(POP, EAX);
+   asmCode.AddCmd(MOV, AsmMemory(EBX), EAX);
+   AsmStrImmediate* loopBegin = asmCode.GenLabel("forloop");
+   GenerateLoopLabels(asmCode);
+   asmCode.AddLabel(loopBegin);
+   var->Generate(asmCode, depth);
+   finalExpr->Generate(asmCode);
+   asmCode.AddCmd(POP, EBX);
+   asmCode.AddCmd(POP, EAX);
+   asmCode.AddCmd(CMP, EAX, EBX);
+   asmCode.AddCmd(loopType == loopTo ? JG : JL, breakLabel);
+   stmt->Generate(asmCode);
+   asmCode.AddLabel(continueLabel);
+   var->GenerateLValue(asmCode, depth);
+   asmCode.AddCmd(POP, EAX);
+   asmCode.AddCmd(loopType == loopTo ? ADD : SUB, AsmMemory(EAX), 1);
+   asmCode.AddCmd(JMP, loopBegin);
+   asmCode.AddLabel(breakLabel);
 }
 
 bool NodeForStmt::IsForLoop()

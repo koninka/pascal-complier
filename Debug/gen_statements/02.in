@@ -1,0 +1,9 @@
+   function f(): integer;
+   begin
+      result := 5;
+      exit;
+      result := 20;
+   end;
+begin
+   f();
+end.

@@ -1,0 +1,10 @@
+var
+   c: integer;
+   procedure foo(c: integer; b: integer);
+   begin
+      c := b + c;
+      write(c);
+   end;
+begin
+   foo(4, 5);
+end.

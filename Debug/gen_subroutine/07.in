@@ -1,0 +1,8 @@
+function F(): integer;
+begin
+   result := 5;
+end;
+
+begin
+   Write(F());
+end.
