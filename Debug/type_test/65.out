@@ -3,7 +3,7 @@
 
 
              ---- 5             
-       ---- i2f       
+       ---- real typecast       
        ---- 5       
  ---- call 
        ---- foo       

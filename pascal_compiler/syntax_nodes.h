@@ -25,12 +25,18 @@ struct NodeExpr: public SyntaxNode {
 
 typedef vector<NodeExpr*> Args;
 
-class NodeNumber: public NodeExpr {
-   void GenerateForInt(AsmCode&) const;
-   void GenerateForFloat(AsmCode&) const;
+struct NodeIntegerNumber: public NodeExpr {
+   NodeIntegerNumber(TokenPtr);
+   Symbol* GetType() override;
+   void Generate(AsmCode&) override;
+};
+
+class NodeRealNumber: public NodeExpr {
+   AsmStrImmediate* constLabel;
 public:
-	NodeNumber(TokenPtr, unsigned);
-	Symbol* GetType() override;
+   NodeRealNumber(TokenPtr);
+   Symbol* GetType() override;
+   void GenerateData(AsmCode&);
    void Generate(AsmCode&) override;
 };
 
@@ -62,22 +68,26 @@ public:
 	void PrintNode(int) override;
 };
 
-struct NodeIntTypecast: public NodeUnaryOp {
-   NodeIntTypecast(NodeExpr*);
+class NodeTypecast: public NodeUnaryOp {
+protected:
+   void GenerateRealTypecast(AsmCode&);
+   void GenerateIntegerTypecast(AsmCode&);
+public:
+   NodeTypecast(NodeExpr*, NodeType);
+};
+
+struct NodeIntegerTypecast: public NodeTypecast {
+   NodeIntegerTypecast(NodeExpr*);
    Symbol* GetType() override;
    void Generate(AsmCode&) override;
+   void PrintNode(int) override;
 };
 
-struct NodeInt2Float: public NodeUnaryOp {
-   NodeInt2Float(NodeExpr*);
-	void PrintNode(int) override;
-	Symbol* GetType() override;
-};
-
-struct NodeFloat2Int: public NodeUnaryOp {
-   NodeFloat2Int(NodeExpr*);
-	void PrintNode(int) override;
-	Symbol* GetType() override;
+struct NodeRealTypecast: public NodeTypecast {
+   NodeRealTypecast(NodeExpr*);
+   Symbol* GetType() override;
+   void Generate(AsmCode&) override;
+   void PrintNode(int) override;
 };
 
 struct NodeOrd: public NodeUnaryOp {

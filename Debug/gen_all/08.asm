@@ -12,9 +12,9 @@ includelib c:\masm32\lib\msvcrt.lib
 @generate_0 proc
 	push	ebp
 	mov	ebp, esp
-	sub	esp, dword ptr 8
+	sub	esp, 8
 	mov	ebx, ebp
-	add	ebx, dword ptr 12
+	add	ebx, 12
 	push	[ebx]
 	push	dword ptr [v_n]
 	pop	ebx
@@ -24,12 +24,12 @@ includelib c:\masm32\lib\msvcrt.lib
 	movzx	eax, al
 	push	eax
 	pop	eax
-	mov	ebx, dword ptr 0
+	mov	ebx, 0
 	cmp	eax, ebx
 	je	@else_3
-	push	dword ptr 1
+	push	1
 	mov	ebx, ebp
-	add	ebx, dword ptr -4
+	add	ebx, -4
 	push	ebx
 	pop	ebx
 	pop	eax
@@ -45,9 +45,9 @@ includelib c:\masm32\lib\msvcrt.lib
 	push	offset v_x
 	mov	ebx, ebp
 	push	[ebx - 4]
-	mov	ebx, dword ptr 4
+	mov	ebx, 4
 	pop	eax
-	sub	eax, dword ptr 1
+	sub	eax, 1
 	imul	eax, ebx
 	pop	ebx
 	add	eax, ebx
@@ -56,10 +56,10 @@ includelib c:\masm32\lib\msvcrt.lib
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, dword ptr 8
+	add	esp, 8
 @lcontinue_6:
 	mov	ebx, ebp
-	add	ebx, dword ptr -4
+	add	ebx, -4
 	push	ebx
 	pop	eax
 	add	[eax], dword ptr 1
@@ -67,12 +67,12 @@ includelib c:\masm32\lib\msvcrt.lib
 @lend_5:
 	push	offset fmt_str_new_line
 	call	crt_printf
-	add	esp, dword ptr 4
+	add	esp, 4
 	jmp	@endif_2
 @else_3:
-	push	dword ptr 1
+	push	1
 	mov	ebx, ebp
-	add	ebx, dword ptr -8
+	add	ebx, -8
 	push	ebx
 	pop	ebx
 	pop	eax
@@ -89,16 +89,16 @@ includelib c:\masm32\lib\msvcrt.lib
 	push	[ebx - 8]
 	push	offset v_x
 	mov	ebx, ebp
-	add	ebx, dword ptr 12
+	add	ebx, 12
 	push	[ebx]
-	push	dword ptr 1
+	push	1
 	pop	ebx
 	pop	eax
 	add	eax, ebx
 	push	eax
-	mov	ebx, dword ptr 4
+	mov	ebx, 4
 	pop	eax
-	sub	eax, dword ptr 1
+	sub	eax, 1
 	imul	eax, ebx
 	pop	ebx
 	add	eax, ebx
@@ -107,19 +107,19 @@ includelib c:\masm32\lib\msvcrt.lib
 	pop	ebx
 	mov	[eax], ebx
 	mov	ebx, ebp
-	add	ebx, dword ptr 12
+	add	ebx, 12
 	push	[ebx]
-	push	dword ptr 1
+	push	1
 	pop	ebx
 	pop	eax
 	add	eax, ebx
 	push	eax
 	push	ebp
 	call	@generate_0
-	add	esp, dword ptr 4
+	add	esp, 4
 @lcontinue_9:
 	mov	ebx, ebp
-	add	ebx, dword ptr -8
+	add	ebx, -8
 	push	ebx
 	pop	eax
 	add	[eax], dword ptr 1
@@ -134,22 +134,22 @@ includelib c:\masm32\lib\msvcrt.lib
 @generate_0 endp
 main:
 	mov	ebp, esp
-	push	dword ptr 2
+	push	2
 	push	offset v_m
 	pop	eax
 	pop	ebx
 	mov	[eax], ebx
-	push	dword ptr 3
+	push	3
 	push	offset v_n
 	pop	eax
 	pop	ebx
 	mov	[eax], ebx
-	push	dword ptr 0
+	push	0
 	push	ebp
 	call	@generate_0
-	add	esp, dword ptr 4
+	add	esp, 4
 @exit_10:
 	mov	esp, ebp
-	mov	eax, dword ptr 0
+	mov	eax, 0
 	ret
 end main

@@ -17,7 +17,7 @@ includelib c:\masm32\lib\msvcrt.lib
 	add	ebx, dword ptr 12
 	push	[ebx]
 	pop	eax
-	add	eax, dword ptr 0
+	add	eax, 0
 	push	eax
 	pop	eax
 	mov	ebx, [eax]
@@ -32,7 +32,7 @@ includelib c:\masm32\lib\msvcrt.lib
 	add	ebx, dword ptr 12
 	push	[ebx]
 	pop	eax
-	add	eax, dword ptr 4
+	add	eax, 4
 	push	eax
 	pop	eax
 	mov	ebx, [eax]
@@ -41,7 +41,7 @@ includelib c:\masm32\lib\msvcrt.lib
 	add	ebx, dword ptr 12
 	push	[ebx]
 	pop	eax
-	add	eax, dword ptr 0
+	add	eax, 0
 	push	eax
 	pop	eax
 	pop	ebx
@@ -52,7 +52,7 @@ includelib c:\masm32\lib\msvcrt.lib
 	add	ebx, dword ptr 12
 	push	[ebx]
 	pop	eax
-	add	eax, dword ptr 4
+	add	eax, 4
 	push	eax
 	pop	eax
 	pop	ebx
@@ -64,74 +64,74 @@ includelib c:\masm32\lib\msvcrt.lib
 @swap_0 endp
 main:
 	mov	ebp, esp
-	push	dword ptr 10
+	push	10
 	push	offset v_a
 	pop	eax
-	add	eax, dword ptr 0
+	add	eax, 0
 	push	eax
 	pop	eax
 	pop	ebx
 	mov	[eax], ebx
-	push	dword ptr 20
+	push	20
 	push	offset v_a
 	pop	eax
-	add	eax, dword ptr 4
+	add	eax, 4
 	push	eax
 	pop	eax
 	pop	ebx
 	mov	[eax], ebx
 	push	offset v_a
 	pop	eax
-	add	eax, dword ptr 0
+	add	eax, 0
 	push	eax
 	pop	eax
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, dword ptr 8
+	add	esp, 8
 	push	offset fmt_str3
 	call	crt_printf
-	add	esp, dword ptr 4
+	add	esp, 4
 	push	offset v_a
 	pop	eax
-	add	eax, dword ptr 4
+	add	eax, 4
 	push	eax
 	pop	eax
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, dword ptr 8
+	add	esp, 8
 	push	offset fmt_str_new_line
 	call	crt_printf
-	add	esp, dword ptr 4
+	add	esp, 4
 	push	offset v_a
 	push	ebp
 	call	@swap_0
-	add	esp, dword ptr 4
+	add	esp, 4
 	push	offset v_a
 	pop	eax
-	add	eax, dword ptr 0
+	add	eax, 0
 	push	eax
 	pop	eax
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, dword ptr 8
+	add	esp, 8
 	push	offset fmt_str4
 	call	crt_printf
-	add	esp, dword ptr 4
+	add	esp, 4
 	push	offset v_a
 	pop	eax
-	add	eax, dword ptr 4
+	add	eax, 4
 	push	eax
 	pop	eax
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, dword ptr 8
+	add	esp, 8
 	push	offset fmt_str_new_line
 	call	crt_printf
-	add	esp, dword ptr 4
+	add	esp, 4
 @exit_2:
 	mov	esp, ebp
 	mov	eax, dword ptr 0

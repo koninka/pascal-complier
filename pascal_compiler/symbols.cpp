@@ -151,9 +151,15 @@ size_t SymConstFloat::GetSize()
    return _size = typeFloat->GetSize();
 }
 
+void SymConstFloat::GenerateDeclaration(AsmCode& asmCode)
+{
+   constLabel = asmCode.AddData(name, value);
+   //asmCode.AddCmd(PUSH, AsmVarAddr(asmCode.AddData(asmCode.GenStrLabel("str"), value)));
+}
+
 void SymConstFloat::Generate(AsmCode& asmCode, unsigned) const
 {
-
+   asmCode.AddCmd(PUSH, constLabel);
 }
 
 void SymConstFloat::PrintSymbol(int d)
@@ -259,7 +265,7 @@ void SymVarGlobal::Generate(AsmCode& asmCode, unsigned) const
       GenerateLValue(asmCode, 0);
       asmCode.PushMemory(type->GetSize());
    } else {
-      asmCode.AddCmd(PUSH, AsmVarDword(new AsmMemory(varLabel)));
+      asmCode.AddCmd(PUSH, AsmMemory(varLabel, 0, szDWORD));
    }
 }
 
@@ -425,7 +431,7 @@ SymTypeFloat::SymTypeFloat():
    SymTypeScalar(stTypeFloat)
 {
    _size = 4;
-	name  = "double";
+	name  = "real";
 }
 
 SymTypeChar::SymTypeChar(): 

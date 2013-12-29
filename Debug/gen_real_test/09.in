@@ -1,0 +1,10 @@
+var
+   a: real;
+   procedure foo(var a1: real);
+   begin
+      a1 := 32.54;
+   end;
+begin
+   foo(a);
+   write(a);
+end.

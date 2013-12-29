@@ -2,6 +2,17 @@
 
 #include <sstream>
 
+string GetSizeType(SizeType type)
+{
+   switch (type) {
+      case szNONE:   return "";
+      case szBYTE:   return "byte ptr ";
+      case szDWORD:  return "dword ptr ";
+      case szQWORD:  return "qword ptr ";
+      default:       return "";
+   }
+}
+
 string GetReg(Register reg)
 {
    switch (reg) {
@@ -11,7 +22,10 @@ string GetReg(Register reg)
       case EDX:   return "edx";
       case ESP:   return "esp";
       case EBP:   return "ebp";
+      case AX:    return "ax";
       case AL:    return "al";
+      case ST1:   return "st(1)";
+      case ST:    return "st";
       default:    return "";
    }
 }
@@ -25,6 +39,18 @@ string GetCmd(OpCode opCode)
       case JE:          return "je";
       case JG:          return "jg";
       case JL:          return "jl";
+      case FLD:         return "fld";
+      case FILD:        return "fild";
+      case FCHS:        return "fchs";
+      case FSTP:        return "fstp";
+      case FXCH:        return "fxch";
+      case FADDP:       return "faddp";
+      case FMULP:       return "fmulp";
+      case FSUBRP:      return "fsubrp";
+      case FDIVP:       return "fdivp";
+      case FDIVRP:      return "fdivrp";
+      case FCOMPP:      return "fcompp";
+      case FNSTSW:      return "fnstsw";
       case SAR:         return "sar";
       case SAL:         return "sal";
       case LEA:         return "lea";
@@ -47,8 +73,14 @@ string GetCmd(OpCode opCode)
       case IDIV:        return "idiv";
       case MOV:         return "mov";
       case MOVZX:       return "movzx";
+      case MOVZB:       return "movzb";
       case ADD:         return "add";
       case SUB:         return "sub";
+      case SAHF:        return "sahf";
+      case SETA:        return "seta";
+      case SETAE:       return "setae";
+      case SETB:        return "setb";
+      case SETBE:       return "setbe";
       case SETG:        return "setg";
       case SETGE:       return "setge";
       case SETL:        return "setl";
@@ -169,6 +201,16 @@ void AsmData::Print() const
    cout << "\t" << _name << " db " << _size << " dup(0)";
 }
 
+AsmDataReal::AsmDataReal(string AName, double AValue):
+   AsmDataBase(AName),
+   _value(AValue)
+{}
+
+void AsmDataReal::Print() const
+{
+   cout << "\t" << _name << " real4 " << fixed << _value;
+}
+
 AsmDataStr::AsmDataStr(string AName, string AValue):
    AsmDataBase(AName),
    _value(AValue)
@@ -237,12 +279,7 @@ int AsmIntImmediate::GetIntValue() const
 
 void AsmIntImmediate::PrintBase() const
 {
-   if (_sizeType == szBYTE) {
-      cout << "byte";
-   } else if (_sizeType == szDWORD) {
-      cout << "dword";
-   }
-   cout << " ptr " <<_value;
+   cout << GetSizeType(_sizeType) << _value;
 }
 
 AsmVarBase::AsmVarBase(AsmOperand* AOper):
@@ -283,18 +320,21 @@ string AsmStrImmediate::GetStrValue() const
    return _value;
 }
 
-AsmMemory::AsmMemory(AsmOperand* AOper, int AOffset):
+AsmMemory::AsmMemory(AsmOperand* AOper, int AOffset, SizeType AType):
    _oper(AOper),
-   _offset(AOffset)
+   _offset(AOffset),
+   _size(AType)
 {}
 
-AsmMemory::AsmMemory(Register AReg, int AOffset):
+AsmMemory::AsmMemory(Register AReg, int AOffset, SizeType AType):
    _oper(new AsmRegister(AReg)),
-   _offset(AOffset)
+   _offset(AOffset),
+   _size(AType)
 {}
 
 void AsmMemory::Print() const
 {
+   cout << GetSizeType(_size);
    cout << '[';
    _oper->PrintBase();
    if (_offset) {
@@ -402,6 +442,13 @@ AsmStrImmediate* AsmCode::AddData(string name)
    return new AsmStrImmediate(name);
 }
 
+AsmStrImmediate* AsmCode::AddData(string name, double value)
+{
+   name = GenStrLabel("f" + name);
+   data.push_back(new AsmDataReal(name, value));
+   return new AsmStrImmediate(name);
+}
+
 AsmStrImmediate* AsmCode::AddData(string name, size_t size)
 {
    name = "v_" + name;
@@ -506,7 +553,13 @@ void AsmCode::GenCallWriteForInt()
 
 void AsmCode::GenCallWriteForReal()
 {
-   formatStrReal = formatStrReal == nullptr ? AddData("float", "%f") : formatStrReal;
+   formatStrReal = formatStrReal == nullptr ? AddData("float", " %0.14E") : formatStrReal;
+   AddCmd(FLD, AsmMemory(ESP, 0, szDWORD));
+   AddCmd(SUB, ESP, 8);
+   AddCmd(FSTP, AsmMemory(ESP, 0, szQWORD));
+   AddCmd(PUSH, AsmVarAddr(formatStrReal));
+   AddCmd(CALL, functWrite);
+   AddCmd(ADD, ESP, 12);
 }
 
 void AsmCode::GenCallWriteForStr()

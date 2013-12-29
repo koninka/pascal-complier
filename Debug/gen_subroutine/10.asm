@@ -15,7 +15,7 @@ includelib c:\masm32\lib\msvcrt.lib
 	add	ebx, dword ptr 12
 	push	ebx
 	pop	eax
-	add	eax, dword ptr 4
+	add	eax, 4
 	push	eax
 	pop	eax
 	mov	ebx, [eax]
@@ -34,7 +34,7 @@ includelib c:\masm32\lib\msvcrt.lib
 	add	ebx, dword ptr 4
 	push	ebx
 	pop	eax
-	add	eax, dword ptr 0
+	add	eax, 0
 	push	eax
 	pop	eax
 	pop	ebx
@@ -43,7 +43,7 @@ includelib c:\masm32\lib\msvcrt.lib
 	add	ebx, dword ptr 12
 	push	ebx
 	pop	eax
-	add	eax, dword ptr 0
+	add	eax, 0
 	push	eax
 	pop	eax
 	mov	ebx, [eax]
@@ -62,7 +62,7 @@ includelib c:\masm32\lib\msvcrt.lib
 	add	ebx, dword ptr 4
 	push	ebx
 	pop	eax
-	add	eax, dword ptr 4
+	add	eax, 4
 	push	eax
 	pop	eax
 	pop	ebx
@@ -74,24 +74,24 @@ includelib c:\masm32\lib\msvcrt.lib
 @swap_0 endp
 main:
 	mov	ebp, esp
-	push	dword ptr 4
+	push	4
 	push	offset v_a
 	pop	eax
-	add	eax, dword ptr 0
+	add	eax, 0
 	push	eax
 	pop	eax
 	pop	ebx
 	mov	[eax], ebx
-	push	dword ptr 11
+	push	11
 	push	offset v_a
 	pop	eax
-	add	eax, dword ptr 4
+	add	eax, 4
 	push	eax
 	pop	eax
 	pop	ebx
 	mov	[eax], ebx
-	sub	esp, dword ptr 8
-	push	dword ptr 3
+	sub	esp, 8
+	push	3
 	push	offset v_a
 	pop	eax
 	mov	ebx, [eax + 4]
@@ -100,7 +100,7 @@ main:
 	push	ebx
 	push	ebp
 	call	@swap_0
-	add	esp, dword ptr 12
+	add	esp, 12
 	push	offset v_b
 	pop	eax
 	pop	ebx
@@ -109,25 +109,25 @@ main:
 	mov	[eax + 4], ebx
 	push	offset v_b
 	pop	eax
-	add	eax, dword ptr 0
+	add	eax, 0
 	push	eax
 	pop	eax
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, dword ptr 8
+	add	esp, 8
 	push	offset fmt_str3
 	call	crt_printf
-	add	esp, dword ptr 4
+	add	esp, 4
 	push	offset v_b
 	pop	eax
-	add	eax, dword ptr 4
+	add	eax, 4
 	push	eax
 	pop	eax
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, dword ptr 8
+	add	esp, 8
 @exit_2:
 	mov	esp, ebp
 	mov	eax, dword ptr 0

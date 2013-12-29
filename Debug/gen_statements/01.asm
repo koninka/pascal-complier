@@ -8,10 +8,10 @@ includelib c:\masm32\lib\msvcrt.lib
 main:
 	mov	ebp, esp
 	jmp	@exit_0
-	push	dword ptr 30
+	push	30
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, dword ptr 8
+	add	esp, 8
 @exit_0:
 	mov	esp, ebp
 	mov	eax, dword ptr 0

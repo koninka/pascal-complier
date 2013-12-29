@@ -144,6 +144,5 @@ public:
 	void ParseProgram();
 	void PrintTree();
 	void PrintBlock();
-	void PrintSymTable();
-   
+   void PrintSymTable();
 };

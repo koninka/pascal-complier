@@ -7,7 +7,7 @@ includelib c:\masm32\lib\msvcrt.lib
 @f_0 proc
 	push	ebp
 	mov	ebp, esp
-	push	dword ptr 5
+	push	5
 	mov	ebx, ebp
 	add	ebx, dword ptr 12
 	push	ebx
@@ -15,7 +15,7 @@ includelib c:\masm32\lib\msvcrt.lib
 	pop	ebx
 	mov	[eax], ebx
 	jmp	@exit_1
-	push	dword ptr 20
+	push	20
 	mov	ebx, ebp
 	add	ebx, dword ptr 12
 	push	ebx
@@ -29,10 +29,10 @@ includelib c:\masm32\lib\msvcrt.lib
 @f_0 endp
 main:
 	mov	ebp, esp
-	sub	esp, dword ptr 4
+	sub	esp, 4
 	push	ebp
 	call	@f_0
-	add	esp, dword ptr 0
+	add	esp, 0
 @exit_2:
 	mov	esp, ebp
 	mov	eax, dword ptr 0

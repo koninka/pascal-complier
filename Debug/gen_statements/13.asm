@@ -8,14 +8,14 @@ includelib c:\masm32\lib\msvcrt.lib
 .code
 main:
 	mov	ebp, esp
-	push	dword ptr 0
+	push	0
 	push	offset v_i
 	pop	ebx
 	pop	eax
 	mov	[ebx], eax
 @forloop_1:
 	push	dword ptr [v_i]
-	push	dword ptr 5
+	push	5
 	pop	eax
 	neg	eax
 	push	eax
@@ -28,7 +28,7 @@ main:
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, dword ptr 8
+	add	esp, 8
 @lcontinue_3:
 	push	offset v_i
 	pop	eax

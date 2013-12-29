@@ -34,15 +34,15 @@ includelib c:\masm32\lib\msvcrt.lib
 @sum_0 endp
 main:
 	mov	ebp, esp
-	sub	esp, dword ptr 4
-	push	dword ptr 1
-	push	dword ptr 5
+	sub	esp, 4
+	push	1
+	push	5
 	push	ebp
 	call	@sum_0
-	add	esp, dword ptr 8
+	add	esp, 8
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, dword ptr 8
+	add	esp, 8
 @exit_2:
 	mov	esp, ebp
 	mov	eax, dword ptr 0

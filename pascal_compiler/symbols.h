@@ -89,12 +89,14 @@ public:
 
 class SymConstFloat: public SymConst {
 	double value;
+   AsmStrImmediate* constLabel;
 public:
 	SymConstFloat(double);
 	double getValue() const;
 	void PrintSymbol(int) override;
 	Symbol* GetType() override;
    size_t GetSize() override;
+   void GenerateDeclaration(AsmCode&);
    void Generate(AsmCode&, unsigned) const override;
 };
 

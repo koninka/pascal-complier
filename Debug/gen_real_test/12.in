@@ -1,0 +1,12 @@
+   function foo(a: real): real;
+      function bar(): real;
+      begin
+         result := a * 17.0043;
+      end;
+   begin
+      result := -432.504 + bar();
+   end;
+
+begin
+   write(foo(20));
+end.

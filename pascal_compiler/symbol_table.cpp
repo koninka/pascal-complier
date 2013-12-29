@@ -60,6 +60,8 @@ void SymTable::GenerateDeclarations(AsmCode& asmCode) const
    for (auto &symbol : symbols) {
       if (*symbol == stVarGlobal) {
          dynamic_cast<SymVarGlobal*>(symbol)->GenerateDeclaration(asmCode);
+      } else if (*symbol == stConstFloat) {
+         dynamic_cast<SymConstFloat*>(symbol)->GenerateDeclaration(asmCode);
       }
    }
    for (auto &symbol : symbols) {

@@ -22,8 +22,9 @@ int main(int argc, char *argv[])
 		//Parser parser(scanner1);
 		//parser.isDeclarationParse = false;
 		//parser.ParseProgram();
-  //    freopen("tree.asm", "w", stdout);
-  //    parser.Generate();
+//      parser.PrintBlock();
+      //freopen("tree.asm", "w", stdout);
+      //parser.Generate();
 		//cout << "-----------TABLE-----------" << endl << endl;
 		//parser.PrintSymTable();
       //cout << endl << endl << "-----------ASM-----------" << endl << endl;
@@ -113,7 +114,10 @@ int main(int argc, char *argv[])
 	} catch (JumpNotAllowedException& e) {
 		isErr = true;
 		errMsg = e.getMessage();
-	}
+	} catch (IllegalTypeConversionException& e) {
+      isErr = true;
+      errMsg = e.getMessage();
+   }
 	if (isErr) {
 		cout << errMsg << endl;
 	}

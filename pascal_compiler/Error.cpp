@@ -237,11 +237,23 @@ string WrongParametersException::getMessage() const
 }
 
 JumpNotAllowedException::JumpNotAllowedException(string& AFname, int ALine, int ATag):
-		fname(AFname), _line(ALine), tag(ATag) {}
+		fname(AFname), _line(ALine), tag(ATag)
+{}
 
 string JumpNotAllowedException::getMessage() const
 {
    stringstream msg;
 	msg << fname << "(" << _line << ") Error: " << (tag == Tag::CONTINUE ? "continue" : "break") << " not allowed";
+   return msg.str();
+}
+
+IllegalTypeConversionException::IllegalTypeConversionException(string& AFname, int ALine):
+   fname(AFname), _line(ALine)
+{}
+
+string IllegalTypeConversionException::getMessage() const
+{
+   stringstream msg;
+   msg << fname << "(" << _line << ") Error: Illegal type conversion";
    return msg.str();
 }

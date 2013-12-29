@@ -8,10 +8,10 @@ includelib c:\masm32\lib\msvcrt.lib
 @foo_0 proc
 	push	ebp
 	mov	ebp, esp
-	push	dword ptr 500
+	push	500
 	push	ebp
 	call	@bar_1
-	add	esp, dword ptr 4
+	add	esp, 4
 @exit_2:
 	mov	esp, ebp
 	pop	ebp
@@ -37,13 +37,13 @@ includelib c:\masm32\lib\msvcrt.lib
 @bar_1 endp
 main:
 	mov	ebp, esp
-	sub	esp, dword ptr 4
+	sub	esp, 4
 	push	ebp
 	call	@foo_0
-	add	esp, dword ptr 0
+	add	esp, 0
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, dword ptr 8
+	add	esp, 8
 @exit_4:
 	mov	esp, ebp
 	mov	eax, dword ptr 0

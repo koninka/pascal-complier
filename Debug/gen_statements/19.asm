@@ -12,7 +12,7 @@ includelib c:\masm32\lib\msvcrt.lib
 .code
 main:
 	mov	ebp, esp
-	push	dword ptr 10
+	push	10
 	push	offset v_a
 	pop	eax
 	pop	ebx
@@ -23,11 +23,11 @@ main:
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, dword ptr 8
+	add	esp, 8
 	push	offset fmt_str3
 	call	crt_printf
-	add	esp, dword ptr 4
-	push	dword ptr 10
+	add	esp, 4
+	push	10
 	push	offset v_b
 	pop	eax
 	pop	ebx
@@ -38,12 +38,12 @@ main:
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, dword ptr 8
+	add	esp, 8
 	push	offset fmt_str6
 	call	crt_printf
-	add	esp, dword ptr 4
+	add	esp, 4
 	push	dword ptr [v_b]
-	push	dword ptr 1
+	push	1
 	pop	ebx
 	pop	eax
 	sub	eax, ebx
@@ -53,7 +53,7 @@ main:
 	pop	ebx
 	mov	[eax], ebx
 	push	dword ptr [v_b]
-	push	dword ptr 1
+	push	1
 	pop	ebx
 	pop	eax
 	cmp	eax, ebx
@@ -61,13 +61,13 @@ main:
 	movzx	eax, al
 	push	eax
 	pop	eax
-	mov	ebx, dword ptr 0
+	mov	ebx, 0
 	cmp	eax, ebx
 	je	@endif_7
 	jmp	@lend_4
 @endif_7:
-	push	dword ptr 0
-	push	dword ptr 0
+	push	0
+	push	0
 	pop	ebx
 	pop	eax
 	cmp	eax, ebx
@@ -75,16 +75,16 @@ main:
 	movzx	eax, al
 	push	eax
 	pop	eax
-	mov	ebx, dword ptr 0
+	mov	ebx, 0
 	cmp	eax, ebx
 	je	@lcontinue_5
 	jmp	@lend_4
 @lend_4:
 	push	offset fmt_str_new_line
 	call	crt_printf
-	add	esp, dword ptr 4
+	add	esp, 4
 	push	dword ptr [v_a]
-	push	dword ptr 1
+	push	1
 	pop	ebx
 	pop	eax
 	sub	eax, ebx
@@ -94,7 +94,7 @@ main:
 	pop	ebx
 	mov	[eax], ebx
 	push	dword ptr [v_a]
-	push	dword ptr 1
+	push	1
 	pop	ebx
 	pop	eax
 	cmp	eax, ebx
@@ -102,13 +102,13 @@ main:
 	movzx	eax, al
 	push	eax
 	pop	eax
-	mov	ebx, dword ptr 0
+	mov	ebx, 0
 	cmp	eax, ebx
 	je	@endif_8
 	jmp	@lend_1
 @endif_8:
-	push	dword ptr 0
-	push	dword ptr 0
+	push	0
+	push	0
 	pop	ebx
 	pop	eax
 	cmp	eax, ebx
@@ -116,7 +116,7 @@ main:
 	movzx	eax, al
 	push	eax
 	pop	eax
-	mov	ebx, dword ptr 0
+	mov	ebx, 0
 	cmp	eax, ebx
 	je	@lcontinue_2
 	jmp	@lend_1

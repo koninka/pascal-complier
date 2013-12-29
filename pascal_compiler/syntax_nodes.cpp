@@ -56,38 +56,37 @@ bool NodeExpr::IsSubroutineCall()
 	return false;
 }
 
-NodeNumber::NodeNumber(TokenPtr ptr, unsigned ADepth):
-   NodeExpr(ptr, ntNumber, ADepth)
+NodeIntegerNumber::NodeIntegerNumber(TokenPtr ptr):
+   NodeExpr(ptr, ntIntegerNumber, 0)
 {}
 
-Symbol* NodeNumber::GetType()
+Symbol* NodeIntegerNumber::GetType()
 {
-	Symbol* symbol(nullptr);
-	if (*token == ttIntegerNumber) {
-		symbol = typeInteger;
-	} else {
-		symbol = typeFloat;
-	}
-	return symbol;
+   return typeInteger;
 }
 
-void NodeNumber::Generate(AsmCode& asmCode)
-{
-   if (*token == ttIntegerNumber) {
-      GenerateForInt(asmCode);
-   } else {
-      GenerateForFloat(asmCode);
-   }
-}
-
-void NodeNumber::GenerateForInt(AsmCode& asmCode) const
+void NodeIntegerNumber::Generate(AsmCode& asmCode)
 {
    asmCode.AddCmd(PUSH, dynamic_cast<IntegerNumber*>(token.get())->value);
 }
 
-void NodeNumber::GenerateForFloat(AsmCode& asmCode) const
-{
+NodeRealNumber::NodeRealNumber(TokenPtr ptr):
+   NodeExpr(ptr, ntRealNumber, 0)
+{}
 
+Symbol* NodeRealNumber::GetType()
+{
+   return typeFloat;
+}
+
+void NodeRealNumber::GenerateData(AsmCode& asmCode)
+{
+   constLabel = asmCode.AddData("v", dynamic_cast<RealNumber*>(token.get())->value);
+}
+
+void NodeRealNumber::Generate(AsmCode& asmCode)
+{
+   asmCode.AddCmd(PUSH, constLabel);
 }
 
 NodeCharacterString::NodeCharacterString(TokenPtr ptr, unsigned ADepth):
@@ -200,51 +199,69 @@ void NodeUnaryOp::GenerateForInt(AsmCode& asmCode) const
 
 void NodeUnaryOp::GenerateForReal(AsmCode& asmCode) const
 {
-
+   if (token->tag != Tag::SUBTRACTION) return;
+   asmCode.AddCmd(FLD, AsmMemory(ESP, 0, szDWORD));
+   asmCode.AddCmd(FCHS);
+   asmCode.AddCmd(FSTP, AsmMemory(ESP, 0, szDWORD));
 }
 
-NodeIntTypecast::NodeIntTypecast(NodeExpr* AArg):
-   NodeUnaryOp(nullptr, AArg, ntIntTypeCast, 0)
+NodeTypecast::NodeTypecast(NodeExpr* AArg, NodeType AType):
+   NodeUnaryOp(nullptr, AArg, AType)
 {}
 
-Symbol* NodeIntTypecast::GetType()
+void NodeTypecast::GenerateRealTypecast(AsmCode& asmCode)
 {
-   return typeInteger;
+   arg->Generate(asmCode);
+   asmCode.AddCmd(FILD, AsmMemory(ESP, 0, szDWORD));
+   asmCode.AddCmd(FSTP, AsmMemory(ESP, 0, szDWORD));
 }
 
-void NodeIntTypecast::Generate(AsmCode& asmCode)
+void NodeTypecast::GenerateIntegerTypecast(AsmCode& asmCode)
 {
    arg->Generate(asmCode);
 }
 
-NodeInt2Float::NodeInt2Float(NodeExpr* AArg):
-   NodeUnaryOp(nullptr, AArg, ntInt2Float, 0)
+NodeIntegerTypecast::NodeIntegerTypecast(NodeExpr* AArg):
+   NodeTypecast(AArg, ntIntTypeCast)
 {}
 
-void NodeInt2Float::PrintNode(int d)
+Symbol* NodeIntegerTypecast::GetType()
 {
-	arg->PrintNode(d + 1);
-	SyntaxNode::PrintText(d, "i2f");
+   return typeInteger;
 }
 
-Symbol* NodeInt2Float::GetType()
+void NodeIntegerTypecast::Generate(AsmCode& asmCode)
 {
-	return typeFloat;
+   GenerateIntegerTypecast(asmCode);
 }
 
-NodeFloat2Int::NodeFloat2Int(NodeExpr* AArg):
-   NodeUnaryOp(nullptr, AArg, ntFloat2Int, 0)
+void NodeIntegerTypecast::PrintNode(int d)
+{
+   arg->PrintNode(d + 1);
+   SyntaxNode::PrintText(d, "int typecast");
+}
+
+NodeRealTypecast::NodeRealTypecast(NodeExpr* AArg):
+   NodeTypecast(AArg, ntRealTypeCast)
 {}
 
-void NodeFloat2Int::PrintNode(int d)
+Symbol* NodeRealTypecast::GetType()
 {
-	arg->PrintNode(d + 1);
-	SyntaxNode::PrintText(d, "f2i");
+   return typeFloat;
 }
 
-Symbol* NodeFloat2Int::GetType()
+void NodeRealTypecast::Generate(AsmCode& asmCode)
 {
-	return typeInteger;
+   if (*(arg->GetType()) == stTypeChar) {
+      GenerateIntegerTypecast(asmCode);
+   }
+   GenerateRealTypecast(asmCode);
+}
+
+void NodeRealTypecast::PrintNode(int d)
+{
+	arg->PrintNode(d + 1);
+	SyntaxNode::PrintText(d, "real typecast");
 }
 
 NodeOrd::NodeOrd(TokenPtr ptr, NodeExpr* AArg, unsigned ADepth):
@@ -298,11 +315,16 @@ Symbol* NodeBinary::GetType()
 		result = leftType;
 	} else if (*leftType == stTypeInteger && *rightType == stTypeFloat) {
 		result = rightType;
-		left = new NodeInt2Float(left);
+		left = new NodeRealTypecast(left);
 	} else if (*leftType == stTypeFloat && *rightType == stTypeInteger) {
 		result = leftType;
-		right = new NodeFloat2Int(right);
+		right = new NodeRealTypecast(right);
 	}
+   if (result != nullptr && token->tag == Tag::DIVISION) {
+      right = *(right->GetType()) == stTypeInteger ? new NodeRealTypecast(right) : right;
+      left = *(left->GetType()) == stTypeInteger ? new NodeRealTypecast(left) : left;
+      result = typeFloat;
+   }
 	return result != nullptr ? GetReferenceType(result) : result;	
 }
 
@@ -382,7 +404,27 @@ void NodeBinaryOp::GenerateForInt(AsmCode& asmCode) const
 
 void NodeBinaryOp::GenerateForReal(AsmCode& asmCode) const
 {
-
+   asmCode.AddCmd(FLD, AsmMemory(ESP, 4, szDWORD));
+   asmCode.AddCmd(FLD, AsmMemory(ESP, 0, szDWORD));
+   asmCode.AddCmd(ADD, ESP, 4);
+   switch (token->tag) {
+      case Tag::ADDITION:
+         asmCode.AddCmd(FADDP, ST1, ST);
+         break;
+      case Tag::SUBTRACTION:
+         asmCode.AddCmd(FSUBRP, ST1, ST);
+         break;
+      case Tag::MULTIPLICATION:
+         asmCode.AddCmd(FMULP, ST1, ST);
+         break;
+      case Tag::DIVISION:
+         asmCode.AddCmd(FDIVP, ST1, ST);
+         break;
+      default:
+         GenerateForRealRelationalOp(asmCode);
+         return;
+   }
+   asmCode.AddCmd(FSTP, AsmMemory(ESP, 0, szDWORD));
 }
 
 void NodeBinaryOp::GenerateForIntRelationalOp(AsmCode& asmCode) const
@@ -412,7 +454,36 @@ void NodeBinaryOp::GenerateForIntRelationalOp(AsmCode& asmCode) const
 
 void NodeBinaryOp::GenerateForRealRelationalOp(AsmCode& asmCode) const
 {
-
+   asmCode.AddCmd(FXCH, ST1);
+   asmCode.AddCmd(FCOMPP);
+   asmCode.AddCmd(FNSTSW, AX);
+   switch (token->tag) {
+      case Tag::GT:
+         asmCode.AddCmd(SAHF);
+         asmCode.AddCmd(SETA, AL);
+         break;
+      case Tag::GE:
+         asmCode.AddCmd(SAHF);
+         asmCode.AddCmd(SETAE, AL);
+         break;
+      case Tag::LT:
+         asmCode.AddCmd(SAHF);
+         asmCode.AddCmd(SETB, AL);
+         break;
+      case Tag::LE:
+         asmCode.AddCmd(SAHF);
+         asmCode.AddCmd(SETBE, AL);
+         break;
+      case Tag::EQ:
+         asmCode.AddCmd(SAHF);
+         asmCode.AddCmd(SETE, AL);
+         break;
+      case Tag::NE:
+         asmCode.AddCmd(SAHF);
+         asmCode.AddCmd(SETNE, AL);
+   }
+   asmCode.AddCmd(MOVZX, EAX, AL);
+   asmCode.AddCmd(MOV, AsmMemory(ESP), EAX);
 }
 
 NodeAssignOp::NodeAssignOp(TokenPtr ptr, NodeExpr* l, NodeExpr* r):
@@ -504,7 +575,7 @@ void NodeWriteBase::Generate(AsmCode& asmCode)
       if (arg->IsLValue()) {
          arg->GenerateLValue(asmCode);
          asmCode.AddCmd(POP, EAX);
-         asmCode.AddCmd(PUSH, AsmVarDword(new AsmMemory(EAX)));
+         asmCode.AddCmd(PUSH, AsmMemory(EAX, 0, szDWORD));
       } else {
          arg->Generate(asmCode);
       }

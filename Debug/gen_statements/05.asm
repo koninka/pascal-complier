@@ -10,34 +10,34 @@ includelib c:\masm32\lib\msvcrt.lib
 .code
 main:
 	mov	ebp, esp
-	push	dword ptr 9
+	push	9
 	push	offset v_i
 	pop	ebx
 	pop	eax
 	mov	[ebx], eax
 @forloop_1:
 	push	dword ptr [v_i]
-	push	dword ptr 1
+	push	1
 	pop	ebx
 	pop	eax
 	cmp	eax, ebx
 	jl	@lend_2
-	push	dword ptr 10
+	push	10
 	push	dword ptr [v_i]
 	pop	ebx
 	pop	eax
 	sub	eax, ebx
 	push	eax
-	push	dword ptr 2
+	push	2
 	pop	ebx
 	pop	eax
 	imul	ebx
 	push	eax
 	push	offset v_a
 	push	dword ptr [v_i]
-	mov	ebx, dword ptr 4
+	mov	ebx, 4
 	pop	eax
-	sub	eax, dword ptr 0
+	sub	eax, 0
 	imul	eax, ebx
 	pop	ebx
 	add	eax, ebx
@@ -51,14 +51,14 @@ main:
 	sub	[eax], dword ptr 1
 	jmp	@forloop_1
 @lend_2:
-	push	dword ptr 10
+	push	10
 	push	offset v_i
 	pop	eax
 	pop	ebx
 	mov	[eax], ebx
 @lcontinue_5:
 	push	dword ptr [v_i]
-	push	dword ptr 1
+	push	1
 	pop	ebx
 	pop	eax
 	sub	eax, ebx
@@ -69,9 +69,9 @@ main:
 	mov	[eax], ebx
 	push	offset v_a
 	push	dword ptr [v_i]
-	mov	ebx, dword ptr 4
+	mov	ebx, 4
 	pop	eax
-	sub	eax, dword ptr 0
+	sub	eax, 0
 	imul	eax, ebx
 	pop	ebx
 	add	eax, ebx
@@ -80,22 +80,22 @@ main:
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, dword ptr 8
+	add	esp, 8
 	push	offset fmt_str6
 	call	crt_printf
-	add	esp, dword ptr 4
+	add	esp, 4
 	push	offset v_a
 	push	dword ptr [v_i]
-	mov	ebx, dword ptr 4
+	mov	ebx, 4
 	pop	eax
-	sub	eax, dword ptr 0
+	sub	eax, 0
 	imul	eax, ebx
 	pop	ebx
 	add	eax, ebx
 	push	eax
 	pop	eax
 	push	[eax]
-	push	dword ptr 0
+	push	0
 	pop	ebx
 	pop	eax
 	cmp	eax, ebx
@@ -103,7 +103,7 @@ main:
 	movzx	eax, al
 	push	eax
 	pop	eax
-	mov	ebx, dword ptr 0
+	mov	ebx, 0
 	cmp	eax, ebx
 	je	@lcontinue_5
 	jmp	@lend_4

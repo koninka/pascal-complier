@@ -132,3 +132,11 @@ public:
 	JumpNotAllowedException(string&, int, int);
 	string getMessage() const;
 };
+
+class IllegalTypeConversionException {
+   int _line;
+public:
+   string fname;
+   IllegalTypeConversionException(string&, int);
+   string getMessage() const;
+};

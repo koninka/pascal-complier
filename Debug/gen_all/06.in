@@ -14,16 +14,16 @@ begin
    b := tmp;
 end;
 
-procedure Print(a: ArrT);
+procedure Print(a: array of integer);
 var
    i: Integer;
 begin
-   for i := s to f do
+   for i := s - 1 to f - 1 do
       Write(a[i], ' ');
    Writeln();
 end;
 
-function Partition(var a: ArrT; l, r: Integer): Integer;
+function Partition(var a: array of integer; l, r: Integer): Integer;
 var
     i, j : Integer;
 begin 
@@ -41,7 +41,7 @@ begin
    Result := i;
 end;
 
-procedure QSort(var a: ArrT; l, r: Integer);
+procedure QSort(var a: array of integer; l, r: Integer);
 var
    q: Integer;
 begin
@@ -53,6 +53,10 @@ begin
    end;
 end;
 
+procedure QuickSort(var arr: array of integer);
+begin
+   QSort(arr, s - 1, f - 1);
+end;
 
 var
    a: ArrT;
@@ -61,6 +65,6 @@ begin
    for i := s to f do
       a[i] := (i*6180 + 19) mod 21;
    Print(a);
-   QSort(a, s, f);
+   QuickSort(a);
    Print(a);
 end.

@@ -8,8 +8,8 @@ includelib c:\masm32\lib\msvcrt.lib
 .code
 main:
 	mov	ebp, esp
-	push	dword ptr 4
-	push	dword ptr 5
+	push	4
+	push	5
 	pop	ebx
 	pop	eax
 	cmp	eax, ebx
@@ -17,17 +17,17 @@ main:
 	movzx	eax, al
 	push	eax
 	pop	eax
-	mov	ebx, dword ptr 0
+	mov	ebx, 0
 	cmp	eax, ebx
 	je	@endif_1
-	push	dword ptr 5
-	push	dword ptr 2
+	push	5
+	push	2
 	pop	ebx
 	pop	eax
 	xor	edx, edx
 	idiv	ebx
 	push	edx
-	push	dword ptr 0
+	push	0
 	pop	ebx
 	pop	eax
 	cmp	eax, ebx
@@ -35,17 +35,17 @@ main:
 	movzx	eax, al
 	push	eax
 	pop	eax
-	mov	ebx, dword ptr 0
+	mov	ebx, 0
 	cmp	eax, ebx
 	je	@else_3
 	push	offset fmt_str4
 	call	crt_printf
-	add	esp, dword ptr 4
+	add	esp, 4
 	jmp	@endif_2
 @else_3:
 	push	offset fmt_str5
 	call	crt_printf
-	add	esp, dword ptr 4
+	add	esp, 4
 	jmp	@endif_2
 @endif_2:
 @endif_1:

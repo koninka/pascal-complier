@@ -1,0 +1,6 @@
+var
+   a: array[1..10] of real;
+begin
+   a[5] := -43.43;
+   write(a[5]);
+end.

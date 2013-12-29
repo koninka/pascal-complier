@@ -123,7 +123,7 @@ void Parser::DoRight2LeftSimpleTypecast(Symbol* ltype, NodeExpr** rPtr)
 {
 	Symbol* rtype = (*rPtr)->GetType();
 	if (*ltype == stTypeFloat && rtype != nullptr && *rtype == stTypeInteger) {
-		*rPtr = new NodeInt2Float(*rPtr);
+		*rPtr = new NodeRealTypecast(*rPtr);
 	}
 }
 
@@ -472,7 +472,7 @@ double Parser::ComputeConstantExpression(NodeExpr* node, int line)
 		result = (this->*(it->second))(
 					ComputeConstantExpression(dynamic_cast<NodeBinaryOp*>(node)->GetLeft(), line),
 					ComputeConstantExpression(dynamic_cast<NodeBinaryOp*>(node)->GetRight(), line));
-	} else if (*node == ntNumber) {
+	} else if (*node == ntRealNumber || *node == ntIntegerNumber) {
 		result =
 			*(node->token) == ttIntegerNumber
 			? castToken<IntegerNumber>(node->token)->value
@@ -750,13 +750,20 @@ NodeExpr* Parser::ParseFactor(unsigned depth)
 		}
 		PutToken(token);
 		result = new NodeUnaryOp(tmp_token, ParseFactor(depth), depth);
-	} else if (*token == ttIntegerNumber || *token == ttRealNumber) {
-		result = new NodeNumber(token, depth);
-	} else if (*token == ttCharacterString) {
+	} else if (*token == ttIntegerNumber) {
+		result = new NodeIntegerNumber(token);
+   } else if (*token == ttRealNumber) {
+      result = new NodeRealNumber(token);
+      dynamic_cast<NodeRealNumber*>(result)->GenerateData(asmCode);
+   }  else if (*token == ttCharacterString) {
 		result = new NodeCharacterString(token, depth);
    } else if (*token == Tag::IDENTIFICATOR && token->text == "integer") {
       CheckExpectedToken(Tag::LPARENTHESIS);
-      result = new NodeIntTypecast(ParseExpression(0, depth));
+      result = new NodeIntegerTypecast(ParseExpression(0, depth));
+      Symbol* exprType = dynamic_cast<NodeIntegerTypecast*>(result)->arg->GetType();
+      if (*exprType != stTypeChar && *exprType != stTypeFloat && *exprType != stTypeInteger) {
+         throw IllegalTypeConversionException(scanner.fname, _line);
+      }
       CheckExpectedToken(Tag::RPARENTHESIS);
    } else if (*token == Tag::LPARENTHESIS) {
 		result = ParseExpression(0, depth);

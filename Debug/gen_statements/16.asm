@@ -14,7 +14,7 @@ includelib c:\masm32\lib\msvcrt.lib
 	push	ebp
 	mov	ebp, esp
 	sub	esp, dword ptr 4
-	push	dword ptr 1
+	push	1
 	mov	ebx, ebp
 	add	ebx, dword ptr -4
 	push	ebx
@@ -24,7 +24,7 @@ includelib c:\masm32\lib\msvcrt.lib
 @forloop_2:
 	mov	ebx, ebp
 	push	[ebx - 4]
-	push	dword ptr 10
+	push	10
 	pop	ebx
 	pop	eax
 	cmp	eax, ebx
@@ -36,9 +36,9 @@ includelib c:\masm32\lib\msvcrt.lib
 	push	ebx
 	mov	ebx, ebp
 	push	[ebx - 4]
-	mov	ebx, dword ptr 4
+	mov	ebx, 4
 	pop	eax
-	sub	eax, dword ptr 1
+	sub	eax, 1
 	imul	eax, ebx
 	pop	ebx
 	add	eax, ebx
@@ -47,10 +47,10 @@ includelib c:\masm32\lib\msvcrt.lib
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, dword ptr 8
+	add	esp, 8
 	push	offset fmt_str5
 	call	crt_printf
-	add	esp, dword ptr 4
+	add	esp, 4
 @lcontinue_4:
 	mov	ebx, ebp
 	add	ebx, dword ptr -4
@@ -61,7 +61,7 @@ includelib c:\masm32\lib\msvcrt.lib
 @lend_3:
 	push	offset fmt_str_new_line
 	call	crt_printf
-	add	esp, dword ptr 4
+	add	esp, 4
 @exit_1:
 	mov	esp, ebp
 	pop	ebp
@@ -69,32 +69,32 @@ includelib c:\masm32\lib\msvcrt.lib
 @p_0 endp
 main:
 	mov	ebp, esp
-	push	dword ptr 1
+	push	1
 	push	offset v_i
 	pop	ebx
 	pop	eax
 	mov	[ebx], eax
 @forloop_7:
 	push	dword ptr [v_i]
-	push	dword ptr 10
+	push	10
 	pop	ebx
 	pop	eax
 	cmp	eax, ebx
 	jg	@lend_8
-	push	dword ptr 1
+	push	1
 	push	offset v_j
 	pop	ebx
 	pop	eax
 	mov	[ebx], eax
 @forloop_10:
 	push	dword ptr [v_j]
-	push	dword ptr 10
+	push	10
 	pop	ebx
 	pop	eax
 	cmp	eax, ebx
 	jg	@lend_11
 	push	dword ptr [v_i]
-	push	dword ptr 2
+	push	2
 	push	dword ptr [v_j]
 	pop	ebx
 	pop	eax
@@ -106,17 +106,17 @@ main:
 	push	eax
 	push	offset v_a
 	push	dword ptr [v_i]
-	mov	ebx, dword ptr 40
+	mov	ebx, 40
 	pop	eax
-	sub	eax, dword ptr 1
+	sub	eax, 1
 	imul	eax, ebx
 	pop	ebx
 	add	eax, ebx
 	push	eax
 	push	dword ptr [v_j]
-	mov	ebx, dword ptr 4
+	mov	ebx, 4
 	pop	eax
-	sub	eax, dword ptr 1
+	sub	eax, 1
 	imul	eax, ebx
 	pop	ebx
 	add	eax, ebx
@@ -136,44 +136,44 @@ main:
 	add	[eax], dword ptr 1
 	jmp	@forloop_7
 @lend_8:
-	push	dword ptr 1
+	push	1
 	push	offset v_i
 	pop	ebx
 	pop	eax
 	mov	[ebx], eax
 @forloop_13:
 	push	dword ptr [v_i]
-	push	dword ptr 10
+	push	10
 	pop	ebx
 	pop	eax
 	cmp	eax, ebx
 	jg	@lend_14
 	push	offset v_a
 	push	dword ptr [v_i]
-	mov	ebx, dword ptr 40
+	mov	ebx, 40
 	pop	eax
-	sub	eax, dword ptr 1
+	sub	eax, 1
 	imul	eax, ebx
 	pop	ebx
 	add	eax, ebx
 	push	eax
 	pop	eax
-	mov	ecx, dword ptr 40
+	mov	ecx, 40
 	add	eax, ecx
-	mov	ebx, dword ptr 0
+	mov	ebx, 0
 @L_16:
 	cmp	ebx, ecx
 	jge	@L_17
-	sub	eax, dword ptr 4
+	sub	eax, 4
 	mov	edx, [eax]
 	push	edx
-	add	ebx, dword ptr 4
+	add	ebx, 4
 	jmp	@L_16
 @L_17:
-	push	dword ptr 40
+	push	40
 	push	ebp
 	call	@p_0
-	add	esp, dword ptr 44
+	add	esp, 44
 @lcontinue_15:
 	push	offset v_i
 	pop	eax

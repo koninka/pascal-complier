@@ -1,5 +1,7 @@
 {$mode objfpc}
-type ArrT = array[1..20] of integer;
+const
+   N = 20;
+type ArrT = array[1..N] of integer;
 
 procedure Init(var a :  ArrT);
 begin
@@ -10,11 +12,11 @@ begin
    a[5] := 17;    a[15] := 18;    a[10] := 19;   a[20] := 20;
 end;
 
-procedure WriteArr(a :  ArrT);
+procedure WriteArr(a :  Array of integer);
 var
    i : Integer;
 begin
-   for i := 1 to 20 do
+   for i := 0 to N - 1 do
       Write(a[i], ' ');
    Writeln();
 end;

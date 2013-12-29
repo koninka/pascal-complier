@@ -16,7 +16,7 @@ main:
 	mov	ebp, esp
 	push	ebp
 	call	@proc_0
-	add	esp, dword ptr 0
+	add	esp, 0
 @exit_2:
 	mov	esp, ebp
 	mov	eax, dword ptr 0

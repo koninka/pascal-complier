@@ -9,6 +9,8 @@
 enum NodeType {
 	ntNode,
 	ntNumber,
+   ntIntegerNumber,
+   ntRealNumber,
 	ntCharacterString,
 	ntVar,
 	ntBinary,
@@ -34,8 +36,7 @@ enum NodeType {
 	ntForStmt,
 	ntRepeateStmt,
    ntIntTypeCast,
-	ntInt2Float,
-	ntFloat2Int
+   ntRealTypeCast
 };
 
 class SyntaxNode {

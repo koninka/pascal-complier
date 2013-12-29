@@ -10,7 +10,7 @@ main:
 	mov	ebp, esp
 @lcontinue_2:
 	push	dword ptr [v_i]
-	push	dword ptr 20
+	push	20
 	pop	ebx
 	pop	eax
 	cmp	eax, ebx
@@ -18,7 +18,7 @@ main:
 	movzx	eax, al
 	push	eax
 	pop	eax
-	mov	ebx, dword ptr 0
+	mov	ebx, 0
 	cmp	eax, ebx
 	je	@lend_1
 	jmp	@lend_1
@@ -27,7 +27,7 @@ main:
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, dword ptr 8
+	add	esp, 8
 	jmp	@lcontinue_2
 @lend_1:
 @exit_0:

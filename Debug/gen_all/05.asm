@@ -13,10 +13,10 @@ includelib c:\masm32\lib\msvcrt.lib
 @print_0 proc
 	push	ebp
 	mov	ebp, esp
-	sub	esp, dword ptr 4
-	push	dword ptr 1
+	sub	esp, 4
+	push	1
 	mov	ebx, ebp
-	add	ebx, dword ptr -4
+	add	ebx, -4
 	push	ebx
 	pop	ebx
 	pop	eax
@@ -24,22 +24,22 @@ includelib c:\masm32\lib\msvcrt.lib
 @forloop_2:
 	mov	ebx, ebp
 	push	[ebx - 4]
-	push	dword ptr 4
+	push	4
 	pop	ebx
 	pop	eax
 	cmp	eax, ebx
 	jg	@lend_3
 	mov	ebx, ebp
-	add	ebx, dword ptr 12
+	add	ebx, 12
 	push	ebx
 	pop	eax
-	add	eax, dword ptr 0
+	add	eax, 0
 	push	eax
 	mov	ebx, ebp
 	push	[ebx - 4]
-	mov	ebx, dword ptr 4
+	mov	ebx, 4
 	pop	eax
-	sub	eax, dword ptr 1
+	sub	eax, 1
 	imul	eax, ebx
 	pop	ebx
 	add	eax, ebx
@@ -48,21 +48,21 @@ includelib c:\masm32\lib\msvcrt.lib
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, dword ptr 8
+	add	esp, 8
 	push	offset fmt_str5
 	call	crt_printf
-	add	esp, dword ptr 4
+	add	esp, 4
 	mov	ebx, ebp
-	add	ebx, dword ptr 12
+	add	ebx, 12
 	push	ebx
 	pop	eax
-	add	eax, dword ptr 16
+	add	eax, 16
 	push	eax
 	mov	ebx, ebp
 	push	[ebx - 4]
-	mov	ebx, dword ptr 4
+	mov	ebx, 4
 	pop	eax
-	sub	eax, dword ptr 1
+	sub	eax, 1
 	imul	eax, ebx
 	pop	ebx
 	add	eax, ebx
@@ -71,13 +71,13 @@ includelib c:\masm32\lib\msvcrt.lib
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, dword ptr 8
+	add	esp, 8
 	push	offset fmt_str_new_line
 	call	crt_printf
-	add	esp, dword ptr 4
+	add	esp, 4
 @lcontinue_4:
 	mov	ebx, ebp
-	add	ebx, dword ptr -4
+	add	ebx, -4
 	push	ebx
 	pop	eax
 	add	[eax], dword ptr 1
@@ -90,27 +90,27 @@ includelib c:\masm32\lib\msvcrt.lib
 @print_0 endp
 main:
 	mov	ebp, esp
-	push	dword ptr 1
+	push	1
 	push	offset v_i
 	pop	ebx
 	pop	eax
 	mov	[ebx], eax
 @forloop_7:
 	push	dword ptr [v_i]
-	push	dword ptr 4
+	push	4
 	pop	ebx
 	pop	eax
 	cmp	eax, ebx
 	jg	@lend_8
-	push	dword ptr 1
+	push	1
 	push	offset v_a
 	pop	eax
-	add	eax, dword ptr 0
+	add	eax, 0
 	push	eax
 	push	dword ptr [v_i]
-	mov	ebx, dword ptr 4
+	mov	ebx, 4
 	pop	eax
-	sub	eax, dword ptr 1
+	sub	eax, 1
 	imul	eax, ebx
 	pop	ebx
 	add	eax, ebx
@@ -118,15 +118,15 @@ main:
 	pop	eax
 	pop	ebx
 	mov	[eax], ebx
-	push	dword ptr 2
+	push	2
 	push	offset v_a
 	pop	eax
-	add	eax, dword ptr 16
+	add	eax, 16
 	push	eax
 	push	dword ptr [v_i]
-	mov	ebx, dword ptr 4
+	mov	ebx, 4
 	pop	eax
-	sub	eax, dword ptr 1
+	sub	eax, 1
 	imul	eax, ebx
 	pop	ebx
 	add	eax, ebx
@@ -142,52 +142,52 @@ main:
 @lend_8:
 	push	offset v_a
 	pop	eax
-	mov	ecx, dword ptr 32
+	mov	ecx, 32
 	add	eax, ecx
-	mov	ebx, dword ptr 0
+	mov	ebx, 0
 @L_10:
 	cmp	ebx, ecx
 	jge	@L_11
-	sub	eax, dword ptr 4
+	sub	eax, 4
 	mov	edx, [eax]
 	push	edx
-	add	ebx, dword ptr 4
+	add	ebx, 4
 	jmp	@L_10
 @L_11:
 	push	ebp
 	call	@print_0
-	add	esp, dword ptr 32
+	add	esp, 32
 	push	offset v_a
 	pop	eax
-	mov	ecx, dword ptr 32
+	mov	ecx, 32
 	add	eax, ecx
-	mov	ebx, dword ptr 0
+	mov	ebx, 0
 @L_12:
 	cmp	ebx, ecx
 	jge	@L_13
-	sub	eax, dword ptr 4
+	sub	eax, 4
 	mov	edx, [eax]
 	push	edx
-	add	ebx, dword ptr 4
+	add	ebx, 4
 	jmp	@L_12
 @L_13:
 	push	offset v_b
 	pop	eax
-	sub	eax, dword ptr 4
-	mov	ebx, dword ptr 0
-	mov	ecx, dword ptr 32
+	sub	eax, 4
+	mov	ebx, 0
+	mov	ecx, 32
 @assignBegin_14:
 	cmp	ebx, ecx
 	jge	@assignEnd_15
-	add	eax, dword ptr 4
+	add	eax, 4
 	pop	edx
 	mov	[eax], edx
-	add	ebx, dword ptr 4
+	add	ebx, 4
 	jmp	@assignBegin_14
 @assignEnd_15:
 	push	offset v_a
 	pop	eax
-	add	eax, dword ptr 16
+	add	eax, 16
 	push	eax
 	pop	eax
 	mov	ebx, [eax + 12]
@@ -200,7 +200,7 @@ main:
 	push	ebx
 	push	offset v_b
 	pop	eax
-	add	eax, dword ptr 0
+	add	eax, 0
 	push	eax
 	pop	eax
 	pop	ebx
@@ -213,23 +213,23 @@ main:
 	mov	[eax + 12], ebx
 	push	offset v_b
 	pop	eax
-	mov	ecx, dword ptr 32
+	mov	ecx, 32
 	add	eax, ecx
-	mov	ebx, dword ptr 0
+	mov	ebx, 0
 @L_16:
 	cmp	ebx, ecx
 	jge	@L_17
-	sub	eax, dword ptr 4
+	sub	eax, 4
 	mov	edx, [eax]
 	push	edx
-	add	ebx, dword ptr 4
+	add	ebx, 4
 	jmp	@L_16
 @L_17:
 	push	ebp
 	call	@print_0
-	add	esp, dword ptr 32
+	add	esp, 32
 @exit_6:
 	mov	esp, ebp
-	mov	eax, dword ptr 0
+	mov	eax, 0
 	ret
 end main

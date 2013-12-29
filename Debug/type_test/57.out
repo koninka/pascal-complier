@@ -7,7 +7,7 @@
                          ---- call                         
                                ---- foo                               
              ---- -             
-       ---- i2f       
+       ---- real typecast       
  ---- := 
        ---- a       
 program main

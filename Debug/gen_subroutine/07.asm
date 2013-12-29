@@ -8,7 +8,7 @@ includelib c:\masm32\lib\msvcrt.lib
 @f_0 proc
 	push	ebp
 	mov	ebp, esp
-	push	dword ptr 5
+	push	5
 	mov	ebx, ebp
 	add	ebx, dword ptr 12
 	push	ebx
@@ -22,13 +22,13 @@ includelib c:\masm32\lib\msvcrt.lib
 @f_0 endp
 main:
 	mov	ebp, esp
-	sub	esp, dword ptr 4
+	sub	esp, 4
 	push	ebp
 	call	@f_0
-	add	esp, dword ptr 0
+	add	esp, 0
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, dword ptr 8
+	add	esp, 8
 @exit_2:
 	mov	esp, ebp
 	mov	eax, dword ptr 0

@@ -1,7 +1,7 @@
                    ---- 5                   
              ---- +             
                    ---- b                   
-       ---- i2f       
+       ---- real typecast       
  ---- := 
        ---- a       
 program main

@@ -1,11 +1,11 @@
                                ---- 2                               
-                         ---- f2i                         
-                   ---- f2i                   
+                         ---- int typecast                         
+                   ---- int typecast                   
              ---- mod             
                    ---- 5.5                   
        ---- +       
                    ---- b                   
-             ---- i2f             
+             ---- real typecast             
  ---- := 
        ---- a       
 program main

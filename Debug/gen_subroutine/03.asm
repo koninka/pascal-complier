@@ -8,7 +8,7 @@ includelib c:\masm32\lib\msvcrt.lib
 	push	ebp
 	mov	ebp, esp
 	sub	esp, dword ptr 4
-	push	dword ptr 10
+	push	10
 	mov	ebx, ebp
 	add	ebx, dword ptr -4
 	push	ebx

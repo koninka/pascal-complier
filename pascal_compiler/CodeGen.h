@@ -7,8 +7,10 @@
 using namespace std;
 
 enum SizeType {
+   szNONE,
    szBYTE,
-   szDWORD
+   szDWORD,
+   szQWORD
 };
 
 enum Register {
@@ -18,7 +20,10 @@ enum Register {
    EDX,
    ESP,
    EBP,
-   AL
+   AX,
+   AL,
+   ST1,
+   ST
 };
 
 enum OpCode {
@@ -39,6 +44,11 @@ enum OpCode {
    NEG,
    SAR,
    SAL,
+   SAHF,
+   SETA,
+   SETAE,
+   SETB,
+   SETBE,
    SETG,
    SETGE,
    SETL,
@@ -47,6 +57,7 @@ enum OpCode {
    SETNE,
 	MOV,
    MOVZX,
+   MOVZB,
 	ADD,
 	SUB,
 	CMP,
@@ -58,6 +69,18 @@ enum OpCode {
 	LEA,
    IMUL,
    IDIV,
+   FLD,
+   FILD,
+   FCHS,
+   FADDP,
+   FSUBRP,
+   FMULP,
+   FDIVP,
+   FDIVRP,
+   FSTP,
+   FXCH,
+   FCOMPP,
+   FNSTSW
 };
 
 struct AsmOperand;
@@ -142,6 +165,13 @@ public:
    void Print() const override;
 };
 
+class AsmDataReal: public AsmDataBase {
+   double _value;
+public:
+   AsmDataReal(string, double);
+   void Print() const override;
+};
+
 class AsmDataStr: public AsmDataBase {
    string _value;
 public:
@@ -209,11 +239,12 @@ public:
 };
 
 class AsmMemory: public AsmOperand {
-   AsmOperand* _oper;
    int _offset;
+   SizeType _size;
+   AsmOperand* _oper;
 public:
-   AsmMemory(AsmOperand*, int = 0);
-   AsmMemory(Register, int = 0);
+   AsmMemory(AsmOperand*, int = 0, SizeType = szNONE);
+   AsmMemory(Register, int = 0, SizeType = szNONE);
    void Print() const override;
 };
 
@@ -241,14 +272,15 @@ public:
    void AddCmd(OpCode, AsmStrImmediate*);
    void AddCmd(OpCode, AsmStrImmediate);
    void AddCmd(OpCode, AsmIntImmediate);
-   void AddCmd(OpCode, int, SizeType = szDWORD);
+   void AddCmd(OpCode, int, SizeType = szNONE);
    void AddCmd(OpCode, AsmOperand*, AsmOperand*);
    void AddCmd(OpCode, Register, Register);
-   void AddCmd(OpCode, Register, int, SizeType = szDWORD);
+   void AddCmd(OpCode, Register, int, SizeType = szNONE);
    void AddCmd(OpCode, AsmMemory, AsmIntImmediate);
    void AddCmd(OpCode, AsmMemory, Register);
    void AddCmd(OpCode, Register, AsmMemory);
    AsmStrImmediate* AddData(string);
+   AsmStrImmediate* AddData(string, double);
    AsmStrImmediate* AddData(string, size_t);
    AsmStrImmediate* AddData(string, string);
    void AddLabel(AsmStrImmediate*);

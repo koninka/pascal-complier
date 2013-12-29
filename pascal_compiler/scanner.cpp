@@ -63,7 +63,7 @@ Scanner::Scanner(const char* _fname):
    reserve<Word>(_keywords, Word(Tag::PROCEDURE, "procedure"));   
    reserve<Word>(_keywords, Word(Tag::PROGRAM,   "program"));
    reserve<Word>(_keywords, Word(Tag::RECORD,    "record"));
-   reserve<Word>(_keywords, Word(Tag::REPEAT,   "repeat"));
+   reserve<Word>(_keywords, Word(Tag::REPEAT,    "repeat"));
    reserve<Word>(_keywords, Word(Tag::STRING,    "string"));
    reserve<Word>(_keywords, Word(Tag::THEN,      "then"));
    reserve<Word>(_keywords, Word(Tag::TO,        "to"));

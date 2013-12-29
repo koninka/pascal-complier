@@ -1,0 +1,13 @@
+var
+   a: real;
+   procedure foo(a1: real);
+   var
+      a2: real;
+   begin
+      a2 := 32.54 * 3.59 + a1;
+      a := a1 + a2;
+   end;
+begin
+   foo(-2.89);
+   write(a);
+end.
