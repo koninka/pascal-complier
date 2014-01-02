@@ -13,10 +13,10 @@ includelib c:\masm32\lib\msvcrt.lib
 @p_0 proc
 	push	ebp
 	mov	ebp, esp
-	sub	esp, dword ptr 4
+	sub	esp, 4
 	push	1
 	mov	ebx, ebp
-	add	ebx, dword ptr -4
+	add	ebx, -4
 	push	ebx
 	pop	ebx
 	pop	eax
@@ -30,9 +30,9 @@ includelib c:\masm32\lib\msvcrt.lib
 	cmp	eax, ebx
 	jg	@lend_3
 	mov	ebx, ebp
-	add	ebx, dword ptr 12
+	add	ebx, 12
 	mov	eax, [ebx]
-	add	ebx, dword ptr 4
+	add	ebx, 4
 	push	ebx
 	mov	ebx, ebp
 	push	[ebx - 4]
@@ -53,7 +53,7 @@ includelib c:\masm32\lib\msvcrt.lib
 	add	esp, 4
 @lcontinue_4:
 	mov	ebx, ebp
-	add	ebx, dword ptr -4
+	add	ebx, -4
 	push	ebx
 	pop	eax
 	add	[eax], dword ptr 1
@@ -182,6 +182,6 @@ main:
 @lend_14:
 @exit_6:
 	mov	esp, ebp
-	mov	eax, dword ptr 0
+	mov	eax, 0
 	ret
 end main

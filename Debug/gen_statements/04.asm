@@ -56,6 +56,6 @@ main:
 	add	esp, 8
 @exit_0:
 	mov	esp, ebp
-	mov	eax, dword ptr 0
+	mov	eax, 0
 	ret
 end main

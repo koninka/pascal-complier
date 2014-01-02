@@ -5,7 +5,7 @@ includelib c:\masm32\lib\msvcrt.lib
 .data
 	fv2 real4 17.004300
 	fv3 real4 432.504000
-	fmt_float db " %0.14E", 0
+	fmt_float db "% 0.14E", 0
 .code
 @foo_0 proc
 	push	ebp

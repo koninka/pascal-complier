@@ -95,7 +95,7 @@ public:
 class SymSubroutineVar: public SymVar {
 protected:
    unsigned _depth;
-   void ComputeSubroutineEBPToEBX(AsmCode&, unsigned) const;
+   void GetLexicalNesting(AsmCode&, unsigned) const;
 public:
    SymSubroutineVar(SymbolPtr, size_t, unsigned, SymbolType);
 };

@@ -94,7 +94,8 @@ main:
 	add	eax, ebx
 	push	eax
 	pop	eax
-	push	[eax]
+	mov	ebx, [eax]
+	push	ebx
 	push	0
 	pop	ebx
 	pop	eax
@@ -110,6 +111,6 @@ main:
 @lend_4:
 @exit_0:
 	mov	esp, ebp
-	mov	eax, dword ptr 0
+	mov	eax, 0
 	ret
 end main

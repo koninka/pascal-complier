@@ -17,10 +17,10 @@ main:
 	mov	ebx, [eax]
 	push	ebx
 	push	offset v_a
-	push	dword ptr 2
-	mov	ebx, dword ptr 12
+	push	2
+	mov	ebx, 12
 	pop	eax
-	sub	eax, dword ptr 1
+	sub	eax, 1
 	imul	eax, ebx
 	pop	ebx
 	add	eax, ebx
@@ -34,6 +34,6 @@ main:
 	mov	[eax + 8], ebx
 @exit_0:
 	mov	esp, ebp
-	mov	eax, dword ptr 0
+	mov	eax, 0
 	ret
 end main

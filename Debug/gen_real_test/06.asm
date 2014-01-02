@@ -76,11 +76,10 @@ main:
 	fld	dword ptr [esp + 4]
 	fld	dword ptr [esp]
 	add	esp, 4
-	fxch	st(1)
 	fcompp
 	fnstsw	ax
 	sahf
-	seta	al
+	setb	al
 	movzx	eax, al
 	mov	[esp], eax
 	pop	eax
@@ -108,11 +107,10 @@ main:
 	fld	dword ptr [esp + 4]
 	fld	dword ptr [esp]
 	add	esp, 4
-	fxch	st(1)
 	fcompp
 	fnstsw	ax
 	sahf
-	seta	al
+	setb	al
 	movzx	eax, al
 	mov	[esp], eax
 	pop	eax
@@ -140,11 +138,10 @@ main:
 	fld	dword ptr [esp + 4]
 	fld	dword ptr [esp]
 	add	esp, 4
-	fxch	st(1)
 	fcompp
 	fnstsw	ax
 	sahf
-	seta	al
+	setb	al
 	movzx	eax, al
 	mov	[esp], eax
 	pop	eax
@@ -172,11 +169,10 @@ main:
 	fld	dword ptr [esp + 4]
 	fld	dword ptr [esp]
 	add	esp, 4
-	fxch	st(1)
 	fcompp
 	fnstsw	ax
 	sahf
-	setb	al
+	seta	al
 	movzx	eax, al
 	mov	[esp], eax
 	pop	eax
@@ -204,11 +200,10 @@ main:
 	fld	dword ptr [esp + 4]
 	fld	dword ptr [esp]
 	add	esp, 4
-	fxch	st(1)
 	fcompp
 	fnstsw	ax
 	sahf
-	setb	al
+	seta	al
 	movzx	eax, al
 	mov	[esp], eax
 	pop	eax
@@ -236,11 +231,10 @@ main:
 	fld	dword ptr [esp + 4]
 	fld	dword ptr [esp]
 	add	esp, 4
-	fxch	st(1)
 	fcompp
 	fnstsw	ax
 	sahf
-	setb	al
+	seta	al
 	movzx	eax, al
 	mov	[esp], eax
 	pop	eax
@@ -268,11 +262,10 @@ main:
 	fld	dword ptr [esp + 4]
 	fld	dword ptr [esp]
 	add	esp, 4
-	fxch	st(1)
 	fcompp
 	fnstsw	ax
 	sahf
-	setbe	al
+	setae	al
 	movzx	eax, al
 	mov	[esp], eax
 	pop	eax
@@ -300,11 +293,10 @@ main:
 	fld	dword ptr [esp + 4]
 	fld	dword ptr [esp]
 	add	esp, 4
-	fxch	st(1)
 	fcompp
 	fnstsw	ax
 	sahf
-	setbe	al
+	setae	al
 	movzx	eax, al
 	mov	[esp], eax
 	pop	eax
@@ -332,11 +324,10 @@ main:
 	fld	dword ptr [esp + 4]
 	fld	dword ptr [esp]
 	add	esp, 4
-	fxch	st(1)
 	fcompp
 	fnstsw	ax
 	sahf
-	setbe	al
+	setae	al
 	movzx	eax, al
 	mov	[esp], eax
 	pop	eax
@@ -364,11 +355,10 @@ main:
 	fld	dword ptr [esp + 4]
 	fld	dword ptr [esp]
 	add	esp, 4
-	fxch	st(1)
 	fcompp
 	fnstsw	ax
 	sahf
-	setae	al
+	setbe	al
 	movzx	eax, al
 	mov	[esp], eax
 	pop	eax
@@ -396,11 +386,10 @@ main:
 	fld	dword ptr [esp + 4]
 	fld	dword ptr [esp]
 	add	esp, 4
-	fxch	st(1)
 	fcompp
 	fnstsw	ax
 	sahf
-	setae	al
+	setbe	al
 	movzx	eax, al
 	mov	[esp], eax
 	pop	eax
@@ -428,11 +417,10 @@ main:
 	fld	dword ptr [esp + 4]
 	fld	dword ptr [esp]
 	add	esp, 4
-	fxch	st(1)
 	fcompp
 	fnstsw	ax
 	sahf
-	setae	al
+	setbe	al
 	movzx	eax, al
 	mov	[esp], eax
 	pop	eax
@@ -460,7 +448,6 @@ main:
 	fld	dword ptr [esp + 4]
 	fld	dword ptr [esp]
 	add	esp, 4
-	fxch	st(1)
 	fcompp
 	fnstsw	ax
 	sahf
@@ -492,7 +479,6 @@ main:
 	fld	dword ptr [esp + 4]
 	fld	dword ptr [esp]
 	add	esp, 4
-	fxch	st(1)
 	fcompp
 	fnstsw	ax
 	sahf
@@ -524,7 +510,6 @@ main:
 	fld	dword ptr [esp + 4]
 	fld	dword ptr [esp]
 	add	esp, 4
-	fxch	st(1)
 	fcompp
 	fnstsw	ax
 	sahf
@@ -556,7 +541,6 @@ main:
 	fld	dword ptr [esp + 4]
 	fld	dword ptr [esp]
 	add	esp, 4
-	fxch	st(1)
 	fcompp
 	fnstsw	ax
 	sahf

@@ -38,6 +38,7 @@ class Parser {
 
 	int _line;	
    bool _isGlobalNamespace;
+   bool _isConstantParsing;
    AsmCode asmCode;
 	SyntaxNode* root;
 	SymTable* symTable;
@@ -106,7 +107,7 @@ class Parser {
 	Args ParseCommaSeparated(unsigned);
 
 	Symbol* FindSymbolByName(string, bool = false);
-	Symbol* CreateConstExprSymbol(NodeExpr*, int);
+	Symbol* CreateConstExprSymbol(int);
 	Symbol* ParseConstantExpression();
 	Symbol* ParseArrayDeclaration(bool);
    Symbol* ParseRecordDeclaration();

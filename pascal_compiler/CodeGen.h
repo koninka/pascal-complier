@@ -73,7 +73,7 @@ enum OpCode {
    FILD,
    FCHS,
    FADDP,
-   FSUBRP,
+   FSUBP,
    FMULP,
    FDIVP,
    FDIVRP,

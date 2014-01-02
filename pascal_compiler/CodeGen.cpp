@@ -46,7 +46,7 @@ string GetCmd(OpCode opCode)
       case FXCH:        return "fxch";
       case FADDP:       return "faddp";
       case FMULP:       return "fmulp";
-      case FSUBRP:      return "fsubrp";
+      case FSUBP:       return "fsubp";
       case FDIVP:       return "fdivp";
       case FDIVRP:      return "fdivrp";
       case FCOMPP:      return "fcompp";
@@ -553,7 +553,7 @@ void AsmCode::GenCallWriteForInt()
 
 void AsmCode::GenCallWriteForReal()
 {
-   formatStrReal = formatStrReal == nullptr ? AddData("float", " %0.14E") : formatStrReal;
+   formatStrReal = formatStrReal == nullptr ? AddData("float", "% 0.14E") : formatStrReal;
    AddCmd(FLD, AsmMemory(ESP, 0, szDWORD));
    AddCmd(SUB, ESP, 8);
    AddCmd(FSTP, AsmMemory(ESP, 0, szQWORD));

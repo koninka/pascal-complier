@@ -8,32 +8,32 @@ includelib c:\masm32\lib\msvcrt.lib
 .code
 main:
 	mov	ebp, esp
-	push	dword ptr 1
+	push	1
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, dword ptr 8
-	push	dword ptr 2
-	push	dword ptr 5
+	add	esp, 8
+	push	2
+	push	5
 	pop	ebx
 	pop	eax
 	add	eax, ebx
 	push	eax
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, dword ptr 8
-	push	dword ptr 10
+	add	esp, 8
+	push	10
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, dword ptr 8
+	add	esp, 8
 	push	offset fmt_str_new_line
 	call	crt_printf
-	add	esp, dword ptr 4
-	push	dword ptr 40
+	add	esp, 4
+	push	40
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, dword ptr 8
+	add	esp, 8
 @exit_0:
 	mov	esp, ebp
-	mov	eax, dword ptr 0
+	mov	eax, 0
 	ret
 end main

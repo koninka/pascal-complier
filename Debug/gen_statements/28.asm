@@ -8,12 +8,12 @@ includelib c:\masm32\lib\msvcrt.lib
 @foo_0 proc
 	push	ebp
 	mov	ebp, esp
-	sub	esp, dword ptr 4
+	sub	esp, 4
 	push	ebp
 	call	@bar_1
 	add	esp, 0
 	mov	ebx, ebp
-	add	ebx, dword ptr -4
+	add	ebx, -4
 	push	ebx
 	pop	eax
 	push	dword ptr [eax]
@@ -28,7 +28,7 @@ includelib c:\masm32\lib\msvcrt.lib
 @bar_1 proc
 	push	ebp
 	mov	ebp, esp
-	sub	esp, dword ptr 4
+	sub	esp, 4
 	push	ebp
 	call	@last1_3
 	add	esp, 0
@@ -54,7 +54,7 @@ includelib c:\masm32\lib\msvcrt.lib
 	mov	ebx, ebp
 	mov	ebx, [ebx + 8]
 	mov	ebx, [ebx + 8]
-	add	ebx, dword ptr -4
+	add	ebx, -4
 	push	ebx
 	pop	eax
 	pop	ebx
@@ -80,7 +80,7 @@ includelib c:\masm32\lib\msvcrt.lib
 	push	eax
 	mov	ebx, ebp
 	mov	ebx, [ebx + 8]
-	add	ebx, dword ptr -4
+	add	ebx, -4
 	push	ebx
 	pop	eax
 	pop	ebx
@@ -97,7 +97,7 @@ includelib c:\masm32\lib\msvcrt.lib
 	mov	ebx, ebp
 	mov	ebx, [ebx + 8]
 	mov	ebx, [ebx + 8]
-	add	ebx, dword ptr -4
+	add	ebx, -4
 	push	ebx
 	pop	eax
 	pop	ebx
@@ -114,6 +114,6 @@ main:
 	add	esp, 0
 @exit_10:
 	mov	esp, ebp
-	mov	eax, dword ptr 0
+	mov	eax, 0
 	ret
 end main
