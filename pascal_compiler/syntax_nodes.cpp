@@ -412,7 +412,7 @@ void NodeBinaryOp::GenerateForReal(AsmCode& asmCode) const
          asmCode.AddCmd(FADDP, ST1, ST);
          break;
       case Tag::SUBTRACTION:
-         asmCode.AddCmd(FSUBRP, ST1, ST);
+         asmCode.AddCmd(FSUBP, ST1, ST);
          break;
       case Tag::MULTIPLICATION:
          asmCode.AddCmd(FMULP, ST1, ST);
@@ -454,25 +454,24 @@ void NodeBinaryOp::GenerateForIntRelationalOp(AsmCode& asmCode) const
 
 void NodeBinaryOp::GenerateForRealRelationalOp(AsmCode& asmCode) const
 {
-   asmCode.AddCmd(FXCH, ST1);
    asmCode.AddCmd(FCOMPP);
    asmCode.AddCmd(FNSTSW, AX);
    switch (token->tag) {
       case Tag::GT:
          asmCode.AddCmd(SAHF);
-         asmCode.AddCmd(SETA, AL);
+         asmCode.AddCmd(SETB, AL);
          break;
       case Tag::GE:
          asmCode.AddCmd(SAHF);
-         asmCode.AddCmd(SETAE, AL);
+         asmCode.AddCmd(SETBE, AL);
          break;
       case Tag::LT:
          asmCode.AddCmd(SAHF);
-         asmCode.AddCmd(SETB, AL);
+         asmCode.AddCmd(SETA, AL);
          break;
       case Tag::LE:
          asmCode.AddCmd(SAHF);
-         asmCode.AddCmd(SETBE, AL);
+         asmCode.AddCmd(SETAE, AL);
          break;
       case Tag::EQ:
          asmCode.AddCmd(SAHF);
@@ -549,7 +548,6 @@ void NodeRecordAccess::GenerateLValue(AsmCode& asmCode) const
    left->GenerateLValue(asmCode);
    asmCode.AddCmd(POP, EAX);
    asmCode.AddCmd(ADD, EAX, dynamic_cast<NodeVar*>(right)->symbol->GetOffset());
-   //asmCode.AddCmd(LEA, EAX, AsmMemory(EAX, ));
    asmCode.AddCmd(PUSH, EAX);
 }
 
@@ -659,7 +657,6 @@ void NodeCall::Generate(AsmCode& asmCode)
          Symbol* symbol = args[i]->GetType();
          args[i]->Generate(asmCode);
          if (symbol != nullptr && *(symbol) == stTypeArray) {
-            //asmCode.AddCmd(PUSH, symbol->GetType()->GetSize());
             asmCode.AddCmd(PUSH, symbol->GetSize());
             size += 4;
          }
@@ -706,12 +703,12 @@ void NodeArrIdx::Generate(AsmCode& asmCode)
 {
    ComputeIndexToEax(asmCode);
    size_t size = dynamic_cast<SymTypeArry*>(arrName->GetSymbol()->GetType())->elemType->GetSize();
-   if (size > 4) {
+   //if (size > 4) {
       asmCode.PushMemory(size);
-   } else {
-      asmCode.AddCmd(POP, EAX);
-      asmCode.AddCmd(PUSH, AsmMemory(EAX));
-   }
+   //} else {
+      //asmCode.AddCmd(POP, EAX);
+      //asmCode.AddCmd(PUSH, AsmMemory(EAX));
+   //}
 }
 
 void NodeArrIdx::GenerateLValue(AsmCode& asmCode) const

@@ -4,7 +4,7 @@ include c:\masm32\include\msvcrt.inc
 includelib c:\masm32\lib\msvcrt.lib
 .data
 	fv0 real4 2.500000
-	fmt_float db " %0.14E", 0
+	fmt_float db "% 0.14E", 0
 .code
 main:
 	mov	ebp, esp

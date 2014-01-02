@@ -154,7 +154,6 @@ size_t SymConstFloat::GetSize()
 void SymConstFloat::GenerateDeclaration(AsmCode& asmCode)
 {
    constLabel = asmCode.AddData(name, value);
-   //asmCode.AddCmd(PUSH, AsmVarAddr(asmCode.AddData(asmCode.GenStrLabel("str"), value)));
 }
 
 void SymConstFloat::Generate(AsmCode& asmCode, unsigned) const

@@ -11,7 +11,8 @@ double getFrac(double value)
 Parser::Parser(const Scanner& AScanner): scanner(AScanner), _priorities(PRIORITIES_NUMBER),
 		symTable(new SymTable),
       tableStack(SymTableStack()),
-      _isGlobalNamespace(true)
+      _isGlobalNamespace(true),
+      _isConstantParsing(false)
 {
 	symTable->Add(typeChar);
 	symTable->Add(typeFloat);
@@ -553,9 +554,12 @@ Symbol* Parser::FindSymbolByName(string name, bool findInCurTable)
 	return result;
 }
 
-Symbol* Parser::CreateConstExprSymbol(NodeExpr* node, int line)
+Symbol* Parser::CreateConstExprSymbol(int line)
 {
-	double value = ComputeConstantExpression(node, line);
+   _isConstantParsing = true;
+   NodeExpr* expr = ParseExpression(0, 0);
+   _isConstantParsing = false;
+	double value = ComputeConstantExpression(expr, line);
 	if (getFrac(value) == 0) {
 		return new SymConstInteger(int(value));
 	} else {
@@ -570,7 +574,7 @@ Symbol* Parser::ParseConstantExpression()
 		return new SymConstCharacterString(token->getValue());
 	}
 	PutToken(token);
-	return CreateConstExprSymbol(ParseExpression(0, 0), _line);
+	return CreateConstExprSymbol(_line);
 }
 
 Symbol* Parser::ParseArrayDeclaration(bool isOpenArray)
@@ -754,7 +758,9 @@ NodeExpr* Parser::ParseFactor(unsigned depth)
 		result = new NodeIntegerNumber(token);
    } else if (*token == ttRealNumber) {
       result = new NodeRealNumber(token);
-      dynamic_cast<NodeRealNumber*>(result)->GenerateData(asmCode);
+      if (!_isConstantParsing) {
+         dynamic_cast<NodeRealNumber*>(result)->GenerateData(asmCode);
+      }
    }  else if (*token == ttCharacterString) {
 		result = new NodeCharacterString(token, depth);
    } else if (*token == Tag::IDENTIFICATOR && token->text == "integer") {

@@ -481,7 +481,8 @@ main:
 	add	eax, ebx
 	push	eax
 	pop	eax
-	push	[eax]
+	mov	ebx, [eax]
+	push	ebx
 	push	offset v_a
 	push	dword ptr [v_j]
 	push	1
@@ -497,7 +498,8 @@ main:
 	add	eax, ebx
 	push	eax
 	pop	eax
-	push	[eax]
+	mov	ebx, [eax]
+	push	ebx
 	pop	ebx
 	pop	eax
 	cmp	eax, ebx

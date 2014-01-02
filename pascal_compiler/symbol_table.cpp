@@ -340,7 +340,7 @@ SymSubroutineVar::SymSubroutineVar(SymbolPtr AType, size_t AOffset, unsigned ADe
    _depth(ADepth)
 {}
 
-void SymSubroutineVar::ComputeSubroutineEBPToEBX(AsmCode& asmCode, unsigned stmtDepth) const
+void SymSubroutineVar::GetLexicalNesting(AsmCode& asmCode, unsigned stmtDepth) const
 {
    asmCode.AddCmd(MOV, EBX, EBP);
    for (size_t i = 0; i < stmtDepth - _depth; i++) {
@@ -364,17 +364,15 @@ void SymVarLocal::PrintSymbol(int d)
 
 void SymVarLocal::Generate(AsmCode& asmCode, unsigned stmtDepth) const
 {
-   ComputeSubroutineEBPToEBX(asmCode, stmtDepth);
+   GetLexicalNesting(asmCode, stmtDepth);
    asmCode.AddCmd(PUSH, AsmMemory(EBX, -int(_offset) - 4));
 }
 
 void SymVarLocal::GenerateLValue(AsmCode& asmCode, unsigned stmtDepth) const
 {
-   ComputeSubroutineEBPToEBX(asmCode, stmtDepth);
+   GetLexicalNesting(asmCode, stmtDepth);
    asmCode.AddCmd(ADD, EBX, -int(_offset) - 4);
    asmCode.AddCmd(PUSH, EBX);
-   //asmCode.AddCmd(LEA, EAX, AsmMemory(EBP, -int(_offset) - 4));
-   //asmCode.AddCmd(PUSH, EAX);
 }
 
 SymParamBase::SymParamBase(SymbolPtr AType, size_t AOffset, SymSubroutine* ASubroutine, unsigned ADepth, SymbolType ASymType):
@@ -389,7 +387,7 @@ void SymParamBase::GetParamSize(AsmCode& asmCode) const
 
 void SymParamBase::GenerateOffsetInStack(AsmCode& asmCode, unsigned stmtDepth) const
 {
-   ComputeSubroutineEBPToEBX(asmCode, stmtDepth);
+   GetLexicalNesting(asmCode, stmtDepth);
    asmCode.AddCmd(ADD, EBX, 12); //eax point to the first arg
    Symbols params = subroutine->GetParams()->symbols;
    // можно этот цикл сделать на ассемблере
@@ -400,9 +398,8 @@ void SymParamBase::GenerateOffsetInStack(AsmCode& asmCode, unsigned stmtDepth) c
          if (*(param->GetType()) == stTypeOpenArray || *(param->GetType()) == stTypeArray) {
             asmCode.AddCmd(MOV, EAX, AsmMemory(EBX)); //array size of byte
             asmCode.AddCmd(ADD, EBX, 4);
-            if (!needBreak) {
-               asmCode.AddCmd(ADD, EBX, EAX);
-            }
+            if (needBreak) break;
+            asmCode.AddCmd(ADD, EBX, EAX);
          } else if (!needBreak) {
             asmCode.AddCmd(ADD, EBX, param->GetSize());
          }

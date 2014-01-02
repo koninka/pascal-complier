@@ -22,9 +22,8 @@ int main(int argc, char *argv[])
 		//Parser parser(scanner1);
 		//parser.isDeclarationParse = false;
 		//parser.ParseProgram();
-//      parser.PrintBlock();
-      //freopen("tree.asm", "w", stdout);
-      //parser.Generate();
+  //    freopen("tree.asm", "w", stdout);
+  //    parser.Generate();
 		//cout << "-----------TABLE-----------" << endl << endl;
 		//parser.PrintSymTable();
       //cout << endl << endl << "-----------ASM-----------" << endl << endl;
@@ -121,5 +120,5 @@ int main(int argc, char *argv[])
 	if (isErr) {
 		cout << errMsg << endl;
 	}
-	return 0;
+   	return 0;
 }

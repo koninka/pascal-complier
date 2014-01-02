@@ -7,10 +7,10 @@ includelib c:\masm32\lib\msvcrt.lib
 @proc_0 proc
 	push	ebp
 	mov	ebp, esp
-	sub	esp, dword ptr 4
+	sub	esp, 4
 	push	10
 	mov	ebx, ebp
-	add	ebx, dword ptr -4
+	add	ebx, -4
 	push	ebx
 	pop	eax
 	pop	ebx
@@ -24,6 +24,6 @@ main:
 	mov	ebp, esp
 @exit_2:
 	mov	esp, ebp
-	mov	eax, dword ptr 0
+	mov	eax, 0
 	ret
 end main

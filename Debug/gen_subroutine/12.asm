@@ -16,7 +16,7 @@ includelib c:\masm32\lib\msvcrt.lib
 	mov	ebp, esp
 	push	0
 	mov	ebx, ebp
-	add	ebx, dword ptr 12
+	add	ebx, 12
 	push	[ebx]
 	push	1
 	mov	ebx, 4
@@ -31,7 +31,7 @@ includelib c:\masm32\lib\msvcrt.lib
 	mov	[eax], ebx
 	push	1
 	mov	ebx, ebp
-	add	ebx, dword ptr 12
+	add	ebx, 12
 	push	[ebx]
 	push	2
 	mov	ebx, 4
@@ -46,7 +46,7 @@ includelib c:\masm32\lib\msvcrt.lib
 	mov	[eax], ebx
 	push	2
 	mov	ebx, ebp
-	add	ebx, dword ptr 12
+	add	ebx, 12
 	push	[ebx]
 	push	3
 	mov	ebx, 4
@@ -174,6 +174,6 @@ main:
 	add	esp, 4
 @exit_2:
 	mov	esp, ebp
-	mov	eax, dword ptr 0
+	mov	eax, 0
 	ret
 end main

@@ -1,16 +1,5 @@
 const
-   H = 40;
-var
-   a: array[1..H] of real;
-   procedure foo(arr: array of real);
-   var
-      i: integer;
-   begin
-      for i := 0 to H - 1 do
-         arr[i] := (658943 mod 19) * 2.43  / (i + 1);
-      for i := 0 to H - 1 do
-         writeln(arr[i]);
-   end;
+	h = -0.23;
 begin
-   foo(a);
+	write(h + 20.43);
 end.

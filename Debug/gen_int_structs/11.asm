@@ -8,8 +8,8 @@ includelib c:\masm32\lib\msvcrt.lib
 .code
 main:
 	mov	ebp, esp
-	push	dword ptr 5
-	push	dword ptr 3
+	push	5
+	push	3
 	pop	ebx
 	pop	eax
 	cmp	eax, ebx
@@ -18,12 +18,12 @@ main:
 	push	eax
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, dword ptr 8
+	add	esp, 8
 	push	offset fmt_str_new_line
 	call	crt_printf
-	add	esp, dword ptr 4
-	push	dword ptr 5
-	push	dword ptr 3
+	add	esp, 4
+	push	5
+	push	3
 	pop	ebx
 	pop	eax
 	cmp	eax, ebx
@@ -32,12 +32,12 @@ main:
 	push	eax
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, dword ptr 8
+	add	esp, 8
 	push	offset fmt_str_new_line
 	call	crt_printf
-	add	esp, dword ptr 4
-	push	dword ptr 5
-	push	dword ptr 3
+	add	esp, 4
+	push	5
+	push	3
 	pop	ebx
 	pop	eax
 	cmp	eax, ebx
@@ -46,12 +46,12 @@ main:
 	push	eax
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, dword ptr 8
+	add	esp, 8
 	push	offset fmt_str_new_line
 	call	crt_printf
-	add	esp, dword ptr 4
-	push	dword ptr 5
-	push	dword ptr 3
+	add	esp, 4
+	push	5
+	push	3
 	pop	ebx
 	pop	eax
 	cmp	eax, ebx
@@ -60,12 +60,12 @@ main:
 	push	eax
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, dword ptr 8
+	add	esp, 8
 	push	offset fmt_str_new_line
 	call	crt_printf
-	add	esp, dword ptr 4
-	push	dword ptr 5
-	push	dword ptr 3
+	add	esp, 4
+	push	5
+	push	3
 	pop	ebx
 	pop	eax
 	cmp	eax, ebx
@@ -74,12 +74,12 @@ main:
 	push	eax
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, dword ptr 8
+	add	esp, 8
 	push	offset fmt_str_new_line
 	call	crt_printf
-	add	esp, dword ptr 4
-	push	dword ptr 5
-	push	dword ptr 3
+	add	esp, 4
+	push	5
+	push	3
 	pop	ebx
 	pop	eax
 	cmp	eax, ebx
@@ -88,12 +88,12 @@ main:
 	push	eax
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, dword ptr 8
+	add	esp, 8
 	push	offset fmt_str_new_line
 	call	crt_printf
-	add	esp, dword ptr 4
+	add	esp, 4
 @exit_0:
 	mov	esp, ebp
-	mov	eax, dword ptr 0
+	mov	eax, 0
 	ret
 end main
