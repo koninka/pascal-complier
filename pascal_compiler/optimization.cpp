@@ -290,6 +290,17 @@ Optimizator::Optimizator()
    );
    Add2(
       [this]() -> bool {
+         return                                              //DANGER DANGER
+            CheckCmds(Cmd(1), Cmd(2), MOV, PUSH)             //mov   eax, 1
+            && IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1)      //push  eax
+            && IsIntImm(Cmd(1)->arg2);
+      },
+      [this]() {
+         cmdsContainer.AddCmd(PUSH, Cmd(1)->arg2);
+      }
+   );
+   Add2(
+      [this]() -> bool {
          return
                CheckCmds(Cmd(1), Cmd(2), ADD, ADD)
             && IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1)
