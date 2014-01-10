@@ -1,8 +1,7 @@
 var
-   r: record
-      a: integer;
-   end;
+   i: integer;
 begin
-   r.a := -25;
-   Write(r.a);
+   i := 20;
+   i := -i;
+   write(i);
 end.

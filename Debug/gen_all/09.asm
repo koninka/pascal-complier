@@ -8,9 +8,8 @@ includelib c:\masm32\lib\msvcrt.lib
 .code
 main:
 	mov	ebp, esp
-	lea	ebx, v_a
-	mov	[ebx], dword ptr 24
 	lea	eax, v_a
+	mov	[eax], dword ptr 24
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf

@@ -14,13 +14,13 @@ int main(int argc, char *argv[])
 	string errMsg;
    try {
 		Printer printer;
-		//Scanner scanner1("test.tree");
-		//Parser parser(scanner1);
-  //    parser.isOptimize = true;
-		//parser.isDeclarationParse = false;
-		//parser.ParseProgram();
-  //    freopen("tree.asm", "w", stdout);
-  //    parser.Generate();
+      //Scanner scanner1("test.tree");
+      //Parser parser(scanner1);
+      //parser.isOptimize = true;
+      //parser.isDeclarationParse = false;
+      //parser.ParseProgram();
+      //freopen("tree.asm", "w", stdout);
+      //parser.Generate();
       if (argc > 1) {
          if (argv[1][0] == '-') {
             for (int i = 1, len = strlen(argv[1]); i < len; i++) {

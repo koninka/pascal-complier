@@ -607,9 +607,9 @@ Optimizator::Optimizator()
    Add3(
       [this]() -> bool {
          //return  false;
-         return                                                      //lea R1, R2
+         return                                                      //lea R1, oper
                CheckCmds(Cmd(1), Cmd(2), Cmd(3), LEA, MOV, LEA)      //mov [R1], 20
-            && IsEqOperands(Cmd(1)->arg1, Cmd(3)->arg1)              //lea R1, R2
+            && IsEqOperands(Cmd(1)->arg1, Cmd(3)->arg1)              //lea R1, oper
             && CmpOperands(Cmd(1)->arg2, Cmd(3)->arg2)
             && IsMem(Cmd(2)->arg1)
             && IsEqOperands(Cmd(1)->arg1, GetMem(Cmd(2)->arg1).arg);
@@ -617,6 +617,23 @@ Optimizator::Optimizator()
       [this]() {
          cmdsContainer.AddCmd(Cmd(1));
          cmdsContainer.AddCmd(Cmd(2));
+      }
+   );
+   Add3(
+      [this]() -> bool {
+         //return  false;
+         return                                                      //lea R2, oper
+               CheckCmds(Cmd(1), Cmd(2), Cmd(3), LEA, MOV, LEA)      //mov [R2], 20
+            && CmpOperands(Cmd(1)->arg2, Cmd(3)->arg2)               //lea R1, oper
+            && IsMem(Cmd(2)->arg1)
+            && IsEqOperands(Cmd(1)->arg1, GetMem(Cmd(2)->arg1).arg)
+            && !IsEqOperands(Cmd(1)->arg1, Cmd(3)->arg1)
+            && !CmpOperands(Cmd(3)->arg1, Cmd(2)->arg2);
+      },
+      [this]() {
+         cmdsContainer.AddCmd(Cmd(3));
+         AsmMemory mem = GetMem(Cmd(2)->arg1);
+         cmdsContainer.AddCmd(MOV, AsmMemory(Cmd(3)->arg1, mem.GetOffset(), mem.GetSizeType()), Cmd(2)->arg2);
       }
    );
    Add3(
