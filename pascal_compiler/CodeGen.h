@@ -297,9 +297,11 @@ struct AsmCodeBase {
    void AddCmd(OpCode, AsmMemory, AsmIntImmediate);
    void AddCmd(OpCode, AsmOperand*, AsmIntImmediate);
    void AddCmd(OpCode, AsmOperand*, AsmVarAddr);
+   void AddCmd(OpCode, AsmVarAddr, AsmOperand*);
    void AddCmd(OpCode, AsmMemory, Register);
    void AddCmd(OpCode, AsmMemory, AsmRegister);
    void AddCmd(OpCode, AsmMemory, AsmOperand*);
+   void AddCmd(OpCode, AsmOperand*, AsmMemory);
    void AddCmd(OpCode, Register, AsmMemory);
    void CleanCommands();
    Commands GetCommands() const;

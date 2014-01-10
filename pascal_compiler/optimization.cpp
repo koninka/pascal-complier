@@ -73,7 +73,7 @@ static bool IsEqOperands(AsmOperand* oper1, AsmOperand* oper2)
    } else if (IsStrImm(oper1) && IsStrImm(oper2)) {
       result = CastOperand<AsmStrImmediate>(oper1)->GetStrValue() == CastOperand<AsmStrImmediate>(oper2)->GetStrValue();
    } else if (IsAddr(oper1) && IsAddr(oper2)) {
-      result = CastOperand<AsmVarAddr>(oper1) == oper2; /// ПОДУМАТЬ
+      result = CastOperand<AsmVarAddr>(oper1) == oper2; /// ГЏГЋГ„Г“ГЊГЂГ’Гњ
    }
    return result;
 }
@@ -366,7 +366,7 @@ Optimizator::Optimizator()
          return
                CheckCmds(Cmd(1), Cmd(2), LEA, ADD)        //lea   ebx, v_a
             && IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg2)   //add   eax, ebx
-            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1); // возможно не нужна
+            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1); // ГўГ®Г§Г¬Г®Г¦Г­Г® Г­ГҐ Г­ГіГ¦Г­Г 
       },
       [this]() {
          cmdsContainer.AddCmd(ADD, Cmd(2)->arg1, AsmVarAddr(Cmd(1)->arg2));
@@ -377,7 +377,7 @@ Optimizator::Optimizator()
          return
                CheckCmds(Cmd(1), Cmd(2), XOR, IMUL)     //xor   eax, eax
             && IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1) //imul  eax, ebx
-            && IsEqOperands(Cmd(1)->arg1, Cmd(1)->arg2); // возможно не требуется
+            && IsEqOperands(Cmd(1)->arg1, Cmd(1)->arg2); // ГўГ®Г§Г¬Г®Г¦Г­Г® Г­ГҐ ГІГ°ГҐГЎГіГҐГІГ±Гї
       },
       [this]() {
          cmdsContainer.AddCmd(Cmd(1));
@@ -388,7 +388,7 @@ Optimizator::Optimizator()
          return
                CheckCmds(Cmd(1), Cmd(2), XOR, ADD)        //xor   eax, eax
             && IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1)   //add   eax, offset v_a + 4
-            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg2); //возможно не требуется
+            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg2); //ГўГ®Г§Г¬Г®Г¦Г­Г® Г­ГҐ ГІГ°ГҐГЎГіГҐГІГ±Гї
       },
       [this]() {
          cmdsContainer.AddCmd(MOV, Cmd(1)->arg1, Cmd(2)->arg2);
@@ -397,7 +397,7 @@ Optimizator::Optimizator()
    Add2(
       [this]() -> bool {
          return
-               CheckCmds(Cmd(1), Cmd(2), POP, MOV)        //pop   ebx
+               CheckCmds(Cmd(1), Cmd(2), POP, MOV)          //pop   ebx
             && IsMem(Cmd(2)->arg1)                          //mov[eax], ebx
             && IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg2);
       },
@@ -405,7 +405,35 @@ Optimizator::Optimizator()
          cmdsContainer.AddCmd(POP, Cmd(2)->arg1);
       }
    );
+//--------------------------------------------------------------
 
+   Add2(
+      [this]() -> bool {                        //DANGER DANGER
+         return
+               *Cmd(1) == MOV                   //mov ebx, ebp
+            && IsReg(Cmd(1)->arg2)              //mov eax, [ebx + 12]
+            && IsMem(Cmd(2)->arg2)
+            && IsEqOperands(Cmd(1)->arg1, GetMem(Cmd(2)->arg2).arg)
+            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1);   //not need maybe
+      },
+      [this]() {
+         cmdsContainer.AddCmd(Cmd(2)->GetOpCode(), Cmd(2)->arg1, AsmMemory(Cmd(1)->arg2, GetMem(Cmd(2)->arg2).GetOffset()));
+      }
+   );
+   Add2(
+      [this]() -> bool {                        //DANGER DANGER
+         return
+               *Cmd(1) == MOV                      //mov ebx, ebp
+            && IsCmd2(Cmd(2))
+            && IsReg(Cmd(1)->arg2)              //mov [ebx + 12], 4
+            && IsMem(Cmd(2)->arg1)
+            && IsEqOperands(Cmd(1)->arg1, GetMem(Cmd(2)->arg1).arg)
+            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg2);   //not need maybe
+      },
+      [this]() {
+         cmdsContainer.AddCmd(Cmd(2)->GetOpCode(), AsmMemory(Cmd(1)->arg2, GetMem(Cmd(2)->arg1).GetOffset()), Cmd(2)->arg2);
+      }
+   );
    //-------------------------------------------------------------------------
    //-------------------------THREE COMMANDS OPTIMIZATIONS--------------------
    Add3(
@@ -432,8 +460,8 @@ Optimizator::Optimizator()
             && IsIntImm(Cmd(1)->arg2)                     // add ebx, eax
             && IsEqOperands(Cmd(2)->arg1, Cmd(3)->arg1)
             && IsEqOperands(Cmd(1)->arg1, Cmd(3)->arg2)
-            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1)  //может не нужна
-            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg2); //может не нужна
+            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1)  //Г¬Г®Г¦ГҐГІ Г­ГҐ Г­ГіГ¦Г­Г 
+            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg2); //Г¬Г®Г¦ГҐГІ Г­ГҐ Г­ГіГ¦Г­Г 
       },
       [this]() {
          cmdsContainer.AddCmd(Cmd(2));
@@ -462,9 +490,9 @@ Optimizator::Optimizator()
             && (*Cmd(3) == ADD || *Cmd(3) == SUB)            //mov   eax, dword ptr[v_a]
             && IsEqOperands(Cmd(1)->arg1, Cmd(3)->arg2)      //add   eax, ebx
             && IsEqOperands(Cmd(2)->arg1, Cmd(3)->arg1)
-            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg2) // может не нужна - крест накрест
+            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg2) // Г¬Г®Г¦ГҐГІ Г­ГҐ Г­ГіГ¦Г­Г  - ГЄГ°ГҐГ±ГІ Г­Г ГЄГ°ГҐГ±ГІ
             && !IsEqOperands(Cmd(1)->arg2, Cmd(2)->arg1)
-            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1); // можент не нужна
+            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1); // Г¬Г®Г¦ГҐГ­ГІ Г­ГҐ Г­ГіГ¦Г­Г 
       },
       [this]() {
          cmdsContainer.AddCmd(Cmd(2));
@@ -478,7 +506,7 @@ Optimizator::Optimizator()
             && *Cmd(3) == IMUL && IsCmd1(Cmd(3))         //mov   eax, dword ptr[v_i]
             && IsEqOperands(Cmd(1)->arg1, Cmd(3)->arg1)   //imul  ebx
             && !IsEqOperands(Cmd(1)->arg2, Cmd(2)->arg1)
-            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1); // возможно не требуется
+            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1); // ГўГ®Г§Г¬Г®Г¦Г­Г® Г­ГҐ ГІГ°ГҐГЎГіГҐГІГ±Гї
       },
       [this]() {
          cmdsContainer.AddCmd(Cmd(2));
@@ -492,7 +520,7 @@ Optimizator::Optimizator()
             && *Cmd(3) == IMUL && !IsCmd2(Cmd(3))         //mov   ebx, 3
             && IsEqOperands(Cmd(2)->arg1, Cmd(3)->arg1)   //imul  ebx
             && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg2)
-            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1);  // возможно не требуется
+            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1);  // ГўГ®Г§Г¬Г®Г¦Г­Г® Г­ГҐ ГІГ°ГҐГЎГіГҐГІГ±Гї
       },
       [this]() {
          cmdsContainer.AddCmd(Cmd(1));
@@ -517,7 +545,7 @@ Optimizator::Optimizator()
                CheckCmds(Cmd(1), Cmd(2), Cmd(3), MOV, MOV, CMP)      //mov   ebx, intImm1      mov eax, intImm2
             && IsEqOperands(Cmd(1)->arg1, Cmd(3)->arg2)              //mov   eax, intImm2      cmp eax, intImm1
             && IsEqOperands(Cmd(2)->arg1, Cmd(3)->arg1)              //cmp   eax, ebx
-            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg2); // возможно не требуется
+            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg2); // ГўГ®Г§Г¬Г®Г¦Г­Г® Г­ГҐ ГІГ°ГҐГЎГіГҐГІГ±Гї
       },
       [this]() {
          cmdsContainer.AddCmd(Cmd(2));
@@ -543,8 +571,8 @@ Optimizator::Optimizator()
          return                                                        //mov   ebx, dword ptr - 5
                CheckCmds(Cmd(1), Cmd(2), Cmd(3), MOV, MOV, MOV)        //mov   eax, offset v_c + 4
             && IsEqOperands(Cmd(1)->arg1, Cmd(3)->arg2)                //mov[eax], ebx
-            && IsMem(Cmd(3)->arg1)                                     // возможно не требуется
-            && IsEqOperands(Cmd(2)->arg1, GetMem(Cmd(3)->arg1).arg)    // возможно не требуется
+            && IsMem(Cmd(3)->arg1)                                     // ГўГ®Г§Г¬Г®Г¦Г­Г® Г­ГҐ ГІГ°ГҐГЎГіГҐГІГ±Гї
+            && IsEqOperands(Cmd(2)->arg1, GetMem(Cmd(3)->arg1).arg)    // ГўГ®Г§Г¬Г®Г¦Г­Г® Г­ГҐ ГІГ°ГҐГЎГіГҐГІГ±Гї
             && !IsMem(Cmd(1)->arg2)
             && !CmpOperands(Cmd(1)->arg2, Cmd(2)->arg1);
       },
@@ -609,7 +637,7 @@ Optimizator::Optimizator()
             && IsEqOperands(Cmd(1)->arg1, Cmd(3)->arg2)              //push eax
             && IsEqOperands(Cmd(2)->arg1, Cmd(3)->arg1)              //mov eax, ebx
             && IsIntImm(Cmd(1)->arg2)
-            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1);            // возможно не требуется
+            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1);            // ГўГ®Г§Г¬Г®Г¦Г­Г® Г­ГҐ ГІГ°ГҐГЎГіГҐГІГ±Гї
       },
       [this]() {
          cmdsContainer.AddCmd(Cmd(2));
@@ -655,7 +683,7 @@ Optimizator::Optimizator()
             && (*Cmd(2) == ADD || *Cmd(2) == SUB)                       //add   eax, ebx
             && IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg2)                 //mov   ebx, 4
             && IsEqOperands(Cmd(1)->arg1, Cmd(3)->arg1)
-            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1) //возможно не требуется
+            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1) //ГўГ®Г§Г¬Г®Г¦Г­Г® Г­ГҐ ГІГ°ГҐГЎГіГҐГІГ±Гї
             && IsStrImm(Cmd(1)->arg2);
       },
       [this]() {
@@ -674,6 +702,67 @@ Optimizator::Optimizator()
       },
       [this]() {
          cmdsContainer.AddCmd(Cmd(2));
+         cmdsContainer.AddCmd(Cmd(3));
+      }
+   );
+//-------------------------------------------
+   Add3(
+      [this]() -> bool {
+         return
+               CheckCmds(Cmd(1), Cmd(3), ADD, MOV)       //add   ebx, dword ptr 16
+            && IsEqOperands(Cmd(1)->arg1, Cmd(3)->arg1)  //add   eax, dword ptr [ebx]
+            && IsIntImm(Cmd(1)->arg2)                    //mov   ebx, ebp
+            && IsMem(Cmd(2)->arg2)
+            && IsEqOperands(Cmd(1)->arg1, GetMem(Cmd(2)->arg2).arg)
+            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1); //возможно не требуется
+      },
+      [this]() {
+         AsmMemory mem = GetMem(Cmd(2)->arg2);
+         mem.SetOffset(mem.GetOffset() + GetIntImmVal(Cmd(1)->arg2));
+         cmdsContainer.AddCmd(Cmd(2)->GetOpCode(), Cmd(2)->arg1, mem);
+         cmdsContainer.AddCmd(Cmd(3));
+      }
+   );
+   Add3(
+      [this]() -> bool {
+         return                                                        //DANGER!!!!
+               CheckCmds(Cmd(1), Cmd(2), Cmd(3), PUSH, MOV, POP)       //push eax
+            && IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1)                //mov eax, ebx
+            && IsMem(Cmd(3)->arg1)                                     //pop [eax]
+            && IsEqOperands(Cmd(1)->arg1, GetMem(Cmd(3)->arg1).arg)
+            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg2); //возможно не требуется
+      },
+      [this]() {
+         AsmMemory mem = GetMem(Cmd(3)->arg1);
+         cmdsContainer.AddCmd(MOV, AsmMemory(Cmd(2)->arg2), Cmd(1)->arg1);
+      }
+   );
+   Add3(
+      [this]() -> bool {
+         return                                                        //DANGER!!!!
+               CheckCmds(Cmd(1), Cmd(2), Cmd(3), PUSH, MOV, POP)       //push [eax]
+            && IsMem(Cmd(1)->arg1)                                     //mov eax, ebx
+            && IsEqOperands(GetMem(Cmd(1)->arg1).arg, Cmd(2)->arg1)    //pop [eax]
+            && !IsMem(Cmd(2)->arg2)
+            && CmpOperands(Cmd(1)->arg1, Cmd(3)->arg1);
+      },
+      [this]() {
+         AsmMemory mem = GetMem(Cmd(1)->arg1);
+         cmdsContainer.AddCmd(MOV, mem.arg, Cmd(1)->arg1);
+         cmdsContainer.AddCmd(MOV, AsmMemory(Cmd(2)->arg2), mem.arg);
+      }
+   );
+   Add3(
+      [this]() -> bool {
+         return                                                        //DANGER!!!!
+               CheckCmds(Cmd(1), Cmd(2), Cmd(3), MOV, PUSH, MOV)       //mov ebx, ebp
+            && IsMem(Cmd(2)->arg1)                                     //push  [ebx - 4]
+            && IsEqOperands(Cmd(1)->arg1, GetMem(Cmd(2)->arg1).arg)    //mov ebx, ebp
+            && !IsMem(Cmd(1)->arg2)
+            && IsEqOperands(Cmd(1)->arg1, Cmd(3)->arg1);
+      },
+      [this]() {
+         cmdsContainer.AddCmd(PUSH, AsmMemory(Cmd(1)->arg2, GetMem(Cmd(2)->arg1).GetOffset()));
          cmdsContainer.AddCmd(Cmd(3));
       }
    );

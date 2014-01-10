@@ -85,16 +85,15 @@ void Parser::Generate()
    asmCode.AddCmd(MOV, EAX, 0);
    asmCode.AddCmd(RET);
    if (isOptimize) {
-      //asmCode.AddCmd(ADD, ESP, 8);
-      //asmCode.GenWriteNewLine();
-      //asmCode.Print();
+      //asmCode.AddCmd(MOV, EBP, ESP);
+      //asmCode.AddLabel("@exit");
+      //asmCode.AddCmd(MOV, ESP, EBP);
       //asmCode.AddCmd(MOV, EBX, AsmMemory(EBX, 8));
       //asmCode.AddCmd(ADD, EBX, 12);
       //asmCode.AddCmd(PUSH, EBX);
-//add   esp, 8
-//push  offset fmt_str_new_line
-//call  crt_printf
-//add   esp, 4
+      //mov   ebp, esp
+      //   @exit_1:
+      //mov   esp, ebp
       Optimizator optimizator;
       optimizator.Optimize(asmCode);
    }

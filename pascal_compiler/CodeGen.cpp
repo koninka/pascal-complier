@@ -620,6 +620,11 @@ void AsmCodeBase::AddCmd(OpCode cmd, AsmOperand* oper, AsmVarAddr addr)
    commands.push_back(new AsmCmd2(cmd, oper, new AsmVarAddr(addr)));
 }
 
+void AsmCodeBase::AddCmd(OpCode cmd, AsmVarAddr addr, AsmOperand* oper)
+{
+   commands.push_back(new AsmCmd2(cmd, new AsmVarAddr(addr), oper));
+}
+
 void AsmCodeBase::AddCmd(OpCode cmd, AsmMemory mem, Register reg)
 {
    commands.push_back(new AsmCmd2(cmd, new AsmMemory(mem), new AsmRegister(reg)));
@@ -633,6 +638,11 @@ void AsmCodeBase::AddCmd(OpCode cmd, AsmMemory mem, AsmRegister reg)
 void AsmCodeBase::AddCmd(OpCode cmd, AsmMemory mem, AsmOperand* oper)
 {
    commands.push_back(new AsmCmd2(cmd, new AsmMemory(mem), oper));
+}
+
+void AsmCodeBase::AddCmd(OpCode cmd, AsmOperand* oper, AsmMemory mem)
+{
+   commands.push_back(new AsmCmd2(cmd, oper, new AsmMemory(mem)));
 }
 
 void AsmCodeBase::AddCmd(OpCode cmd, Register reg, AsmMemory mem)
