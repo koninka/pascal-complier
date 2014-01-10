@@ -1,7 +1,7 @@
 var
    arr: array[1..5] of integer;
 
-   procedure foo(a: array of integer);
+   procedure foo(var a: array of integer);
    begin
       a[3] := 99;
    end;

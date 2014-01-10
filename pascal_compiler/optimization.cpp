@@ -434,6 +434,18 @@ Optimizator::Optimizator()
          cmdsContainer.AddCmd(Cmd(2)->GetOpCode(), AsmMemory(Cmd(1)->arg2, GetMem(Cmd(2)->arg1).GetOffset()), Cmd(2)->arg2);
       }
    );
+   Add2(
+      [this]() -> bool {                        //DANGER DANGER
+         return
+               CheckCmds(Cmd(1), Cmd(2), ADD, PUSH)   //add eax, 12
+            && IsIntImm(Cmd(1)->arg2)                 //push [eax]
+            && IsMem(Cmd(2)->arg1)
+            && IsEqOperands(Cmd(1)->arg1, GetMem(Cmd(2)->arg1).arg);
+      },
+      [this]() {
+         cmdsContainer.AddCmd(PUSH, AsmMemory(Cmd(1)->arg1, GetIntImmVal(Cmd(1)->arg2) + GetMem(Cmd(2)->arg1).GetOffset()));
+      }
+   );
    //-------------------------------------------------------------------------
    //-------------------------THREE COMMANDS OPTIMIZATIONS--------------------
    Add3(
@@ -740,21 +752,6 @@ Optimizator::Optimizator()
    Add3(
       [this]() -> bool {
          return                                                        //DANGER!!!!
-               CheckCmds(Cmd(1), Cmd(2), Cmd(3), PUSH, MOV, POP)       //push [eax]
-            && IsMem(Cmd(1)->arg1)                                     //mov eax, ebx
-            && IsEqOperands(GetMem(Cmd(1)->arg1).arg, Cmd(2)->arg1)    //pop [eax]
-            && !IsMem(Cmd(2)->arg2)
-            && CmpOperands(Cmd(1)->arg1, Cmd(3)->arg1);
-      },
-      [this]() {
-         AsmMemory mem = GetMem(Cmd(1)->arg1);
-         cmdsContainer.AddCmd(MOV, mem.arg, Cmd(1)->arg1);
-         cmdsContainer.AddCmd(MOV, AsmMemory(Cmd(2)->arg2), mem.arg);
-      }
-   );
-   Add3(
-      [this]() -> bool {
-         return                                                        //DANGER!!!!
                CheckCmds(Cmd(1), Cmd(2), Cmd(3), MOV, PUSH, MOV)       //mov ebx, ebp
             && IsMem(Cmd(2)->arg1)                                     //push  [ebx - 4]
             && IsEqOperands(Cmd(1)->arg1, GetMem(Cmd(2)->arg1).arg)    //mov ebx, ebp
@@ -830,6 +827,18 @@ bool Optimizator::OptimizationFor4Cmd()
       && IsEqOperands(Cmd(2)->arg2, Cmd(4)->arg2)                  // add  eax, ebx
    ) {
       cmdsContainer.AddCmd(Cmd(4));
+   } else if (result = 
+            CheckCmds(Cmd(2), Cmd(3), Cmd(4), PUSH, MOV, POP)       //push [eax]
+         && IsMem(Cmd(2)->arg1)                                     //mov eax, ebx
+         && IsEqOperands(GetMem(Cmd(2)->arg1).arg, Cmd(3)->arg1)    //pop [eax]
+         && !IsMem(Cmd(3)->arg2)
+         && !(*Cmd(1) == PUSH && IsMem(Cmd(1)->arg1) && IsEqOperands(GetMem(Cmd(1)->arg1).arg, Cmd(3)->arg1))
+         && CmpOperands(Cmd(2)->arg1, Cmd(4)->arg1)
+   ) {
+      AsmMemory mem = GetMem(Cmd(2)->arg1);
+      cmdsContainer.AddCmd(Cmd(1));
+      cmdsContainer.AddCmd(MOV, mem.arg, Cmd(2)->arg1);
+      cmdsContainer.AddCmd(MOV, AsmMemory(Cmd(3)->arg2), mem.arg);
    }
    return result;
 }
