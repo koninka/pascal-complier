@@ -9,6 +9,7 @@
 #include "syntax_node.h"
 #include "syntax_nodes.h"
 #include "CodeGen.h"
+#include "optimization.h"
 
 const int PRIORITIES_NUMBER = 4;
 
@@ -138,6 +139,7 @@ class Parser {
 
 	NodeAssignOp* CreateAssignmentStatement(TokenPtr, NodeExpr*, NodeExpr*);
 public:
+   bool isOptimize;
 	bool isDeclarationParse;
 	Scanner scanner;
 	Parser(const Scanner&);

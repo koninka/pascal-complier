@@ -9,23 +9,14 @@ includelib c:\masm32\lib\msvcrt.lib
 .code
 main:
 	mov	ebp, esp
-	push	1
-	push	offset v_i
-	pop	ebx
-	pop	eax
-	mov	[ebx], eax
+	lea	ebx, v_i
+	mov	[ebx], dword ptr 1
 @forloop_1:
-	push	dword ptr [v_i]
-	push	4
-	pop	ebx
-	pop	eax
-	cmp	eax, ebx
+	mov	eax, dword ptr [v_i]
+	cmp	eax, 4
 	jg	@lend_2
-	push	dword ptr [v_i]
-	push	2
-	pop	ebx
-	pop	eax
-	add	eax, ebx
+	mov	eax, dword ptr [v_i]
+	add	eax, 2
 	push	eax
 	push	offset fmt_int
 	call	crt_printf
@@ -34,13 +25,12 @@ main:
 	call	crt_printf
 	add	esp, 4
 @lcontinue_3:
-	push	offset v_i
-	pop	eax
-	add	[eax], dword ptr 1
+	lea	eax, v_i
+	inc	dword ptr [eax]
 	jmp	@forloop_1
 @lend_2:
 @exit_0:
 	mov	esp, ebp
-	mov	eax, 0
+	xor	eax, eax
 	ret
 end main

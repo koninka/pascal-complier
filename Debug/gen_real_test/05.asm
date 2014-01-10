@@ -67,37 +67,19 @@ main:
 	push	30
 	fild	dword ptr [esp]
 	fstp	dword ptr [esp]
-	push	offset v_t
-	pop	eax
-	add	eax, 0
-	push	eax
-	pop	eax
 	pop	ebx
+	lea	eax, v_t
 	mov	[eax], ebx
 	push	10
 	fild	dword ptr [esp]
 	fstp	dword ptr [esp]
-	push	offset v_t
-	pop	eax
-	add	eax, 4
-	push	eax
-	pop	eax
 	pop	ebx
+	mov	eax, offset v_t + 4
 	mov	[eax], ebx
-	push	offset v_t
-	pop	eax
-	add	eax, 0
-	push	eax
-	pop	eax
-	mov	ebx, [eax]
-	push	ebx
-	push	offset v_t
-	pop	eax
-	add	eax, 4
-	push	eax
-	pop	eax
-	mov	ebx, [eax]
-	push	ebx
+	lea	eax, v_t
+	push	[eax]
+	mov	eax, offset v_t + 4
+	push	[eax]
 	fld	dword ptr [esp + 4]
 	fld	dword ptr [esp]
 	add	esp, 4
@@ -111,9 +93,8 @@ main:
 	add	esp, 12
 	push	offset fmt_str_new_line
 	call	crt_printf
-	add	esp, 4
 @exit_5:
 	mov	esp, ebp
-	mov	eax, 0
+	xor	eax, eax
 	ret
 end main

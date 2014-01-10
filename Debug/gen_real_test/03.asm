@@ -11,21 +11,17 @@ main:
 	push	5
 	fild	dword ptr [esp]
 	fstp	dword ptr [esp]
-	push	offset v_f
-	pop	eax
 	pop	ebx
+	lea	eax, v_f
 	mov	[eax], ebx
-	push	offset v_f
-	pop	eax
 	push	dword ptr [eax]
 	fld	dword ptr [esp]
 	sub	esp, 8
 	fstp	qword ptr [esp]
 	push	offset fmt_float
 	call	crt_printf
-	add	esp, 12
 @exit_0:
 	mov	esp, ebp
-	mov	eax, 0
+	xor	eax, eax
 	ret
 end main

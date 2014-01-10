@@ -8,11 +8,8 @@ includelib c:\masm32\lib\msvcrt.lib
 .code
 main:
 	mov	ebp, esp
-	push	5
-	push	3
-	pop	ebx
-	pop	eax
-	cmp	eax, ebx
+	mov	eax, 5
+	cmp	eax, 3
 	setg	al
 	movzx	eax, al
 	push	eax
@@ -22,11 +19,8 @@ main:
 	push	offset fmt_str_new_line
 	call	crt_printf
 	add	esp, 4
-	push	5
-	push	3
-	pop	ebx
-	pop	eax
-	cmp	eax, ebx
+	mov	eax, 5
+	cmp	eax, 3
 	setge	al
 	movzx	eax, al
 	push	eax
@@ -36,11 +30,8 @@ main:
 	push	offset fmt_str_new_line
 	call	crt_printf
 	add	esp, 4
-	push	5
-	push	3
-	pop	ebx
-	pop	eax
-	cmp	eax, ebx
+	mov	eax, 5
+	cmp	eax, 3
 	setl	al
 	movzx	eax, al
 	push	eax
@@ -50,11 +41,8 @@ main:
 	push	offset fmt_str_new_line
 	call	crt_printf
 	add	esp, 4
-	push	5
-	push	3
-	pop	ebx
-	pop	eax
-	cmp	eax, ebx
+	mov	eax, 5
+	cmp	eax, 3
 	setle	al
 	movzx	eax, al
 	push	eax
@@ -64,11 +52,8 @@ main:
 	push	offset fmt_str_new_line
 	call	crt_printf
 	add	esp, 4
-	push	5
-	push	3
-	pop	ebx
-	pop	eax
-	cmp	eax, ebx
+	mov	eax, 5
+	cmp	eax, 3
 	sete	al
 	movzx	eax, al
 	push	eax
@@ -78,11 +63,8 @@ main:
 	push	offset fmt_str_new_line
 	call	crt_printf
 	add	esp, 4
-	push	5
-	push	3
-	pop	ebx
-	pop	eax
-	cmp	eax, ebx
+	mov	eax, 5
+	cmp	eax, 3
 	setne	al
 	movzx	eax, al
 	push	eax
@@ -91,9 +73,8 @@ main:
 	add	esp, 8
 	push	offset fmt_str_new_line
 	call	crt_printf
-	add	esp, 4
 @exit_0:
 	mov	esp, ebp
-	mov	eax, 0
+	xor	eax, eax
 	ret
 end main

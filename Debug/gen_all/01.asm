@@ -13,306 +13,105 @@ includelib c:\masm32\lib\msvcrt.lib
 @init_0 proc
 	push	ebp
 	mov	ebp, esp
-	push	1
 	mov	ebx, ebp
 	add	ebx, 12
-	push	[ebx]
-	push	1
-	mov	ebx, 4
-	pop	eax
-	sub	eax, 1
-	imul	eax, ebx
-	pop	ebx
-	add	eax, ebx
-	push	eax
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
-	push	2
+	mov	eax, dword ptr [ebx]
+	mov	[eax], dword ptr 1
 	mov	ebx, ebp
 	add	ebx, 12
-	push	[ebx]
-	push	11
-	mov	ebx, 4
-	pop	eax
-	sub	eax, 1
-	imul	eax, ebx
-	pop	ebx
-	add	eax, ebx
-	push	eax
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
-	push	3
+	mov	eax, dword ptr 40
+	add	eax, dword ptr [ebx]
+	mov	[eax], dword ptr 2
 	mov	ebx, ebp
 	add	ebx, 12
-	push	[ebx]
-	push	6
-	mov	ebx, 4
-	pop	eax
-	sub	eax, 1
-	imul	eax, ebx
-	pop	ebx
-	add	eax, ebx
-	push	eax
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
-	push	4
+	mov	eax, dword ptr 20
+	add	eax, dword ptr [ebx]
+	mov	[eax], dword ptr 3
 	mov	ebx, ebp
 	add	ebx, 12
-	push	[ebx]
-	push	16
-	mov	ebx, 4
-	pop	eax
-	sub	eax, 1
-	imul	eax, ebx
-	pop	ebx
-	add	eax, ebx
-	push	eax
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
-	push	5
+	mov	eax, dword ptr 60
+	add	eax, dword ptr [ebx]
+	mov	[eax], dword ptr 4
 	mov	ebx, ebp
 	add	ebx, 12
-	push	[ebx]
-	push	2
-	mov	ebx, 4
-	pop	eax
-	sub	eax, 1
-	imul	eax, ebx
-	pop	ebx
-	add	eax, ebx
-	push	eax
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
-	push	6
+	mov	eax, dword ptr 4
+	add	eax, dword ptr [ebx]
+	mov	[eax], dword ptr 5
 	mov	ebx, ebp
 	add	ebx, 12
-	push	[ebx]
-	push	12
-	mov	ebx, 4
-	pop	eax
-	sub	eax, 1
-	imul	eax, ebx
-	pop	ebx
-	add	eax, ebx
-	push	eax
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
-	push	7
+	mov	eax, dword ptr 44
+	add	eax, dword ptr [ebx]
+	mov	[eax], dword ptr 6
 	mov	ebx, ebp
 	add	ebx, 12
-	push	[ebx]
-	push	7
-	mov	ebx, 4
-	pop	eax
-	sub	eax, 1
-	imul	eax, ebx
-	pop	ebx
-	add	eax, ebx
-	push	eax
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
-	push	8
+	mov	eax, dword ptr 24
+	add	eax, dword ptr [ebx]
+	mov	[eax], dword ptr 7
 	mov	ebx, ebp
 	add	ebx, 12
-	push	[ebx]
-	push	17
-	mov	ebx, 4
-	pop	eax
-	sub	eax, 1
-	imul	eax, ebx
-	pop	ebx
-	add	eax, ebx
-	push	eax
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
-	push	9
+	mov	eax, dword ptr 64
+	add	eax, dword ptr [ebx]
+	mov	[eax], dword ptr 8
 	mov	ebx, ebp
 	add	ebx, 12
-	push	[ebx]
-	push	3
-	mov	ebx, 4
-	pop	eax
-	sub	eax, 1
-	imul	eax, ebx
-	pop	ebx
-	add	eax, ebx
-	push	eax
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
-	push	10
+	mov	eax, dword ptr 8
+	add	eax, dword ptr [ebx]
+	mov	[eax], dword ptr 9
 	mov	ebx, ebp
 	add	ebx, 12
-	push	[ebx]
-	push	13
-	mov	ebx, 4
-	pop	eax
-	sub	eax, 1
-	imul	eax, ebx
-	pop	ebx
-	add	eax, ebx
-	push	eax
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
-	push	11
+	mov	eax, dword ptr 48
+	add	eax, dword ptr [ebx]
+	mov	[eax], dword ptr 10
 	mov	ebx, ebp
 	add	ebx, 12
-	push	[ebx]
-	push	8
-	mov	ebx, 4
-	pop	eax
-	sub	eax, 1
-	imul	eax, ebx
-	pop	ebx
-	add	eax, ebx
-	push	eax
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
-	push	12
+	mov	eax, dword ptr 28
+	add	eax, dword ptr [ebx]
+	mov	[eax], dword ptr 11
 	mov	ebx, ebp
 	add	ebx, 12
-	push	[ebx]
-	push	18
-	mov	ebx, 4
-	pop	eax
-	sub	eax, 1
-	imul	eax, ebx
-	pop	ebx
-	add	eax, ebx
-	push	eax
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
-	push	13
+	mov	eax, dword ptr 68
+	add	eax, dword ptr [ebx]
+	mov	[eax], dword ptr 12
 	mov	ebx, ebp
 	add	ebx, 12
-	push	[ebx]
-	push	4
-	mov	ebx, 4
-	pop	eax
-	sub	eax, 1
-	imul	eax, ebx
-	pop	ebx
-	add	eax, ebx
-	push	eax
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
-	push	14
+	mov	eax, dword ptr 12
+	add	eax, dword ptr [ebx]
+	mov	[eax], dword ptr 13
 	mov	ebx, ebp
 	add	ebx, 12
-	push	[ebx]
-	push	14
-	mov	ebx, 4
-	pop	eax
-	sub	eax, 1
-	imul	eax, ebx
-	pop	ebx
-	add	eax, ebx
-	push	eax
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
-	push	15
+	mov	eax, dword ptr 52
+	add	eax, dword ptr [ebx]
+	mov	[eax], dword ptr 14
 	mov	ebx, ebp
 	add	ebx, 12
-	push	[ebx]
-	push	9
-	mov	ebx, 4
-	pop	eax
-	sub	eax, 1
-	imul	eax, ebx
-	pop	ebx
-	add	eax, ebx
-	push	eax
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
-	push	16
+	mov	eax, dword ptr 32
+	add	eax, dword ptr [ebx]
+	mov	[eax], dword ptr 15
 	mov	ebx, ebp
 	add	ebx, 12
-	push	[ebx]
-	push	19
-	mov	ebx, 4
-	pop	eax
-	sub	eax, 1
-	imul	eax, ebx
-	pop	ebx
-	add	eax, ebx
-	push	eax
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
-	push	17
+	mov	eax, dword ptr 72
+	add	eax, dword ptr [ebx]
+	mov	[eax], dword ptr 16
 	mov	ebx, ebp
 	add	ebx, 12
-	push	[ebx]
-	push	5
-	mov	ebx, 4
-	pop	eax
-	sub	eax, 1
-	imul	eax, ebx
-	pop	ebx
-	add	eax, ebx
-	push	eax
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
-	push	18
+	mov	eax, dword ptr 16
+	add	eax, dword ptr [ebx]
+	mov	[eax], dword ptr 17
 	mov	ebx, ebp
 	add	ebx, 12
-	push	[ebx]
-	push	15
-	mov	ebx, 4
-	pop	eax
-	sub	eax, 1
-	imul	eax, ebx
-	pop	ebx
-	add	eax, ebx
-	push	eax
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
-	push	19
+	mov	eax, dword ptr 56
+	add	eax, dword ptr [ebx]
+	mov	[eax], dword ptr 18
 	mov	ebx, ebp
 	add	ebx, 12
-	push	[ebx]
-	push	10
-	mov	ebx, 4
-	pop	eax
-	sub	eax, 1
-	imul	eax, ebx
-	pop	ebx
-	add	eax, ebx
-	push	eax
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
-	push	20
+	mov	eax, dword ptr 36
+	add	eax, dword ptr [ebx]
+	mov	[eax], dword ptr 19
 	mov	ebx, ebp
 	add	ebx, 12
-	push	[ebx]
-	push	20
-	mov	ebx, 4
-	pop	eax
-	sub	eax, 1
-	imul	eax, ebx
-	pop	ebx
-	add	eax, ebx
-	push	eax
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
+	mov	eax, dword ptr 76
+	add	eax, dword ptr [ebx]
+	mov	[eax], dword ptr 20
 @exit_3:
 	mov	esp, ebp
 	pop	ebp
@@ -322,23 +121,15 @@ includelib c:\masm32\lib\msvcrt.lib
 	push	ebp
 	mov	ebp, esp
 	sub	esp, 4
-	push	0
 	mov	ebx, ebp
 	add	ebx, -4
-	push	ebx
-	pop	ebx
-	pop	eax
+	xor	eax, eax
 	mov	[ebx], eax
 @forloop_5:
 	mov	ebx, ebp
+	mov	eax, dword ptr 19
 	push	[ebx - 4]
-	push	20
-	push	1
-	pop	ebx
-	pop	eax
-	sub	eax, ebx
-	push	eax
-	pop	ebx
+	mov	ebx, eax
 	pop	eax
 	cmp	eax, ebx
 	jg	@lend_6
@@ -348,15 +139,11 @@ includelib c:\masm32\lib\msvcrt.lib
 	add	ebx, 4
 	push	ebx
 	mov	ebx, ebp
-	push	[ebx - 4]
+	mov	eax, dword ptr [ebx - 4]
 	mov	ebx, 4
-	pop	eax
-	sub	eax, 0
 	imul	eax, ebx
 	pop	ebx
 	add	eax, ebx
-	push	eax
-	pop	eax
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
@@ -365,16 +152,13 @@ includelib c:\masm32\lib\msvcrt.lib
 	call	crt_printf
 	add	esp, 4
 @lcontinue_7:
-	mov	ebx, ebp
-	add	ebx, -4
-	push	ebx
-	pop	eax
-	add	[eax], dword ptr 1
+	mov	eax, ebp
+	add	eax, -4
+	inc	dword ptr [eax]
 	jmp	@forloop_5
 @lend_6:
 	push	offset fmt_str_new_line
 	call	crt_printf
-	add	esp, 4
 @exit_4:
 	mov	esp, ebp
 	pop	ebp
@@ -386,38 +170,26 @@ includelib c:\masm32\lib\msvcrt.lib
 	sub	esp, 4
 	mov	ebx, ebp
 	add	ebx, 12
-	push	[ebx]
-	pop	eax
-	mov	ebx, [eax]
-	push	ebx
+	mov	eax, dword ptr [ebx]
 	mov	ebx, ebp
 	add	ebx, -4
-	push	ebx
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
+	push	[eax]
+	mov	eax, ebx
+	pop	[eax]
+	mov	ebx, ebp
+	add	ebx, dword ptr 16
+	mov	eax, dword ptr [ebx]
 	mov	ebx, ebp
 	add	ebx, 12
-	add	ebx, 4
-	push	[ebx]
-	pop	eax
-	mov	ebx, [eax]
-	push	ebx
-	mov	ebx, ebp
-	add	ebx, 12
-	push	[ebx]
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
+	push	[eax]
+	mov	eax, dword ptr [ebx]
+	pop	[eax]
 	mov	ebx, ebp
 	push	[ebx - 4]
 	mov	ebx, ebp
-	add	ebx, 12
-	add	ebx, 4
-	push	[ebx]
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
+	add	ebx, dword ptr 16
+	mov	eax, dword ptr [ebx]
+	pop	[eax]
 @exit_9:
 	mov	esp, ebp
 	pop	ebp
@@ -429,146 +201,96 @@ main:
 	push	ebp
 	call	@init_0
 	add	esp, 4
-	push	offset v_a
-	pop	eax
-	mov	ecx, 80
-	add	eax, ecx
-	mov	ebx, 0
+	mov	eax, offset v_a + 80
+	xor	ebx, ebx
 @L_11:
-	cmp	ebx, ecx
+	cmp	ebx, 80
 	jge	@L_12
 	sub	eax, 4
-	mov	edx, [eax]
-	push	edx
 	add	ebx, 4
+	push	dword ptr [eax]
 	jmp	@L_11
 @L_12:
 	push	80
 	push	ebp
 	call	@writearr_1
 	add	esp, 84
-	push	2
-	push	offset v_i
-	pop	ebx
-	pop	eax
-	mov	[ebx], eax
+	lea	ebx, v_i
+	mov	[ebx], dword ptr 2
 @forloop_13:
-	push	dword ptr [v_i]
-	push	20
-	pop	ebx
-	pop	eax
-	cmp	eax, ebx
+	mov	eax, dword ptr [v_i]
+	cmp	eax, 20
 	jg	@lend_14
-	push	dword ptr [v_i]
-	push	offset v_j
-	pop	ebx
-	pop	eax
+	lea	ebx, v_j
+	mov	eax, dword ptr [v_i]
 	mov	[ebx], eax
 @forloop_16:
-	push	dword ptr [v_j]
-	push	2
-	pop	ebx
-	pop	eax
-	cmp	eax, ebx
+	mov	eax, dword ptr [v_j]
+	cmp	eax, 2
 	jl	@lend_17
-	push	offset v_a
-	push	dword ptr [v_j]
 	mov	ebx, 4
-	pop	eax
-	sub	eax, 1
+	mov	eax, dword ptr [v_j]
+	dec	eax
 	imul	eax, ebx
-	pop	ebx
-	add	eax, ebx
-	push	eax
-	pop	eax
-	mov	ebx, [eax]
-	push	ebx
-	push	offset v_a
-	push	dword ptr [v_j]
-	push	1
-	pop	ebx
-	pop	eax
+	add	eax, offset v_a
+	mov	ebx, 1
+	push	[eax]
+	mov	eax, dword ptr [v_j]
 	sub	eax, ebx
-	push	eax
 	mov	ebx, 4
-	pop	eax
-	sub	eax, 1
+	dec	eax
 	imul	eax, ebx
-	pop	ebx
-	add	eax, ebx
-	push	eax
-	pop	eax
-	mov	ebx, [eax]
-	push	ebx
-	pop	ebx
+	add	eax, offset v_a
+	mov	ebx, dword ptr [eax]
 	pop	eax
 	cmp	eax, ebx
 	setg	al
 	movzx	eax, al
-	push	eax
-	pop	eax
-	mov	ebx, 0
+	xor	ebx, ebx
 	cmp	eax, ebx
 	je	@endif_19
-	push	offset v_a
-	push	dword ptr [v_j]
-	push	1
-	pop	ebx
-	pop	eax
-	sub	eax, ebx
-	push	eax
+	mov	eax, dword ptr [v_j]
+	dec	eax
 	mov	ebx, 4
-	pop	eax
-	sub	eax, 1
+	dec	eax
 	imul	eax, ebx
-	pop	ebx
-	add	eax, ebx
-	push	eax
-	push	offset v_a
-	push	dword ptr [v_j]
+	add	eax, offset v_a
 	mov	ebx, 4
-	pop	eax
-	sub	eax, 1
+	push	eax
+	mov	eax, dword ptr [v_j]
+	dec	eax
 	imul	eax, ebx
-	pop	ebx
-	add	eax, ebx
+	add	eax, offset v_a
 	push	eax
 	push	ebp
 	call	@swap_2
 	add	esp, 8
 @endif_19:
 @lcontinue_18:
-	push	offset v_j
-	pop	eax
-	sub	[eax], dword ptr 1
+	lea	eax, v_j
+	dec	dword ptr [eax]
 	jmp	@forloop_16
 @lend_17:
 @lcontinue_15:
-	push	offset v_i
-	pop	eax
-	add	[eax], dword ptr 1
+	lea	eax, v_i
+	inc	dword ptr [eax]
 	jmp	@forloop_13
 @lend_14:
-	push	offset v_a
-	pop	eax
-	mov	ecx, 80
-	add	eax, ecx
-	mov	ebx, 0
+	mov	eax, offset v_a + 80
+	xor	ebx, ebx
 @L_20:
-	cmp	ebx, ecx
+	cmp	ebx, 80
 	jge	@L_21
 	sub	eax, 4
-	mov	edx, [eax]
-	push	edx
 	add	ebx, 4
+	push	dword ptr [eax]
 	jmp	@L_20
 @L_21:
 	push	80
 	push	ebp
 	call	@writearr_1
-	add	esp, 84
 @exit_10:
 	mov	esp, ebp
-	mov	eax, 0
+	xor	eax, eax
 	ret
 end main

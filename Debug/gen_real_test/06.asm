@@ -83,7 +83,7 @@ main:
 	movzx	eax, al
 	mov	[esp], eax
 	pop	eax
-	mov	ebx, 0
+	xor	ebx, ebx
 	cmp	eax, ebx
 	je	@else_34
 	push	offset fmt_str35
@@ -114,7 +114,7 @@ main:
 	movzx	eax, al
 	mov	[esp], eax
 	pop	eax
-	mov	ebx, 0
+	xor	ebx, ebx
 	cmp	eax, ebx
 	je	@else_38
 	push	offset fmt_str39
@@ -145,7 +145,7 @@ main:
 	movzx	eax, al
 	mov	[esp], eax
 	pop	eax
-	mov	ebx, 0
+	xor	ebx, ebx
 	cmp	eax, ebx
 	je	@else_42
 	push	offset fmt_str43
@@ -176,7 +176,7 @@ main:
 	movzx	eax, al
 	mov	[esp], eax
 	pop	eax
-	mov	ebx, 0
+	xor	ebx, ebx
 	cmp	eax, ebx
 	je	@else_46
 	push	offset fmt_str47
@@ -207,7 +207,7 @@ main:
 	movzx	eax, al
 	mov	[esp], eax
 	pop	eax
-	mov	ebx, 0
+	xor	ebx, ebx
 	cmp	eax, ebx
 	je	@else_50
 	push	offset fmt_str51
@@ -238,7 +238,7 @@ main:
 	movzx	eax, al
 	mov	[esp], eax
 	pop	eax
-	mov	ebx, 0
+	xor	ebx, ebx
 	cmp	eax, ebx
 	je	@else_54
 	push	offset fmt_str55
@@ -269,7 +269,7 @@ main:
 	movzx	eax, al
 	mov	[esp], eax
 	pop	eax
-	mov	ebx, 0
+	xor	ebx, ebx
 	cmp	eax, ebx
 	je	@else_58
 	push	offset fmt_str59
@@ -300,7 +300,7 @@ main:
 	movzx	eax, al
 	mov	[esp], eax
 	pop	eax
-	mov	ebx, 0
+	xor	ebx, ebx
 	cmp	eax, ebx
 	je	@else_62
 	push	offset fmt_str63
@@ -331,7 +331,7 @@ main:
 	movzx	eax, al
 	mov	[esp], eax
 	pop	eax
-	mov	ebx, 0
+	xor	ebx, ebx
 	cmp	eax, ebx
 	je	@else_66
 	push	offset fmt_str67
@@ -362,7 +362,7 @@ main:
 	movzx	eax, al
 	mov	[esp], eax
 	pop	eax
-	mov	ebx, 0
+	xor	ebx, ebx
 	cmp	eax, ebx
 	je	@else_70
 	push	offset fmt_str71
@@ -393,7 +393,7 @@ main:
 	movzx	eax, al
 	mov	[esp], eax
 	pop	eax
-	mov	ebx, 0
+	xor	ebx, ebx
 	cmp	eax, ebx
 	je	@else_74
 	push	offset fmt_str75
@@ -424,7 +424,7 @@ main:
 	movzx	eax, al
 	mov	[esp], eax
 	pop	eax
-	mov	ebx, 0
+	xor	ebx, ebx
 	cmp	eax, ebx
 	je	@else_78
 	push	offset fmt_str79
@@ -455,7 +455,7 @@ main:
 	movzx	eax, al
 	mov	[esp], eax
 	pop	eax
-	mov	ebx, 0
+	xor	ebx, ebx
 	cmp	eax, ebx
 	je	@else_82
 	push	offset fmt_str83
@@ -486,7 +486,7 @@ main:
 	movzx	eax, al
 	mov	[esp], eax
 	pop	eax
-	mov	ebx, 0
+	xor	ebx, ebx
 	cmp	eax, ebx
 	je	@else_86
 	push	offset fmt_str87
@@ -517,7 +517,7 @@ main:
 	movzx	eax, al
 	mov	[esp], eax
 	pop	eax
-	mov	ebx, 0
+	xor	ebx, ebx
 	cmp	eax, ebx
 	je	@else_90
 	push	offset fmt_str91
@@ -548,7 +548,7 @@ main:
 	movzx	eax, al
 	mov	[esp], eax
 	pop	eax
-	mov	ebx, 0
+	xor	ebx, ebx
 	cmp	eax, ebx
 	je	@else_94
 	push	offset fmt_str95
@@ -569,6 +569,6 @@ main:
 @endif_93:
 @exit_32:
 	mov	esp, ebp
-	mov	eax, 0
+	xor	eax, eax
 	ret
 end main

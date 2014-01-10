@@ -1,4 +1,0 @@
-const
-   range = 40;
-type
-   arr = array [range] of range;

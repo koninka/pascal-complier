@@ -14,25 +14,13 @@ int main(int argc, char *argv[])
 	string errMsg;
    try {
 		Printer printer;
-		//Scanner scanner("test.tree");
-		//SimpleParser parser(scanner);
-		//printer.printParseTree(parser);
-		//printer.printLexicalTable(scanner, true);
 		//Scanner scanner1("test.tree");
 		//Parser parser(scanner1);
+  //    parser.isOptimize = true;
 		//parser.isDeclarationParse = false;
 		//parser.ParseProgram();
   //    freopen("tree.asm", "w", stdout);
   //    parser.Generate();
-		//cout << "-----------TABLE-----------" << endl << endl;
-		//parser.PrintSymTable();
-      //cout << endl << endl << "-----------ASM-----------" << endl << endl;
-      //parser.Generate();
-      //cout << "-----------BLOCK-----------" << endl << endl;
-      //parser.PrintBlock();
-		//parser.Parse();
-		//printer.printLexicalTable(scanner1, true);
-		//printer.printParseTree(parser);
       if (argc > 1) {
          if (argv[1][0] == '-') {
             for (int i = 1, len = strlen(argv[1]); i < len; i++) {
@@ -66,6 +54,14 @@ int main(int argc, char *argv[])
                      case 'g':
                         {
                            Parser parser(scanner);
+                           parser.isOptimize = false;
+                           printer.printAsmCode(parser);
+                        }
+                        break;
+                     case 'o':
+                        {
+                           Parser parser(scanner);
+                           parser.isOptimize = true;
                            printer.printAsmCode(parser);
                         }
                         break;
@@ -120,5 +116,5 @@ int main(int argc, char *argv[])
 	if (isErr) {
 		cout << errMsg << endl;
 	}
-   	return 0;
+   return 0;
 }

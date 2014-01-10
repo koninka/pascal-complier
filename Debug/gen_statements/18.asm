@@ -9,56 +9,35 @@ includelib c:\masm32\lib\msvcrt.lib
 .code
 main:
 	mov	ebp, esp
-	push	0
-	push	offset v_i
-	pop	eax
-	pop	ebx
+	lea	eax, v_i
+	xor	ebx, ebx
 	mov	[eax], ebx
 @lcontinue_2:
-	push	dword ptr [v_i]
-	push	20
-	pop	ebx
-	pop	eax
-	cmp	eax, ebx
+	mov	eax, dword ptr [v_i]
+	cmp	eax, 20
 	setle	al
 	movzx	eax, al
-	push	eax
-	pop	eax
-	mov	ebx, 0
+	xor	ebx, ebx
 	cmp	eax, ebx
 	je	@lend_1
-	push	dword ptr [v_i]
-	push	1
-	pop	ebx
-	pop	eax
-	add	eax, ebx
-	push	eax
-	push	offset v_i
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
-	push	dword ptr [v_i]
-	push	2
-	pop	ebx
-	pop	eax
+	mov	eax, dword ptr [v_i]
+	inc	eax
+	lea	ebx, v_i
+	mov	[ebx], eax
+	mov	ebx, 2
+	mov	eax, dword ptr [v_i]
 	xor	edx, edx
 	idiv	ebx
-	push	edx
-	push	1
-	pop	ebx
-	pop	eax
-	cmp	eax, ebx
+	mov	eax, edx
+	cmp	eax, 1
 	sete	al
 	movzx	eax, al
-	push	eax
-	pop	eax
-	mov	ebx, 0
+	xor	ebx, ebx
 	cmp	eax, ebx
 	je	@endif_3
 	jmp	@lcontinue_2
 @endif_3:
-	push	offset v_i
-	pop	eax
+	lea	eax, v_i
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
@@ -70,6 +49,6 @@ main:
 @lend_1:
 @exit_0:
 	mov	esp, ebp
-	mov	eax, 0
+	xor	eax, eax
 	ret
 end main

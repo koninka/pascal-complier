@@ -1,0 +1,259 @@
+
+//bool ThreeCmdOptimization::operator()(Command Cmd(1), Command cmd2, Command cmd3)
+//{
+//   bool result = false;
+//   if (*Cmd(1) == MOV && AsmRegister(EBP) == Cmd(1)->arg1 && AsmRegister(ESP) == Cmd(1)->arg2) return false;
+//   AsmCodeBase asmCode;
+//   if (*Cmd(1) == MOV) {
+//      if (
+//         result =
+//            (*cmd2 == ADD || *cmd2 == SUB)
+//            && *cmd3 == MOV
+//            && IsIntImm(cmd2->arg2)
+//            && IsEqOperands(Cmd(1)->arg1, cmd2->arg1)
+//            && IsEqOperands(Cmd(1)->arg1, cmd3->arg2)
+//            //mov   ebx, ebp
+//            //add   ebx, -4
+//            //mov   eax, ebx
+//      ) {
+//         if (!IsEqOperands(Cmd(1)->arg2, cmd3->arg1)) {
+//            asmCode.AddCmd(MOV, cmd3->arg1, Cmd(1)->arg2);
+//         }
+//         asmCode.AddCmd(cmd2->GetOpCode(), cmd3->arg1, cmd2->arg2);
+//      } else if (*cmd2 == MOV) {
+//         // mov eax, 3
+//         // mov ebx, edx
+//         // add ebx, eax
+//         if (
+//            result =
+//             (*cmd3 == ADD || *cmd3 == SUB)
+//             && IsIntImm(Cmd(1)->arg2)
+//             && IsEqOperands(cmd2->arg1, cmd3->arg1)
+//             && IsEqOperands(Cmd(1)->arg1, cmd3->arg2)
+//             && !IsEqOperands(Cmd(1)->arg1, cmd2->arg1) //может не нужна
+//             && !IsEqOperands(Cmd(1)->arg1, cmd2->arg2) //может не нужна
+//         ) {
+//            asmCode.AddCmd(cmd2);
+//            asmCode.AddCmd(cmd3->GetOpCode(), cmd3->arg1, Cmd(1)->arg2);
+//         } else if (
+//               //mov   ebx, eax
+//               //mov   eax, 5
+//               //add   eax, ebx
+//               result =
+//                     (*cmd3 == ADD || *cmd3 == SUB)
+//                  && IsIntImm(cmd2->arg2)
+//                  && IsEqOperands(Cmd(1)->arg1, cmd3->arg2)
+//                  && IsEqOperands(cmd2->arg1, cmd3->arg1)
+//                  && IsEqOperands(Cmd(1)->arg2, cmd2->arg1)
+//                  //&& !IsEqOperands(cmd2->arg1, Cmd(1)->arg2)
+//
+//            ) {
+//            //return false;
+//               asmCode.AddCmd(cmd3->GetOpCode(), cmd2->arg1, cmd2->arg2);
+//               //asmCode.AddCmd(cmd3->GetOpCode(), cmd3->arg1, Cmd(1)->arg2);
+//         } else if (
+//            //mov   ebx, dword ptr[v_b]
+//            //mov   eax, dword ptr[v_a]
+//            //add   eax, ebx
+//               result =
+//                     (*cmd3 == ADD || *cmd3 == SUB)
+//                  && IsEqOperands(Cmd(1)->arg1, cmd3->arg2)
+//                  && IsEqOperands(cmd2->arg1, cmd3->arg1)
+//                  && !IsEqOperands(Cmd(1)->arg1, cmd2->arg2) // может не нужна - крест накрест
+//                  && !IsEqOperands(Cmd(1)->arg2, cmd2->arg1)
+//                  && !IsEqOperands(Cmd(1)->arg1, cmd2->arg1) // можент не нужна
+//
+//            ) {
+//            asmCode.AddCmd(cmd2);
+//            asmCode.AddCmd(cmd3->GetOpCode(), cmd2->arg1, Cmd(1)->arg2);
+//         } else if (
+//               //mov   ebx, 20
+//               //mov   eax, dword ptr[v_i]
+//               //imul  ebx
+//               result =
+//                     *cmd3 == IMUL && cmd3->IsCmd1()
+//                  && IsEqOperands(Cmd(1)->arg1, cmd3->arg1)
+//                  && !IsEqOperands(Cmd(1)->arg2, cmd2->arg1)
+//                  && !IsEqOperands(Cmd(1)->arg1, cmd2->arg1) // возможно не требуется
+//            ) {
+//            asmCode.AddCmd(cmd2);
+//            asmCode.AddCmd(IMUL, cmd2->arg1, Cmd(1)->arg2);
+//         } else if (
+//            //mov   eax, -8
+//            //mov   ebx, 3
+//            //imul  ebx
+//               result =
+//                     *cmd3 == IMUL && cmd3->IsCmd1()
+//                  && IsEqOperands(cmd2->arg1, cmd3->arg1)
+//                  && !IsEqOperands(Cmd(1)->arg1, cmd2->arg2)
+//                  && !IsEqOperands(Cmd(1)->arg1, cmd2->arg1) // возможно не требуется
+//            ) {
+//            asmCode.AddCmd(Cmd(1));
+//            asmCode.AddCmd(IMUL, Cmd(1)->arg1, cmd2->arg2);
+//         } else if (
+//               result =
+//                     *cmd3 == IMUL
+//                  && IsEqOperands(Cmd(1)->arg1, cmd3->arg2)
+//                  && IsEqOperands(cmd2->arg1, cmd3->arg1)
+//         ) {
+//            //return false;
+//            asmCode.AddCmd(cmd2);
+//            asmCode.AddCmd(IMUL, cmd3->arg1, Cmd(1)->arg2);
+//            //mov   ebx, 4
+//            //mov   eax, 3
+//            //imul  eax, ebx
+//         } else if (
+//               result =
+//                  *cmd3 == CMP
+//               && IsEqOperands(Cmd(1)->arg1, cmd3->arg2)
+//               && IsEqOperands(cmd2->arg1, cmd3->arg1)
+//               && !IsEqOperands(Cmd(1)->arg1, cmd2->arg2) // возможно не требуется
+//         ) {
+//            asmCode.AddCmd(cmd2);
+//            asmCode.AddCmd(CMP, cmd2->arg1, Cmd(1)->arg2);
+//            //mov   ebx, intImm1      mov eax, intImm2
+//            //mov   eax, intImm2      cmp eax, intImm1
+//            //cmp   eax, ebx
+//         } else if (*cmd3 == MOV) {
+//
+//            if (result =
+//                //mov   eax, offset v_a + intImm
+//                //mov [eax], dword ptr intImm1
+//                //mov   eax, offset v_a + intImm
+//                     IsEqOperands(Cmd(1)->arg1, cmd3->arg1)
+//                  && IsMem(cmd2->arg1)
+//                  && IsEqOperands(Cmd(1)->arg1, GetMem(cmd2->arg1).GetOperand())
+//                  && CmpOperands(Cmd(1)->arg2, cmd3->arg2)
+//                ) {
+//               asmCode.AddCmd(Cmd(1));
+//               asmCode.AddCmd(cmd2);
+//            } else if (result =
+//               //mov   ebx, dword ptr - 5
+//               //mov   eax, offset v_c + 4
+//               //mov[eax], ebx
+//                           IsEqOperands(Cmd(1)->arg1, cmd3->arg2)
+//                        && IsMem(cmd3->arg1)                                         // возможно не требуется
+//                        && IsEqOperands(cmd2->arg1, GetMem(cmd3->arg1).GetOperand())  // возможно не требуется
+//                        && !IsMem(Cmd(1)->arg2)
+//                        && !CmpOperands(Cmd(1)->arg2, cmd2->arg1)
+//            ) {
+//               asmCode.AddCmd(cmd2);
+//               asmCode.AddCmd(MOV, cmd3->arg1, Cmd(1)->arg2, szDWORD);
+//            }
+//         }
+//      } else if (*cmd2 == LEA && *cmd3 == MOV) {
+//         //; mov   ebx, eax
+//         //; lea   eax, v_i
+//         //; mov[eax], ebx
+//         //
+//         //lea   ebx, v_i
+//         //mov[ebx], eax
+//         if (result =
+//                  IsEqOperands(Cmd(1)->arg1, cmd3->arg2)
+//               && IsEqOperands(Cmd(1)->arg2, cmd2->arg1)
+//               && IsMem(cmd3->arg1)
+//               && IsEqOperands(cmd2->arg1, GetMem(cmd3->arg1).GetOperand())
+//            ) {
+//            asmCode.AddCmd(LEA, Cmd(1)->arg1, cmd2->arg2);
+//            asmCode.AddCmd(
+//               MOV,
+//               AsmMemory(
+//                  GetRegister(Cmd(1)->arg1),
+//                  GetMem(cmd3->arg1).GetOffset(),
+//                  GetMem(cmd3->arg1).GetSizeType()
+//               ),
+//               GetRegister(Cmd(1)->arg2)
+//               );
+//         } else if (result =
+//                        IsEqOperands(Cmd(1)->arg1, cmd3->arg2)
+//                     && IsMem(cmd3->arg1)
+//                     && IsEqOperands(cmd2->arg1, GetMem(cmd3->arg1).GetOperand())
+//                     && !IsEqOperands(Cmd(1)->arg2, cmd2->arg2)
+//                     && !(IsMem(Cmd(1)->arg2) && IsMem(cmd3->arg1))
+//            ) {
+//            //mov   ebx, dword ptr - 25
+//            //lea   eax, v_r              lea eax, v_r
+//            //mov[eax], ebx               mov dword ptr [eax], -25
+//            asmCode.AddCmd(cmd2);
+//            asmCode.AddCmd(MOV, cmd3->arg1, Cmd(1)->arg2, szDWORD);
+//         } else if (result = IsEqOperands(Cmd(1)->arg1, cmd3->arg1) && !IsEqOperands(Cmd(1)->arg1, cmd2->arg2)) {
+//            //mov   ebx, 8
+//            //lea   eax, v_a
+//            //mov   ebx, 4
+//            asmCode.AddCmd(cmd2);
+//            asmCode.AddCmd(cmd3);
+//         }
+//      } else if (result =
+//                       *cmd2 == PUSH && *cmd3 == MOV
+//                    && IsEqOperands(Cmd(1)->arg1, cmd3->arg2)
+//                    && IsEqOperands(cmd2->arg1, cmd3->arg1)
+//                    && IsIntImm(Cmd(1)->arg2)
+//                    && !IsEqOperands(Cmd(1)->arg1, cmd2->arg1) // возможно не требуется
+//                 ) {
+//         //return false;
+//         asmCode.AddCmd(cmd2);
+//         asmCode.AddCmd(MOV, cmd3->arg1, Cmd(1)->arg2);
+//         //mov   ebx, 4
+//         //push  eax
+//         //mov   eax, ebx
+//      }
+//   // lea   eax, v_a
+//   // mov   [eax], dword ptr[v_b]
+//   // lea   eax, v_a
+//   } else if (*Cmd(1) == LEA) {
+//      if (result =
+//            *cmd2 == MOV && *cmd3 == LEA
+//         && IsEqOperands(Cmd(1)->arg1, cmd3->arg1)
+//         && IsEqOperands(Cmd(1)->arg2, cmd3->arg2)
+//         && IsMem(cmd2->arg1)
+//         && IsEqOperands(Cmd(1)->arg1, GetMem(cmd2->arg1).GetOperand())
+//      ) {
+//         asmCode.AddCmd(Cmd(1));
+//         asmCode.AddCmd(cmd2);
+//      } else if ((*cmd2 == ADD || *cmd2 == SUB) && *cmd3 == MOV) {
+//         if (result =
+//             //lea   ebx, v_a
+//             //add   eax, ebx
+//             //mov   ebx, 4
+//                  IsEqOperands(Cmd(1)->arg1, cmd2->arg2)
+//               && IsEqOperands(Cmd(1)->arg1, cmd3->arg1)
+//               && !IsEqOperands(Cmd(1)->arg1, cmd2->arg1) //возможно не требуется
+//               && IsStrImm(Cmd(1)->arg2)
+//         ) {
+//            //return false;
+//            //asmCode.AddCmd(cmd2->GetOpCode(), cmd2->arg1, AsmVarAddr(Cmd(1)->arg2, 0, szDWORD));
+//            asmCode.AddCmd(cmd2->GetOpCode(), cmd2->arg1, AsmVarAddr(Cmd(1)->arg2));
+//            asmCode.AddCmd(cmd3);
+//         } else if (result = false
+//                    //IsEqOperands(Cmd(1)->arg1, cmd2->arg1)
+//                    //IsEqOperands(Cmd(1)->arg1, cmd2->arg1)
+//                    //lea   eax, v_a
+//                    //add   eax, 4
+//                    //mov[eax], dword ptr 5
+//         ) {
+//
+//         }
+//      }
+//   } else if (*Cmd(1) == ADD) {
+//      if (result =
+//               *cmd2 == LABEL
+//            && *cmd3 == MOV
+//            && AsmRegister(ESP) == Cmd(1)->arg1
+//            && AsmRegister(ESP) == cmd3->arg1
+//            && AsmRegister(EBP) == cmd3->arg2
+//      ) {
+//         asmCode.AddCmd(cmd2);
+//         asmCode.AddCmd(cmd3);
+//      }
+//      //add   esp, 8
+//      //@exit_0:
+//      //mov   esp, ebp
+//   }
+//
+//   //mov   ebx, edx
+//   //mov   eax, I
+//   //add   eax, ebx    --> mov eax, edx
+//   //                      add eax, 3
+//   commands = asmCode.GetCommands();
+//   return result;
+//}

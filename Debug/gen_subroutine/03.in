@@ -1,8 +1,10 @@
    procedure proc();
    var
       a: integer;
+      c: integer;
    begin
       a := 10;
+      c := a;
    end;
 
 begin

@@ -11,46 +11,28 @@ includelib c:\masm32\lib\msvcrt.lib
 .code
 main:
 	mov	ebp, esp
-	push	1
-	push	offset v_i
-	pop	ebx
-	pop	eax
-	mov	[ebx], eax
+	lea	ebx, v_i
+	mov	[ebx], dword ptr 1
 @forloop_1:
-	push	dword ptr [v_i]
-	push	20
-	pop	ebx
-	pop	eax
-	cmp	eax, ebx
+	mov	eax, dword ptr [v_i]
+	cmp	eax, 20
 	jg	@lend_2
-	push	dword ptr [v_i]
-	push	10
-	pop	ebx
-	pop	eax
-	cmp	eax, ebx
+	mov	eax, dword ptr [v_i]
+	cmp	eax, 10
 	setg	al
 	movzx	eax, al
-	push	eax
-	pop	eax
-	mov	ebx, 0
+	xor	ebx, ebx
 	cmp	eax, ebx
 	je	@endif_4
 	jmp	@lend_2
 @endif_4:
-	push	1
-	push	offset v_j
-	pop	ebx
-	pop	eax
-	mov	[ebx], eax
+	lea	ebx, v_j
+	mov	[ebx], dword ptr 1
 @forloop_5:
-	push	dword ptr [v_j]
-	push	20
-	pop	ebx
-	pop	eax
-	cmp	eax, ebx
+	mov	eax, dword ptr [v_j]
+	cmp	eax, 20
 	jg	@lend_6
-	push	offset v_j
-	pop	eax
+	lea	eax, v_j
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
@@ -58,37 +40,30 @@ main:
 	push	offset fmt_str8
 	call	crt_printf
 	add	esp, 4
-	push	dword ptr [v_j]
-	push	dword ptr [v_i]
-	pop	ebx
-	pop	eax
-	cmp	eax, ebx
+	mov	eax, dword ptr [v_j]
+	cmp	eax, dword ptr [v_i]
 	sete	al
 	movzx	eax, al
-	push	eax
-	pop	eax
-	mov	ebx, 0
+	xor	ebx, ebx
 	cmp	eax, ebx
 	je	@endif_9
 	jmp	@lend_6
 @endif_9:
 @lcontinue_7:
-	push	offset v_j
-	pop	eax
-	add	[eax], dword ptr 1
+	lea	eax, v_j
+	inc	dword ptr [eax]
 	jmp	@forloop_5
 @lend_6:
 	push	offset fmt_str_new_line
 	call	crt_printf
 	add	esp, 4
 @lcontinue_3:
-	push	offset v_i
-	pop	eax
-	add	[eax], dword ptr 1
+	lea	eax, v_i
+	inc	dword ptr [eax]
 	jmp	@forloop_1
 @lend_2:
 @exit_0:
 	mov	esp, ebp
-	mov	eax, 0
+	xor	eax, eax
 	ret
 end main

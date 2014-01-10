@@ -1,6 +1,10 @@
-   procedure proc();
+var
+   d: integer;
+   procedure proc(var a: integer);
    begin
+      a := 20;
    end;
 begin
-   proc();
+   proc(d);
+   write(d);
 end.

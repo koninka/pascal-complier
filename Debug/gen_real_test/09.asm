@@ -10,13 +10,11 @@ includelib c:\masm32\lib\msvcrt.lib
 @foo_0 proc
 	push	ebp
 	mov	ebp, esp
-	push	fv1
 	mov	ebx, ebp
 	add	ebx, 12
-	push	[ebx]
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
+	mov	eax, dword ptr [ebx]
+	push	fv1
+	pop	[eax]
 @exit_2:
 	mov	esp, ebp
 	pop	ebp
@@ -28,17 +26,15 @@ main:
 	push	ebp
 	call	@foo_0
 	add	esp, 4
-	push	offset v_a
-	pop	eax
+	lea	eax, v_a
 	push	dword ptr [eax]
 	fld	dword ptr [esp]
 	sub	esp, 8
 	fstp	qword ptr [esp]
 	push	offset fmt_float
 	call	crt_printf
-	add	esp, 12
 @exit_3:
 	mov	esp, ebp
-	mov	eax, 0
+	xor	eax, eax
 	ret
 end main

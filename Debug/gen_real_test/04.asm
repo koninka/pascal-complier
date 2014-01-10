@@ -22,9 +22,8 @@ main:
 	fstp	qword ptr [esp]
 	push	offset fmt_float
 	call	crt_printf
-	add	esp, 12
 @exit_1:
 	mov	esp, ebp
-	mov	eax, 0
+	xor	eax, eax
 	ret
 end main

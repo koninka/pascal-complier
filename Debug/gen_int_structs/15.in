@@ -1,6 +1,6 @@
 type
    rec = record
-      x, y: integer;
+      x, y, z: integer;
    end;
 var
    a: rec;

@@ -1,5 +1,8 @@
-const
-	h = -0.23;
+var
+   r: record
+      a: integer;
+   end;
 begin
-	write(h + 20.43);
+   r.a := -25;
+   Write(r.a);
 end.

@@ -16,6 +16,6 @@ main:
 	mov	ebp, esp
 @exit_2:
 	mov	esp, ebp
-	mov	eax, 0
+	xor	eax, eax
 	ret
 end main

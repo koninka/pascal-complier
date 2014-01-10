@@ -8,24 +8,14 @@ includelib c:\masm32\lib\msvcrt.lib
 .code
 main:
 	mov	ebp, esp
-	push	20
-	push	5
-	pop	ebx
-	pop	eax
-	add	eax, ebx
-	push	eax
-	push	offset v_a
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
-	push	offset v_a
-	pop	eax
+	lea	ebx, v_a
+	mov	[ebx], dword ptr 25
+	lea	eax, v_a
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, 8
 @exit_0:
 	mov	esp, ebp
-	mov	eax, 0
+	xor	eax, eax
 	ret
 end main

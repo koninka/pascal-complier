@@ -17,18 +17,14 @@ includelib c:\masm32\lib\msvcrt.lib
 	sub	esp, 4
 	push	ebp
 	call	@bar_1
-	add	esp, 0
 	fld	dword ptr [esp + 4]
 	fld	dword ptr [esp]
 	add	esp, 4
 	faddp	st(1), st
 	fstp	dword ptr [esp]
-	mov	ebx, ebp
-	add	ebx, 12
-	add	ebx, 4
-	push	ebx
-	pop	eax
 	pop	ebx
+	mov	eax, ebp
+	add	eax, dword ptr 16
 	mov	[eax], ebx
 @exit_4:
 	mov	esp, ebp
@@ -48,11 +44,9 @@ includelib c:\masm32\lib\msvcrt.lib
 	add	esp, 4
 	fmulp	st(1), st
 	fstp	dword ptr [esp]
-	mov	ebx, ebp
-	add	ebx, 12
-	push	ebx
-	pop	eax
 	pop	ebx
+	mov	eax, ebp
+	add	eax, 12
 	mov	[eax], ebx
 @exit_5:
 	mov	esp, ebp
@@ -73,9 +67,8 @@ main:
 	fstp	qword ptr [esp]
 	push	offset fmt_float
 	call	crt_printf
-	add	esp, 12
 @exit_6:
 	mov	esp, ebp
-	mov	eax, 0
+	xor	eax, eax
 	ret
 end main

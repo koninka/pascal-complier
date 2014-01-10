@@ -388,7 +388,7 @@ void SymParamBase::GetParamSize(AsmCode& asmCode) const
 void SymParamBase::GenerateOffsetInStack(AsmCode& asmCode, unsigned stmtDepth) const
 {
    GetLexicalNesting(asmCode, stmtDepth);
-   asmCode.AddCmd(ADD, EBX, 12); //eax point to the first arg
+   asmCode.AddCmd(ADD, EBX, 12); //EAX point to the first arg
    Symbols params = subroutine->GetParams()->symbols;
    // можно этот цикл сделать на ассемблере
    bool needBreak = false;

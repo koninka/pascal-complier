@@ -1,5 +1,0 @@
-procedure foo();
-var
-   a: integer;
-const
-   tt = 45;

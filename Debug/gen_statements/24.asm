@@ -10,21 +10,11 @@ includelib c:\masm32\lib\msvcrt.lib
 @bar_0 proc
 	push	ebp
 	mov	ebp, esp
-	push	38
 	mov	ebx, ebp
 	add	ebx, 12
-	push	[ebx]
-	push	2
-	mov	ebx, 4
-	pop	eax
-	sub	eax, 0
-	imul	eax, ebx
-	pop	ebx
-	add	eax, ebx
-	push	eax
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
+	mov	eax, dword ptr 8
+	add	eax, dword ptr [ebx]
+	mov	[eax], dword ptr 38
 @exit_1:
 	mov	esp, ebp
 	pop	ebp
@@ -32,42 +22,21 @@ includelib c:\masm32\lib\msvcrt.lib
 @bar_0 endp
 main:
 	mov	ebp, esp
-	push	20
-	push	offset v_arr
-	push	3
-	mov	ebx, 4
-	pop	eax
-	sub	eax, 1
-	imul	eax, ebx
-	pop	ebx
-	add	eax, ebx
-	push	eax
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
+	mov	eax, offset v_arr + 8
+	mov	[eax], dword ptr 20
 	push	offset v_arr
 	push	ebp
 	call	@bar_0
 	add	esp, 4
-	push	offset v_arr
-	push	3
-	mov	ebx, 4
-	pop	eax
-	sub	eax, 1
-	imul	eax, ebx
-	pop	ebx
-	add	eax, ebx
-	push	eax
-	pop	eax
+	mov	eax, offset v_arr + 8
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
 	add	esp, 8
 	push	offset fmt_str_new_line
 	call	crt_printf
-	add	esp, 4
 @exit_2:
 	mov	esp, ebp
-	mov	eax, 0
+	xor	eax, eax
 	ret
 end main

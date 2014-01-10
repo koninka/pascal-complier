@@ -15,47 +15,28 @@ includelib c:\masm32\lib\msvcrt.lib
 	sub	esp, 4
 	mov	ebx, ebp
 	add	ebx, 12
-	push	[ebx]
-	pop	eax
-	add	eax, 0
-	push	eax
-	pop	eax
-	mov	ebx, [eax]
-	push	ebx
+	mov	eax, dword ptr [ebx]
 	mov	ebx, ebp
 	add	ebx, -4
-	push	ebx
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
+	push	[eax]
+	mov	eax, ebx
+	pop	[eax]
 	mov	ebx, ebp
 	add	ebx, 12
-	push	[ebx]
-	pop	eax
+	mov	eax, dword ptr [ebx]
 	add	eax, 4
-	push	eax
-	pop	eax
-	mov	ebx, [eax]
-	push	ebx
 	mov	ebx, ebp
 	add	ebx, 12
-	push	[ebx]
-	pop	eax
-	add	eax, 0
-	push	eax
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
+	push	[eax]
+	mov	eax, dword ptr [ebx]
+	pop	[eax]
 	mov	ebx, ebp
 	push	[ebx - 4]
 	mov	ebx, ebp
 	add	ebx, 12
-	push	[ebx]
-	pop	eax
-	add	eax, 4
-	push	eax
-	pop	eax
+	mov	eax, dword ptr [ebx]
 	pop	ebx
+	add	eax, 4
 	mov	[eax], ebx
 @exit_1:
 	mov	esp, ebp
@@ -64,27 +45,10 @@ includelib c:\masm32\lib\msvcrt.lib
 @swap_0 endp
 main:
 	mov	ebp, esp
-	push	10
-	push	offset v_a
-	pop	eax
-	add	eax, 0
-	push	eax
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
-	push	20
-	push	offset v_a
-	pop	eax
-	add	eax, 4
-	push	eax
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
-	push	offset v_a
-	pop	eax
-	add	eax, 0
-	push	eax
-	pop	eax
+	lea	eax, v_a
+	mov	[eax], dword ptr 10
+	mov	[eax + 4], dword ptr 20
+	lea	eax, v_a
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
@@ -92,11 +56,7 @@ main:
 	push	offset fmt_str3
 	call	crt_printf
 	add	esp, 4
-	push	offset v_a
-	pop	eax
-	add	eax, 4
-	push	eax
-	pop	eax
+	mov	eax, offset v_a + 4
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
@@ -108,11 +68,7 @@ main:
 	push	ebp
 	call	@swap_0
 	add	esp, 4
-	push	offset v_a
-	pop	eax
-	add	eax, 0
-	push	eax
-	pop	eax
+	lea	eax, v_a
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
@@ -120,20 +76,15 @@ main:
 	push	offset fmt_str4
 	call	crt_printf
 	add	esp, 4
-	push	offset v_a
-	pop	eax
-	add	eax, 4
-	push	eax
-	pop	eax
+	mov	eax, offset v_a + 4
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
 	add	esp, 8
 	push	offset fmt_str_new_line
 	call	crt_printf
-	add	esp, 4
 @exit_2:
 	mov	esp, ebp
-	mov	eax, 0
+	xor	eax, eax
 	ret
 end main

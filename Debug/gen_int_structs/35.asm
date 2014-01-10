@@ -8,62 +8,34 @@ includelib c:\masm32\lib\msvcrt.lib
 .code
 main:
 	mov	ebp, esp
-	push	23432
-	push	offset v_a
-	push	4
-	mov	ebx, 4
-	pop	eax
-	sub	eax, 1
-	imul	eax, ebx
-	pop	ebx
-	add	eax, ebx
-	push	eax
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
-	push	20
-	push	offset v_b
-	push	4
-	mov	ebx, 4
-	pop	eax
-	sub	eax, 1
-	imul	eax, ebx
-	pop	ebx
-	add	eax, ebx
-	push	eax
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
-	push	offset v_b
-	pop	eax
-	mov	ecx, 1600
-	add	eax, ecx
-	mov	ebx, 0
+	mov	eax, offset v_a + 12
+	mov	[eax], dword ptr 23432
+	mov	eax, offset v_b + 12
+	mov	[eax], dword ptr 20
+	mov	eax, offset v_b + 1600
+	xor	ebx, ebx
 @L_1:
-	cmp	ebx, ecx
+	cmp	ebx, 1600
 	jge	@L_2
 	sub	eax, 4
-	mov	edx, [eax]
-	push	edx
 	add	ebx, 4
+	push	dword ptr [eax]
 	jmp	@L_1
 @L_2:
-	push	offset v_a
-	pop	eax
-	sub	eax, 4
-	mov	ebx, 0
-	mov	ecx, 1600
+	mov	eax, offset v_a - 4
+	xor	ebx, ebx
 @assignBegin_3:
-	cmp	ebx, ecx
+	cmp	ebx, 1600
 	jge	@assignEnd_4
-	add	eax, 4
-	pop	edx
-	mov	[eax], edx
+	push	eax
+	add	[esp], dword ptr 4
+	pop	eax
+	pop	[eax]
 	add	ebx, 4
 	jmp	@assignBegin_3
 @assignEnd_4:
 @exit_0:
 	mov	esp, ebp
-	mov	eax, 0
+	xor	eax, eax
 	ret
 end main

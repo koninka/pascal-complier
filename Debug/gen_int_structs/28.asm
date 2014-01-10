@@ -9,95 +9,32 @@ includelib c:\masm32\lib\msvcrt.lib
 .code
 main:
 	mov	ebp, esp
+	mov	eax, offset v_b + 12
+	mov	ebx, 4
 	push	146
-	push	offset v_b
-	push	2
-	mov	ebx, 12
-	pop	eax
-	sub	eax, 1
+	push	eax
+	mov	eax, dword ptr 2
 	imul	eax, ebx
 	pop	ebx
 	add	eax, ebx
-	push	eax
-	push	3
+	pop	[eax]
+	mov	eax, offset v_b + 12
 	mov	ebx, 4
-	pop	eax
-	sub	eax, 1
+	push	eax
+	mov	eax, dword ptr 2
 	imul	eax, ebx
 	pop	ebx
 	add	eax, ebx
-	push	eax
-	pop	eax
-	pop	ebx
+	mov	ebx, dword ptr [eax]
+	push	[eax + 8]
+	push	[eax + 4]
+	mov	eax, offset v_a + 4
 	mov	[eax], ebx
-	push	offset v_b
-	push	2
-	mov	ebx, 12
-	pop	eax
-	sub	eax, 1
-	imul	eax, ebx
-	pop	ebx
-	add	eax, ebx
-	push	eax
-	push	3
-	mov	ebx, 4
-	pop	eax
-	sub	eax, 1
-	imul	eax, ebx
-	pop	ebx
-	add	eax, ebx
-	push	eax
-	pop	eax
-	mov	ebx, [eax + 8]
-	push	ebx
-	mov	ebx, [eax + 4]
-	push	ebx
-	mov	ebx, [eax]
-	push	ebx
-	push	offset v_a
-	push	1
-	mov	ebx, 12
-	pop	eax
-	sub	eax, 1
-	imul	eax, ebx
-	pop	ebx
-	add	eax, ebx
-	push	eax
-	push	2
-	mov	ebx, 4
-	pop	eax
-	sub	eax, 1
-	imul	eax, ebx
-	pop	ebx
-	add	eax, ebx
-	push	eax
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
-	push	offset v_a
-	push	1
-	mov	ebx, 12
-	pop	eax
-	sub	eax, 1
-	imul	eax, ebx
-	pop	ebx
-	add	eax, ebx
-	push	eax
-	push	2
-	mov	ebx, 4
-	pop	eax
-	sub	eax, 1
-	imul	eax, ebx
-	pop	ebx
-	add	eax, ebx
-	push	eax
-	pop	eax
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, 8
 @exit_0:
 	mov	esp, ebp
-	mov	eax, 0
+	xor	eax, eax
 	ret
 end main

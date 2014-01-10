@@ -11,31 +11,21 @@ includelib c:\masm32\lib\msvcrt.lib
 	push	ebp
 	mov	ebp, esp
 	mov	ebx, ebp
-	add	ebx, 12
-	add	ebx, 4
-	add	ebx, 4
-	push	[ebx]
+	add	ebx, dword ptr 20
+	mov	eax, dword ptr [ebx]
 	mov	ebx, ebp
 	add	ebx, 12
-	push	[ebx]
-	pop	ebx
-	pop	eax
-	add	eax, ebx
+	add	eax, dword ptr [ebx]
+	mov	ebx, ebp
+	add	ebx, 12
 	push	eax
-	mov	ebx, ebp
-	add	ebx, 12
-	push	ebx
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
-	mov	ebx, ebp
-	add	ebx, 12
-	push	ebx
-	pop	eax
+	mov	eax, ebx
+	pop	[eax]
+	mov	eax, ebp
+	add	eax, 12
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, 8
 @exit_1:
 	mov	esp, ebp
 	pop	ebp
@@ -48,9 +38,8 @@ main:
 	push	4
 	push	ebp
 	call	@foo_0
-	add	esp, 12
 @exit_2:
 	mov	esp, ebp
-	mov	eax, 0
+	xor	eax, eax
 	ret
 end main

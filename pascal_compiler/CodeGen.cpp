@@ -2,7 +2,8 @@
 
 #include <sstream>
 
-string GetSizeType(SizeType type)
+
+string GetSizeTypeText(SizeType type)
 {
    switch (type) {
       case szNONE:   return "";
@@ -28,6 +29,23 @@ string GetReg(Register reg)
       case ST:    return "st";
       default:    return "";
    }
+}
+
+bool CmpOperands(AsmOperand* oper1, AsmOperand* oper2)
+{
+   bool result = false;
+   if (TryToCastOperand<AsmRegister>(oper1)) {
+      result = *CastOperand<AsmRegister>(oper1) == oper2;
+   } else if (TryToCastOperand<AsmIntImmediate>(oper1)) {
+      result = *CastOperand<AsmIntImmediate>(oper1) == oper2;
+   } else if (TryToCastOperand<AsmStrImmediate>(oper1)) {
+      result = *CastOperand<AsmStrImmediate>(oper1) == oper2;
+   } else if (TryToCastOperand<AsmVarAddr>(oper1)) {
+      result = *CastOperand<AsmVarAddr>(oper1) == oper2;
+   } else if (TryToCastOperand<AsmMemory>(oper1)) {
+      result = *CastOperand<AsmMemory>(oper1) == oper2;
+   }
+   return result;
 }
 
 string GetCmd(OpCode opCode)
@@ -74,6 +92,8 @@ string GetCmd(OpCode opCode)
       case MOV:         return "mov";
       case MOVZX:       return "movzx";
       case MOVZB:       return "movzb";
+      case INC:         return "inc";
+      case DEC:         return "dec";
       case ADD:         return "add";
       case SUB:         return "sub";
       case SAHF:        return "sahf";
@@ -92,15 +112,32 @@ string GetCmd(OpCode opCode)
 }
 
 
+Asm::Asm(OpCode AOpCode, AsmOperand* AArg1, AsmOperand* AArg2):
+   opCode(AOpCode),
+   arg1(AArg1),
+   arg2(AArg2)
+{}
+
+bool Asm::operator==(OpCode AOpCode)
+{
+   return opCode == AOpCode;
+}
+
+bool Asm::operator!=(OpCode AOpCode)
+{
+   return opCode != AOpCode;
+}
+
+OpCode Asm::GetOpCode() const
+{
+   return opCode;
+}
+
 void Asm::Print() const
 {}
 
-AsmCmd::AsmCmd(OpCode AOpCode):
-   opCode(AOpCode)
-{}
-
 AsmCmd0::AsmCmd0(OpCode AOpCode):
-   AsmCmd(AOpCode)
+   Asm(AOpCode)
 {}
 
 void AsmCmd0::Print() const
@@ -109,39 +146,39 @@ void AsmCmd0::Print() const
 }
 
 AsmCmd1::AsmCmd1(OpCode AOpCode, AsmOperand* AOper):
-   AsmCmd(AOpCode),
-   _oper(AOper)
+   Asm(AOpCode, AOper)
 {}
 
 void AsmCmd1::Print() const
 {
    cout << '\t' << GetCmd(opCode) << '\t';
-   _oper->PrintBase();
+   arg1->PrintBase();
 }
 
 AsmCmd2::AsmCmd2(OpCode AOpCode, AsmOperand* ADest, AsmOperand* ASrc):
-   AsmCmd(AOpCode),
-   _dest(ADest),
-   _src(ASrc)
+   Asm(AOpCode, ADest, ASrc)
 {}
 
 void AsmCmd2::Print() const
 {
    cout << '\t' << GetCmd(opCode) << '\t';
-   _dest->Print();
+   arg1->Print();
    cout << ", ";
-   _src->Print();
+   arg2->Print();
 }
 
 AsmLabel::AsmLabel(AsmStrImmediate* ALabel):
+   Asm(LABEL),
    _label(ALabel)
- {}
+{}
 
-AsmLabel::AsmLabel(AsmStrImmediate ALabel) :
+AsmLabel::AsmLabel(AsmStrImmediate ALabel):
+   Asm(LABEL),
    _label(new AsmStrImmediate(ALabel))
  {}
 
-AsmLabel::AsmLabel(string ALabel) :
+AsmLabel::AsmLabel(string ALabel):
+   Asm(LABEL),
    _label(new AsmStrImmediate(ALabel))
  {}
 
@@ -151,16 +188,8 @@ void AsmLabel::Print() const
    cout << ':';
 }
 
-AsmRawCmd::AsmRawCmd(string cmd):
-   _str(cmd)
-{}
-
-void AsmRawCmd::Print() const
-{
-   cout << _str;
-}
-
 AsmSubroutineBase::AsmSubroutineBase(AsmStrImmediate* ALabel):
+   Asm(SUBROUTINE),
    _label(ALabel)
 {}
 
@@ -182,6 +211,16 @@ void AsmSubroutineEnd::Print() const
 {
    _label->PrintBase();
    cout << " endp";
+}
+
+AsmRawCmd::AsmRawCmd(string cmd):
+   Asm(RAW_STR),
+   _str(cmd)
+{}
+
+void AsmRawCmd::Print() const
+{
+   cout << _str;
 }
 
 AsmDataBase::AsmDataBase(string AName):
@@ -238,9 +277,41 @@ void AsmOperand::PrintBase() const
    Print();
 }
 
+void AsmOperand::SetSizeType(SizeType)
+{}
+
+bool AsmOperand::operator==(AsmOperand* oper)
+{
+   return false;
+}
+
 AsmRegister::AsmRegister(Register AReg):
    _register(AReg)
 {}
+
+bool AsmRegister::operator==(AsmOperand* oper)
+{
+   bool result = false;
+   if (TryToCastOperand<AsmRegister>(oper)) {
+      result = _register == CastOperand<AsmRegister>(oper)->_register;
+   }
+   return result;
+}
+
+bool AsmRegister::operator!=(AsmOperand* oper)
+{
+   return !(*this == oper);
+}
+
+bool AsmRegister::operator==(AsmRegister reg)
+{
+   return _register == reg._register;
+}
+
+bool AsmRegister::operator!=(AsmRegister reg)
+{
+   return _register != reg._register;
+}
 
 void AsmRegister::Print() const
 {
@@ -272,6 +343,20 @@ AsmIntImmediate::AsmIntImmediate(int AValue, SizeType AType):
    _sizeType(AType)
 {}
 
+bool AsmIntImmediate::operator==(AsmOperand* oper)
+{
+   bool result = false;
+   if (TryToCastOperand<AsmIntImmediate>(oper)) {
+      result = _value == CastOperand<AsmIntImmediate>(oper)->_value;// && CastOperand<AsmIntImmediate>(oper)->_sizeType;
+   }
+   return result;;
+}
+
+void AsmIntImmediate::SetSizeType(SizeType AType)
+{
+   _sizeType = AType;
+}
+
 int AsmIntImmediate::GetIntValue() const
 {
    return _value;
@@ -279,31 +364,43 @@ int AsmIntImmediate::GetIntValue() const
 
 void AsmIntImmediate::PrintBase() const
 {
-   cout << GetSizeType(_sizeType) << _value;
+   cout << GetSizeTypeText(_sizeType) << _value;
 }
 
 AsmVarBase::AsmVarBase(AsmOperand* AOper):
-   oper(AOper)
+   arg(AOper)
 {}
 
-AsmVarAddr::AsmVarAddr(AsmOperand* AOper) :
-   AsmVarBase(AOper)
+AsmVarAddr::AsmVarAddr(AsmOperand* AOper, int AOffset, SizeType AType):
+   AsmVarBase(AOper),
+   _offset(AOffset),
+   _sizeType(AType)
 {}
+
+bool AsmVarAddr::operator==(AsmOperand* oper_)
+{
+   bool result = false;
+   if (TryToCastOperand<AsmVarAddr>(oper_)) {
+      result =
+            _offset == CastOperand<AsmVarAddr>(oper_)->_offset
+         && _sizeType == CastOperand<AsmVarAddr>(oper_)->_sizeType
+         && CmpOperands(arg, CastOperand<AsmVarAddr>(oper_)->arg);
+   }
+   return result;
+}
+
+int AsmVarAddr::GetOffset() const
+{
+   return _offset;
+}
 
 void AsmVarAddr::PrintBase() const
 {
-   cout << "offset ";
-   oper->PrintBase();
-}
-
-AsmVarDword::AsmVarDword(AsmOperand* AOper):
-   AsmVarBase(AOper)
-{}
-
-void AsmVarDword::PrintBase() const
-{
-   cout << "dword ptr ";
-   oper->PrintBase();
+   cout << GetSizeTypeText(_sizeType) << "offset ";
+   arg->PrintBase();
+   if (_offset) {
+      cout << (_offset > 0 ? " + " : " - ") << abs(_offset);
+   }
 }
 
 AsmStrImmediate::AsmStrImmediate(string AValue):
@@ -320,27 +417,237 @@ string AsmStrImmediate::GetStrValue() const
    return _value;
 }
 
+bool AsmStrImmediate::operator==(AsmOperand* oper)
+{
+   bool result = false;
+   if (TryToCastOperand<AsmStrImmediate>(oper)) {
+      result = _value == CastOperand<AsmStrImmediate>(oper)->_value;
+   }
+   return result;
+}
+
 AsmMemory::AsmMemory(AsmOperand* AOper, int AOffset, SizeType AType):
-   _oper(AOper),
+   arg(AOper),
    _offset(AOffset),
    _size(AType)
 {}
 
 AsmMemory::AsmMemory(Register AReg, int AOffset, SizeType AType):
-   _oper(new AsmRegister(AReg)),
+   arg(new AsmRegister(AReg)),
    _offset(AOffset),
    _size(AType)
 {}
 
+AsmMemory::AsmMemory(AsmRegister AReg, int AOffset, SizeType AType):
+   arg(new AsmRegister(AReg)),
+   _offset(AOffset),
+   _size(AType)
+{}
+
+bool AsmMemory::operator==(AsmOperand* oper)
+{
+   bool result = false;
+   if (TryToCastOperand<AsmMemory>(oper)) {
+      result =
+            _offset == CastOperand<AsmMemory>(oper)->_offset
+         //&& _size == CastOperand<AsmMemory>(oper)->_size
+         && CmpOperands(arg, CastOperand<AsmMemory>(oper)->arg);
+   }
+   return result;
+}
+
+int AsmMemory::GetOffset() const
+{
+   return _offset;
+}
+
+void AsmMemory::SetOffset(int newOffset)
+{
+   _offset = newOffset;
+}
+
+SizeType AsmMemory::GetSizeType() const
+{
+   return _size;
+}
+
+void AsmMemory::SetSizeType(SizeType AType)
+{
+   _size = AType;
+}
+
 void AsmMemory::Print() const
 {
-   cout << GetSizeType(_size);
+   cout << GetSizeTypeText(_size);
    cout << '[';
-   _oper->PrintBase();
+   arg->PrintBase();
    if (_offset) {
       cout << (_offset > 0 ? " + " : " - ") << abs(_offset);
    }
    cout << ']';
+}
+
+void AsmCodeBase::AddCmd(string rawCmd)
+{
+   commands.push_back(new AsmRawCmd(rawCmd));
+}
+
+void AsmCodeBase::AddCmd(OpCode cmd)
+{
+   commands.push_back(new AsmCmd0(cmd));
+}
+
+void AsmCodeBase::AddCmd(Command cmd)
+{
+   commands.push_back(cmd);
+}
+
+void AsmCodeBase::AddCmd(OpCode cmd, AsmMemory mem)
+{
+   commands.push_back(new AsmCmd1(cmd, new AsmMemory(mem)));
+}
+
+void AsmCodeBase::AddCmd(OpCode cmd, Register dest, Register src)
+{
+   commands.push_back(new AsmCmd2(cmd, new AsmRegister(dest), new AsmRegister(src)));
+}
+
+void AsmCodeBase::AddCmd(OpCode cmd, Register dest, AsmStrImmediate* src)
+{
+   commands.push_back(new AsmCmd2(cmd, new AsmRegister(dest), src));
+}
+
+void AsmCodeBase::AddCmd(OpCode cmd, AsmRegister dest, AsmRegister src)
+{
+   commands.push_back(new AsmCmd2(cmd, new AsmRegister(dest), new AsmRegister(src)));
+}
+
+void AsmCodeBase::AddCmd(OpCode cmd, AsmRegister dest, AsmOperand* src)
+{
+   commands.push_back(new AsmCmd2(cmd, new AsmRegister(dest), src));
+}
+
+void AsmCodeBase::AddCmd(OpCode cmd, AsmVarAddr oper)
+{
+   commands.push_back(new AsmCmd1(cmd, new AsmVarAddr(oper)));
+}
+
+void AsmCodeBase::AddCmd(OpCode cmd, Register reg)
+{
+   commands.push_back(new AsmCmd1(cmd, new AsmRegister(reg)));
+}
+
+void AsmCodeBase::AddCmd(OpCode cmd, AsmOperand* oper)
+{
+   commands.push_back(new AsmCmd1(cmd, oper));
+}
+
+//void AsmCodeBase::AddCmd(OpCode cmd, AsmOperand* oper, SizeType AType)
+//{
+//   oper->SetSizeType(AType);
+//   commands.push_back(new AsmCmd1(cmd, oper));
+//}
+
+void AsmCodeBase::AddCmd(OpCode cmd, AsmStrImmediate* strImm)
+{
+   commands.push_back(new AsmCmd1(cmd, strImm));
+}
+
+void AsmCodeBase::AddCmd(OpCode cmd, AsmStrImmediate strImm)
+{
+   AsmStrImmediate* tmp = new AsmStrImmediate(strImm);
+   commands.push_back(new AsmCmd1(cmd, tmp));
+}
+
+void AsmCodeBase::AddCmd(OpCode cmd, AsmIntImmediate intImm)
+{
+   AsmIntImmediate* tmp = new AsmIntImmediate(intImm);
+   commands.push_back(new AsmCmd1(cmd, tmp));
+}
+
+void AsmCodeBase::AddCmd(OpCode cmd, int intImm, SizeType type)
+{
+   AsmIntImmediate* tmp = new AsmIntImmediate(intImm, type);
+   commands.push_back(new AsmCmd1(cmd, tmp));
+}
+
+void AsmCodeBase::AddCmd(OpCode cmd, AsmOperand* oper1, AsmOperand* oper2)
+{
+   //oper2->SetSizeType(AType);
+   commands.push_back(new AsmCmd2(cmd, oper1, oper2));
+}
+
+void AsmCodeBase::AddCmd(OpCode cmd, AsmOperand* oper1, AsmOperand* oper2, SizeType AType)
+{
+   oper2->SetSizeType(AType);
+   AddCmd(cmd, oper1, oper2);
+}
+
+void AsmCodeBase::AddCmd(OpCode cmd, Register reg, int intImm, SizeType type)
+{
+   AsmIntImmediate* imm = new AsmIntImmediate(intImm, type);
+   commands.push_back(new AsmCmd2(cmd, new AsmRegister(reg), imm));
+}
+
+//void AsmCodeBase::AddCmd(OpCode cmd, AsmMemory mem, int intImm, SizeType type)
+//{
+//   AsmIntImmediate* imm = new AsmIntImmediate(intImm, type);
+//   commands.push_back(new AsmCmd2(cmd, new AsmMemory(mem), imm));
+//}
+
+void AsmCodeBase::AddCmd(OpCode cmd, Register reg, AsmIntImmediate intImm)
+{
+   commands.push_back(new AsmCmd2(cmd, new AsmRegister(reg), new AsmIntImmediate(intImm)));
+}
+
+void AsmCodeBase::AddCmd(OpCode cmd, AsmRegister reg, AsmIntImmediate intImm)
+{
+   commands.push_back(new AsmCmd2(cmd, new AsmRegister(reg), new AsmIntImmediate(intImm)));
+}
+
+void AsmCodeBase::AddCmd(OpCode cmd, AsmMemory mem, AsmIntImmediate intImm)
+{
+   commands.push_back(new AsmCmd2(cmd, new AsmMemory(mem), new AsmIntImmediate(intImm)));
+}
+
+void AsmCodeBase::AddCmd(OpCode cmd, AsmOperand* oper, AsmIntImmediate intImm)
+{
+   AddCmd(cmd, oper, new AsmIntImmediate(intImm));
+}
+
+void AsmCodeBase::AddCmd(OpCode cmd, AsmOperand* oper, AsmVarAddr addr)
+{
+   commands.push_back(new AsmCmd2(cmd, oper, new AsmVarAddr(addr)));
+}
+
+void AsmCodeBase::AddCmd(OpCode cmd, AsmMemory mem, Register reg)
+{
+   commands.push_back(new AsmCmd2(cmd, new AsmMemory(mem), new AsmRegister(reg)));
+}
+
+void AsmCodeBase::AddCmd(OpCode cmd, AsmMemory mem, AsmRegister reg)
+{
+   commands.push_back(new AsmCmd2(cmd, new AsmMemory(mem), new AsmRegister(reg)));
+}
+
+void AsmCodeBase::AddCmd(OpCode cmd, AsmMemory mem, AsmOperand* oper)
+{
+   commands.push_back(new AsmCmd2(cmd, new AsmMemory(mem), oper));
+}
+
+void AsmCodeBase::AddCmd(OpCode cmd, Register reg, AsmMemory mem)
+{
+   commands.push_back(new AsmCmd2(cmd, new AsmRegister(reg), new AsmMemory(mem)));
+}
+
+void AsmCodeBase::CleanCommands()
+{
+   commands.clear();
+}
+
+Commands AsmCodeBase::GetCommands() const
+{
+   return commands;
 }
 
 AsmCode::AsmCode():
@@ -350,90 +657,6 @@ AsmCode::AsmCode():
    formatStrReal(nullptr),
    formatStrNewLine(nullptr)
 {}
-
-void AsmCode::AddCmd(string raw_cmd)
-{
-   commands.push_back(new AsmRawCmd(raw_cmd));
-}
-
-void AsmCode::AddCmd(OpCode cmd)
-{
-   commands.push_back(new AsmCmd0(cmd));
-}
-
-void AsmCode::AddCmd(OpCode cmd, AsmMemory mem)
-{
-   commands.push_back(new AsmCmd1(cmd, new AsmMemory(mem)));
-}
-
-void AsmCode::AddCmd(OpCode cmd, Register dest, Register src)
-{
-   commands.push_back(new AsmCmd2(cmd, new AsmRegister(dest), new AsmRegister(src)));
-}
-
-void AsmCode::AddCmd(OpCode cmd, AsmVarAddr oper)
-{
-   commands.push_back(new AsmCmd1(cmd, new AsmVarAddr(oper)));
-}
-
-void AsmCode::AddCmd(OpCode cmd, AsmVarDword oper)
-{
-   commands.push_back(new AsmCmd1(cmd, new AsmVarDword(oper)));
-}
-
-void AsmCode::AddCmd(OpCode cmd, Register reg)
-{
-   commands.push_back(new AsmCmd1(cmd, new AsmRegister(reg)));
-}
-
-void AsmCode::AddCmd(OpCode cmd, AsmStrImmediate* strImm)
-{
-   commands.push_back(new AsmCmd1(cmd, strImm));
-}
-
-void AsmCode::AddCmd(OpCode cmd, AsmStrImmediate strImm)
-{
-   AsmStrImmediate* tmp = new AsmStrImmediate(strImm);
-   commands.push_back(new AsmCmd1(cmd, tmp));
-}
-
-void AsmCode::AddCmd(OpCode cmd, AsmIntImmediate intImm)
-{
-   AsmIntImmediate* tmp = new AsmIntImmediate(intImm);
-   commands.push_back(new AsmCmd1(cmd, tmp));
-}
-
-void AsmCode::AddCmd(OpCode cmd, int intImm, SizeType type)
-{
-   AsmIntImmediate* tmp = new AsmIntImmediate(intImm, type);
-   commands.push_back(new AsmCmd1(cmd, tmp));
-}
-
-void AsmCode::AddCmd(OpCode cmd, AsmOperand* oper1, AsmOperand* oper2)
-{
-   commands.push_back(new AsmCmd2(cmd, oper1, oper2));
-}
-
-void AsmCode::AddCmd(OpCode cmd, Register reg, int intImm, SizeType type)
-{
-   AsmIntImmediate* imm = new AsmIntImmediate(intImm, type);
-   commands.push_back(new AsmCmd2(cmd, new AsmRegister(reg), imm));
-}
-
-void AsmCode::AddCmd(OpCode cmd, AsmMemory mem, AsmIntImmediate intImm)
-{
-   AddCmd(cmd, new AsmMemory(mem), new AsmIntImmediate(intImm));
-}
-
-void AsmCode::AddCmd(OpCode cmd, AsmMemory mem, Register reg)
-{
-   commands.push_back(new AsmCmd2(cmd, new AsmMemory(mem), new AsmRegister(reg)));
-}
-
-void AsmCode::AddCmd(OpCode cmd, Register reg, AsmMemory mem)
-{
-   commands.push_back(new AsmCmd2(cmd, new AsmRegister(reg), new AsmMemory(mem)));
-}
 
 AsmStrImmediate* AsmCode::AddData(string name)
 {
@@ -522,21 +745,19 @@ void AsmCode::PushMemory(unsigned size)
    AddCmd(POP, EAX);
    if (size <= 16) {
       for (size_t i = 0; i < size; i += 4) {
-         AddCmd(MOV, EBX, AsmMemory(EAX, size - i - 4));
-         AddCmd(PUSH, EBX);
+         //AddCmd(MOV, EBX, AsmMemory(EAX, size - i - 4));
+         AddCmd(PUSH, AsmMemory(EAX, size - i - 4));
       }
    } else {
       AsmStrImmediate* labelBegin = GenLabel("L");
-      AsmStrImmediate* labelEnd   = GenLabel("L");
-      AddCmd(MOV, ECX, size);
-      AddCmd(ADD, EAX, ECX);
+      AsmStrImmediate* labelEnd = GenLabel("L");
+      AddCmd(ADD, EAX, size);
       AddCmd(MOV, EBX, 0);
       AddLabel(labelBegin);
-      AddCmd(CMP, EBX, ECX);
+      AddCmd(CMP, EBX, size);
       AddCmd(JGE, labelEnd);
       AddCmd(SUB, EAX, 4);
-      AddCmd(MOV, EDX, AsmMemory(EAX));
-      AddCmd(PUSH, EDX);
+      AddCmd(PUSH, AsmMemory(EAX, 0, szDWORD));
       AddCmd(ADD, EBX, 4);
       AddCmd(JMP, labelBegin);
       AddLabel(labelEnd);
@@ -574,4 +795,22 @@ void AsmCode::GenWriteNewLine()
    AddCmd(PUSH, AsmVarAddr(formatStrNewLine));
    AddCmd(CALL, functWrite);
    AddCmd(ADD, ESP, 4);
+}
+
+void AsmCode::ReplaceCommands(Commands newCommands, size_t idx, size_t amount)
+{
+   commands.erase(commands.begin() + idx, commands.begin() + idx + amount);
+   for (auto &command : newCommands) {
+      commands.insert(commands.begin() + idx++, command);
+   }
+}
+
+Commands AsmCode::GetCommands(size_t idx, size_t amount)
+{
+   return Commands(commands.begin() + idx, commands.begin() + idx + amount);
+}
+
+size_t AsmCode::GetCmdAmount() const
+{
+   return commands.size();
 }

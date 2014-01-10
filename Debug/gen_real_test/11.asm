@@ -12,30 +12,20 @@ includelib c:\masm32\lib\msvcrt.lib
 	push	ebp
 	mov	ebp, esp
 	sub	esp, 4
-	push	0
 	mov	ebx, ebp
 	add	ebx, -4
-	push	ebx
-	pop	ebx
-	pop	eax
+	xor	eax, eax
 	mov	[ebx], eax
 @forloop_3:
 	mov	ebx, ebp
+	mov	eax, dword ptr 39
 	push	[ebx - 4]
-	push	40
-	push	1
-	pop	ebx
-	pop	eax
-	sub	eax, ebx
-	push	eax
-	pop	ebx
+	mov	ebx, eax
 	pop	eax
 	cmp	eax, ebx
 	jg	@lend_4
-	push	658943
-	push	19
-	pop	ebx
-	pop	eax
+	mov	ebx, 19
+	mov	eax, 658943
 	xor	edx, edx
 	idiv	ebx
 	push	edx
@@ -48,11 +38,8 @@ includelib c:\masm32\lib\msvcrt.lib
 	fmulp	st(1), st
 	fstp	dword ptr [esp]
 	mov	ebx, ebp
-	push	[ebx - 4]
-	push	1
-	pop	ebx
-	pop	eax
-	add	eax, ebx
+	mov	eax, dword ptr [ebx - 4]
+	inc	eax
 	push	eax
 	fild	dword ptr [esp]
 	fstp	dword ptr [esp]
@@ -67,42 +54,27 @@ includelib c:\masm32\lib\msvcrt.lib
 	add	ebx, 4
 	push	ebx
 	mov	ebx, ebp
-	push	[ebx - 4]
+	mov	eax, dword ptr [ebx - 4]
 	mov	ebx, 4
-	pop	eax
-	sub	eax, 0
 	imul	eax, ebx
 	pop	ebx
 	add	eax, ebx
-	push	eax
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
+	pop	[eax]
 @lcontinue_5:
-	mov	ebx, ebp
-	add	ebx, -4
-	push	ebx
-	pop	eax
-	add	[eax], dword ptr 1
+	mov	eax, ebp
+	add	eax, -4
+	inc	dword ptr [eax]
 	jmp	@forloop_3
 @lend_4:
-	push	0
 	mov	ebx, ebp
 	add	ebx, -4
-	push	ebx
-	pop	ebx
-	pop	eax
+	xor	eax, eax
 	mov	[ebx], eax
 @forloop_6:
 	mov	ebx, ebp
+	mov	eax, dword ptr 39
 	push	[ebx - 4]
-	push	40
-	push	1
-	pop	ebx
-	pop	eax
-	sub	eax, ebx
-	push	eax
-	pop	ebx
+	mov	ebx, eax
 	pop	eax
 	cmp	eax, ebx
 	jg	@lend_7
@@ -112,15 +84,11 @@ includelib c:\masm32\lib\msvcrt.lib
 	add	ebx, 4
 	push	ebx
 	mov	ebx, ebp
-	push	[ebx - 4]
+	mov	eax, dword ptr [ebx - 4]
 	mov	ebx, 4
-	pop	eax
-	sub	eax, 0
 	imul	eax, ebx
 	pop	ebx
 	add	eax, ebx
-	push	eax
-	pop	eax
 	push	dword ptr [eax]
 	fld	dword ptr [esp]
 	sub	esp, 8
@@ -132,11 +100,9 @@ includelib c:\masm32\lib\msvcrt.lib
 	call	crt_printf
 	add	esp, 4
 @lcontinue_8:
-	mov	ebx, ebp
-	add	ebx, -4
-	push	ebx
-	pop	eax
-	add	[eax], dword ptr 1
+	mov	eax, ebp
+	add	eax, -4
+	inc	dword ptr [eax]
 	jmp	@forloop_6
 @lend_7:
 @exit_2:
@@ -146,26 +112,21 @@ includelib c:\masm32\lib\msvcrt.lib
 @foo_0 endp
 main:
 	mov	ebp, esp
-	push	offset v_a
-	pop	eax
-	mov	ecx, 160
-	add	eax, ecx
-	mov	ebx, 0
+	mov	eax, offset v_a + 160
+	xor	ebx, ebx
 @L_10:
-	cmp	ebx, ecx
+	cmp	ebx, 160
 	jge	@L_11
 	sub	eax, 4
-	mov	edx, [eax]
-	push	edx
 	add	ebx, 4
+	push	dword ptr [eax]
 	jmp	@L_10
 @L_11:
 	push	160
 	push	ebp
 	call	@foo_0
-	add	esp, 164
 @exit_9:
 	mov	esp, ebp
-	mov	eax, 0
+	xor	eax, eax
 	ret
 end main

@@ -497,6 +497,7 @@ void NodeAssignOp::Generate(AsmCode& asmCode)
    size_t size = left->GetType()->GetSize();
    if (size <= 16) {
       for (size_t i = 0; i < size; i += 4) {
+         //asmCode.AddCmd(POP, AsmMemory(EAX, i, szDWORD));
          asmCode.AddCmd(POP, EBX);
          asmCode.AddCmd(MOV, AsmMemory(EAX, i), EBX);
       }
@@ -505,11 +506,15 @@ void NodeAssignOp::Generate(AsmCode& asmCode)
       AsmStrImmediate* labelEnd   = asmCode.GenLabel("assignEnd");
       asmCode.AddCmd(SUB, EAX, 4);
       asmCode.AddCmd(MOV, EBX, 0);
-      asmCode.AddCmd(MOV, ECX, size);
       asmCode.AddLabel(labelBegin);
-      asmCode.AddCmd(CMP, EBX, ECX);
+      asmCode.AddCmd(CMP, EBX, size);
       asmCode.AddCmd(JGE, labelEnd);
-      asmCode.AddCmd(ADD, EAX, 4);
+
+      asmCode.AddCmd(PUSH, EAX);
+      asmCode.AddCmd(ADD, AsmMemory(ESP), AsmIntImmediate(4, szDWORD));
+      asmCode.AddCmd(POP, EAX);
+
+      //asmCode.AddCmd(ADD, EAX, 4);
       asmCode.AddCmd(POP, EDX);
       asmCode.AddCmd(MOV, AsmMemory(EAX), EDX);
       asmCode.AddCmd(ADD, EBX, 4);
@@ -972,7 +977,7 @@ void NodeForStmt::Generate(AsmCode& asmCode)
    asmCode.AddLabel(continueLabel);
    var->GenerateLValue(asmCode, depth);
    asmCode.AddCmd(POP, EAX);
-   asmCode.AddCmd(loopType == loopTo ? ADD : SUB, AsmMemory(EAX), 1);
+   asmCode.AddCmd(loopType == loopTo ? INC : DEC, AsmMemory(EAX, 0, szDWORD));
    asmCode.AddCmd(JMP, loopBegin);
    asmCode.AddLabel(breakLabel);
 }

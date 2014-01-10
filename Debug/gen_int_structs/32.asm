@@ -12,11 +12,7 @@ main:
 	push	offset fmt_int
 	call	crt_printf
 	add	esp, 8
-	push	2
-	push	5
-	pop	ebx
-	pop	eax
-	add	eax, ebx
+	mov	eax, dword ptr 7
 	push	eax
 	push	offset fmt_int
 	call	crt_printf
@@ -31,9 +27,8 @@ main:
 	push	40
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, 8
 @exit_0:
 	mov	esp, ebp
-	mov	eax, 0
+	xor	eax, eax
 	ret
 end main

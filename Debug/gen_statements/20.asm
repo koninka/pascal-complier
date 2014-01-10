@@ -21,28 +21,21 @@ includelib c:\masm32\lib\msvcrt.lib
 .code
 main:
 	mov	ebp, esp
-	push	1
-	push	0
-	pop	ebx
-	pop	eax
+	xor	ebx, ebx
+	mov	eax, 1
 	cmp	eax, ebx
 	setg	al
 	movzx	eax, al
+	xor	ebx, ebx
 	push	eax
-	push	1
-	push	0
-	pop	ebx
-	pop	eax
+	mov	eax, 1
 	cmp	eax, ebx
 	setg	al
 	movzx	eax, al
-	push	eax
-	pop	ebx
+	mov	ebx, eax
 	pop	eax
 	and	eax, ebx
-	push	eax
-	pop	eax
-	mov	ebx, 0
+	xor	ebx, ebx
 	cmp	eax, ebx
 	je	@else_2
 	push	offset fmt_str3
@@ -61,28 +54,21 @@ main:
 	add	esp, 4
 	jmp	@endif_1
 @endif_1:
-	push	1
-	push	0
-	pop	ebx
-	pop	eax
+	xor	ebx, ebx
+	mov	eax, 1
 	cmp	eax, ebx
 	setg	al
 	movzx	eax, al
+	xor	ebx, ebx
 	push	eax
-	push	0
-	push	0
-	pop	ebx
-	pop	eax
+	xor	eax, eax
 	cmp	eax, ebx
 	setg	al
 	movzx	eax, al
-	push	eax
-	pop	ebx
+	mov	ebx, eax
 	pop	eax
 	and	eax, ebx
-	push	eax
-	pop	eax
-	mov	ebx, 0
+	xor	ebx, ebx
 	cmp	eax, ebx
 	je	@else_6
 	push	offset fmt_str7
@@ -101,28 +87,21 @@ main:
 	add	esp, 4
 	jmp	@endif_5
 @endif_5:
-	push	0
-	push	0
-	pop	ebx
-	pop	eax
+	xor	ebx, ebx
+	xor	eax, eax
 	cmp	eax, ebx
 	setg	al
 	movzx	eax, al
+	xor	ebx, ebx
 	push	eax
-	push	1
-	push	0
-	pop	ebx
-	pop	eax
+	mov	eax, 1
 	cmp	eax, ebx
 	setg	al
 	movzx	eax, al
-	push	eax
-	pop	ebx
+	mov	ebx, eax
 	pop	eax
 	and	eax, ebx
-	push	eax
-	pop	eax
-	mov	ebx, 0
+	xor	ebx, ebx
 	cmp	eax, ebx
 	je	@else_10
 	push	offset fmt_str11
@@ -141,28 +120,21 @@ main:
 	add	esp, 4
 	jmp	@endif_9
 @endif_9:
-	push	0
-	push	0
-	pop	ebx
-	pop	eax
+	xor	ebx, ebx
+	xor	eax, eax
 	cmp	eax, ebx
 	setg	al
 	movzx	eax, al
+	xor	ebx, ebx
 	push	eax
-	push	0
-	push	0
-	pop	ebx
-	pop	eax
+	xor	eax, eax
 	cmp	eax, ebx
 	setg	al
 	movzx	eax, al
-	push	eax
-	pop	ebx
+	mov	ebx, eax
 	pop	eax
 	and	eax, ebx
-	push	eax
-	pop	eax
-	mov	ebx, 0
+	xor	ebx, ebx
 	cmp	eax, ebx
 	je	@else_14
 	push	offset fmt_str15
@@ -181,21 +153,15 @@ main:
 	add	esp, 4
 	jmp	@endif_13
 @endif_13:
-	push	1
-	pop	eax
+	mov	eax, 1
 	test	eax, eax
 	sete	al
 	movzx	eax, al
-	push	eax
-	push	0
-	pop	ebx
-	pop	eax
+	xor	ebx, ebx
 	cmp	eax, ebx
 	setg	al
 	movzx	eax, al
-	push	eax
-	pop	eax
-	mov	ebx, 0
+	xor	ebx, ebx
 	cmp	eax, ebx
 	je	@else_18
 	push	offset fmt_str19
@@ -214,19 +180,12 @@ main:
 	add	esp, 4
 	jmp	@endif_17
 @endif_17:
-	push	1
-	pop	eax
-	neg	eax
-	push	eax
-	push	0
-	pop	ebx
-	pop	eax
+	mov	eax, dword ptr -1
+	xor	ebx, ebx
 	cmp	eax, ebx
 	setl	al
 	movzx	eax, al
-	push	eax
-	pop	eax
-	mov	ebx, 0
+	xor	ebx, ebx
 	cmp	eax, ebx
 	je	@else_22
 	push	offset fmt_str23
@@ -245,21 +204,15 @@ main:
 	add	esp, 4
 	jmp	@endif_21
 @endif_21:
-	push	0
-	push	0
-	pop	ebx
-	pop	eax
+	xor	ebx, ebx
+	xor	eax, eax
 	cmp	eax, ebx
 	setg	al
 	movzx	eax, al
-	push	eax
-	pop	eax
 	test	eax, eax
 	sete	al
 	movzx	eax, al
-	push	eax
-	pop	eax
-	mov	ebx, 0
+	xor	ebx, ebx
 	cmp	eax, ebx
 	je	@else_26
 	push	offset fmt_str27
@@ -280,6 +233,6 @@ main:
 @endif_25:
 @exit_0:
 	mov	esp, ebp
-	mov	eax, 0
+	xor	eax, eax
 	ret
 end main

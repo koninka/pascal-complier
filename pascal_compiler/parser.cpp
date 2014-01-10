@@ -12,7 +12,9 @@ Parser::Parser(const Scanner& AScanner): scanner(AScanner), _priorities(PRIORITI
 		symTable(new SymTable),
       tableStack(SymTableStack()),
       _isGlobalNamespace(true),
-      _isConstantParsing(false)
+      _isConstantParsing(false),
+      isOptimize(false),
+      isDeclarationParse(false)
 {
 	symTable->Add(typeChar);
 	symTable->Add(typeFloat);
@@ -82,6 +84,22 @@ void Parser::Generate()
    asmCode.AddCmd(MOV, ESP, EBP);
    asmCode.AddCmd(MOV, EAX, 0);
    asmCode.AddCmd(RET);
+   if (isOptimize) {
+      //asmCode.AddCmd(MOV, EBX, EBP);
+      //asmCode.AddCmd(ADD, EBX, 12);
+      //asmCode.AddCmd(PUSH, AsmMemory(EBX));
+      //asmCode.AddCmd(MOV, EBX, EBP);
+      //asmCode.AddCmd(MOV, EBX, AsmMemory(EBX, 8));
+      //asmCode.AddCmd(ADD, EBX, 12);
+      //asmCode.AddCmd(PUSH, EBX);
+      //mov   ebx, dword ptr - 25
+      //lea   eax, v_r
+      //mov[eax], ebx
+      //lea   eax, v_r
+      //push  dword ptr[eax]
+      Optimizator optimizator;
+      optimizator.Optimize(asmCode);
+   }
    asmCode.AddCmd("end main");
    asmCode.Print();
 }

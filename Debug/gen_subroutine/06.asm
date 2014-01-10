@@ -13,18 +13,10 @@ includelib c:\masm32\lib\msvcrt.lib
 @foo_0 proc
 	push	ebp
 	mov	ebp, esp
-	push	3
-	push	offset v_a
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
-	push	4
-	mov	ebx, ebp
-	add	ebx, 12
-	push	ebx
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
+	lea	eax, v_a
+	mov	[eax], dword ptr 3
+	mov	eax, ebp
+	mov	[eax + 12], dword ptr 4
 @exit_1:
 	mov	esp, ebp
 	pop	ebp
@@ -32,8 +24,7 @@ includelib c:\masm32\lib\msvcrt.lib
 @foo_0 endp
 main:
 	mov	ebp, esp
-	push	offset v_a
-	pop	eax
+	lea	eax, v_a
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
@@ -41,8 +32,7 @@ main:
 	push	offset fmt_str3
 	call	crt_printf
 	add	esp, 4
-	push	offset v_b
-	pop	eax
+	lea	eax, v_b
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
@@ -50,21 +40,11 @@ main:
 	push	offset fmt_str_new_line
 	call	crt_printf
 	add	esp, 4
-	push	123
-	push	offset v_a
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
-	push	39
-	pop	eax
-	neg	eax
-	push	eax
-	push	offset v_b
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
-	push	offset v_a
-	pop	eax
+	lea	eax, v_a
+	mov	[eax], dword ptr 123
+	lea	ebx, v_b
+	mov	[ebx], dword ptr -39
+	lea	eax, v_a
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
@@ -72,17 +52,15 @@ main:
 	push	offset fmt_str4
 	call	crt_printf
 	add	esp, 4
-	push	offset v_b
-	pop	eax
+	lea	eax, v_b
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
 	add	esp, 8
 	push	offset fmt_str_new_line
 	call	crt_printf
-	add	esp, 4
 @exit_2:
 	mov	esp, ebp
-	mov	eax, 0
+	xor	eax, eax
 	ret
 end main

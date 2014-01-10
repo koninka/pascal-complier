@@ -13,26 +13,15 @@ includelib c:\masm32\lib\msvcrt.lib
 	mov	ebp, esp
 	mov	ebx, ebp
 	add	ebx, 12
-	push	[ebx]
-	push	1
-	pop	ebx
-	pop	eax
-	cmp	eax, ebx
+	mov	eax, dword ptr [ebx]
+	cmp	eax, 1
 	setle	al
 	movzx	eax, al
-	push	eax
-	pop	eax
-	mov	ebx, 0
+	xor	ebx, ebx
 	cmp	eax, ebx
 	je	@else_3
-	push	1
-	mov	ebx, ebp
-	add	ebx, 12
-	add	ebx, 4
-	push	ebx
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
+	mov	eax, ebp
+	mov	[eax + 16], dword ptr 1
 	jmp	@endif_2
 @else_3:
 	mov	ebx, ebp
@@ -41,11 +30,8 @@ includelib c:\masm32\lib\msvcrt.lib
 	sub	esp, 4
 	mov	ebx, ebp
 	add	ebx, 12
-	push	[ebx]
-	push	1
-	pop	ebx
-	pop	eax
-	sub	eax, ebx
+	mov	eax, dword ptr [ebx]
+	dec	eax
 	push	eax
 	push	ebp
 	call	@fact_0
@@ -53,14 +39,11 @@ includelib c:\masm32\lib\msvcrt.lib
 	pop	ebx
 	pop	eax
 	imul	ebx
-	push	eax
 	mov	ebx, ebp
-	add	ebx, 12
-	add	ebx, 4
-	push	ebx
-	pop	eax
-	pop	ebx
-	mov	[eax], ebx
+	add	ebx, dword ptr 16
+	push	eax
+	mov	eax, ebx
+	pop	[eax]
 	jmp	@endif_2
 @endif_2:
 @exit_1:
@@ -70,20 +53,13 @@ includelib c:\masm32\lib\msvcrt.lib
 @fact_0 endp
 main:
 	mov	ebp, esp
-	push	1
-	push	offset v_i
-	pop	ebx
-	pop	eax
-	mov	[ebx], eax
+	lea	ebx, v_i
+	mov	[ebx], dword ptr 1
 @forloop_5:
-	push	dword ptr [v_i]
-	push	7
-	pop	ebx
-	pop	eax
-	cmp	eax, ebx
+	mov	eax, dword ptr [v_i]
+	cmp	eax, 7
 	jg	@lend_6
-	push	offset v_i
-	pop	eax
+	lea	eax, v_i
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
@@ -103,13 +79,12 @@ main:
 	call	crt_printf
 	add	esp, 4
 @lcontinue_7:
-	push	offset v_i
-	pop	eax
-	add	[eax], dword ptr 1
+	lea	eax, v_i
+	inc	dword ptr [eax]
 	jmp	@forloop_5
 @lend_6:
 @exit_4:
 	mov	esp, ebp
-	mov	eax, 0
+	xor	eax, eax
 	ret
 end main
