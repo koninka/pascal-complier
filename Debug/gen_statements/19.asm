@@ -19,10 +19,9 @@ main:
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, 8
 	push	offset fmt_str3
 	call	crt_printf
-	add	esp, 4
+	add	esp, 12
 	lea	eax, v_b
 	mov	[eax], dword ptr 10
 @lcontinue_5:
@@ -30,10 +29,9 @@ main:
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, 8
 	push	offset fmt_str6
 	call	crt_printf
-	add	esp, 4
+	add	esp, 12
 	mov	eax, dword ptr [v_b]
 	dec	eax
 	lea	ebx, v_b

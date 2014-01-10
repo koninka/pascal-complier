@@ -209,10 +209,9 @@ includelib c:\masm32\lib\msvcrt.lib
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, 8
 	push	offset fmt_str29
 	call	crt_printf
-	add	esp, 4
+	add	esp, 12
 @lcontinue_28:
 	mov	eax, ebp
 	add	eax, -8
@@ -380,10 +379,9 @@ main:
 	add	esp, 4
 	push	offset fmt_str46
 	call	crt_printf
-	add	esp, 4
 	push	offset fmt_str_new_line
 	call	crt_printf
-	add	esp, 4
+	add	esp, 8
 	mov	eax, offset v_m1 + 400
 	xor	ebx, ebx
 @L_47:
@@ -422,10 +420,9 @@ main:
 @assignEnd_52:
 	push	offset fmt_str53
 	call	crt_printf
-	add	esp, 4
 	push	offset fmt_str_new_line
 	call	crt_printf
-	add	esp, 4
+	add	esp, 8
 	mov	eax, offset v_m2 + 400
 	xor	ebx, ebx
 @L_54:
@@ -442,10 +439,9 @@ main:
 	add	esp, 404
 	push	offset fmt_str56
 	call	crt_printf
-	add	esp, 4
 	push	offset fmt_str_new_line
 	call	crt_printf
-	add	esp, 4
+	add	esp, 8
 	sub	esp, 400
 	mov	eax, offset v_m1 + 400
 	xor	ebx, ebx
@@ -467,10 +463,9 @@ main:
 	add	esp, 404
 	push	offset fmt_str59
 	call	crt_printf
-	add	esp, 4
 	push	offset fmt_str_new_line
 	call	crt_printf
-	add	esp, 4
+	add	esp, 8
 	sub	esp, 400
 	mov	eax, offset v_m1 + 400
 	xor	ebx, ebx
@@ -492,10 +487,9 @@ main:
 	add	esp, 404
 	push	offset fmt_str62
 	call	crt_printf
-	add	esp, 4
 	push	offset fmt_str_new_line
 	call	crt_printf
-	add	esp, 4
+	add	esp, 8
 	mov	eax, offset v_m1 + 400
 	xor	ebx, ebx
 @L_63:
@@ -512,10 +506,9 @@ main:
 	add	esp, 404
 	push	offset fmt_str65
 	call	crt_printf
-	add	esp, 4
 	push	offset fmt_str_new_line
 	call	crt_printf
-	add	esp, 4
+	add	esp, 8
 	mov	eax, offset v_m1 + 400
 	xor	ebx, ebx
 @L_66:

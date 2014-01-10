@@ -41,26 +41,23 @@ main:
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, 8
 	push	offset fmt_str3
 	call	crt_printf
-	add	esp, 4
+	add	esp, 12
 	mov	eax, offset v_a + 4
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, 8
 	push	offset fmt_str4
 	call	crt_printf
-	add	esp, 4
+	add	esp, 12
 	mov	eax, offset v_a + 8
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, 8
 	push	offset fmt_str_new_line
 	call	crt_printf
-	add	esp, 4
+	add	esp, 12
 	push	offset v_a
 	push	ebp
 	call	@fill_0
@@ -70,23 +67,20 @@ main:
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, 8
 	push	offset fmt_str5
 	call	crt_printf
-	add	esp, 4
+	add	esp, 12
 	mov	eax, offset v_a + 4
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, 8
 	push	offset fmt_str6
 	call	crt_printf
-	add	esp, 4
+	add	esp, 12
 	mov	eax, offset v_a + 8
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, 8
 	push	offset fmt_str_new_line
 	call	crt_printf
 @exit_2:

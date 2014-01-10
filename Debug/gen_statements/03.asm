@@ -20,10 +20,9 @@ main:
 	push	eax
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, 8
 	push	offset fmt_str4
 	call	crt_printf
-	add	esp, 4
+	add	esp, 12
 @lcontinue_3:
 	lea	eax, v_i
 	inc	dword ptr [eax]

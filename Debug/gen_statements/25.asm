@@ -61,7 +61,6 @@ main:
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, 8
 	push	offset fmt_str_new_line
 	call	crt_printf
 @exit_2:

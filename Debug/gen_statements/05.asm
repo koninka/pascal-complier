@@ -45,10 +45,9 @@ main:
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, 8
 	push	offset fmt_str6
 	call	crt_printf
-	add	esp, 4
+	add	esp, 12
 	mov	eax, dword ptr [v_i]
 	imul	eax, 4
 	add	eax, offset v_a

@@ -84,6 +84,7 @@ Optimizator::Optimizator()
    optimizations.push_back(&Optimizator::OptimizationFor2Cmd);
    optimizations.push_back(&Optimizator::OptimizationFor3Cmd);
    optimizations.push_back(&Optimizator::OptimizationFor4Cmd);
+   optimizations.push_back(&Optimizator::OptimizationFor5Cmd);
 
    //-------------------------------------------------------------------------
    //-------------------------ONE COMMAND OPTIMIZATIONS-----------------------
@@ -673,7 +674,7 @@ void Optimizator::Optimize(AsmCode& asmCode)
       bool isOptimize = false;
       size_t idx = 0;
       do {
-         for (size_t i = 0; i < AMOUNT_OF_OPTIMIZATION_WINDOWS; i++) {
+         for (size_t i = 0; i < optimizations.size(); i++) {
             if (idx + i >= asmCode.GetCmdAmount())  break;
             commandsToBeOptimized = asmCode.GetCommands(idx, i + 1);
             if ((this->*(optimizations[i]))()) {
@@ -722,25 +723,34 @@ bool Optimizator::OptimizationFor4Cmd()
    bool result = false;
    if (CheckForIllegalCommands(Cmd(1))) return false;
    if (result =
-         CheckCmds(Cmd(1), Cmd(2), Cmd(3), Cmd(4), ADD, PUSH, CALL, ADD)
-      && AsmStrImmediate("crt_printf") == Cmd(2)->arg1
-      && IsIntImm(Cmd(1)->arg2)
-      && IsIntImm(Cmd(4)->arg2)
-      && Cmd(1)->arg1 == ESP
-      && Cmd(4)->arg1 == ESP
-   ) {
-      cmdsContainer.AddCmd(Cmd(2));
-      cmdsContainer.AddCmd(Cmd(3));
-      cmdsContainer.AddCmd(ADD, ESP, GetIntImmVal(Cmd(1)->arg2) + GetIntImmVal(Cmd(4)->arg2));
-   } else if (
-         result =
-            CheckCmds(Cmd(1), Cmd(2), Cmd(3), Cmd(4), PUSH, MOV, POP, ADD)   // DANGER DANGER DANGER !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            && IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1)                  // push eax
-            && IsEqOperands(Cmd(1)->arg1, Cmd(4)->arg1)                  // mov  eax, ebx
-            && IsEqOperands(Cmd(2)->arg2, Cmd(3)->arg1)                  // pop  ebx
-            && IsEqOperands(Cmd(2)->arg2, Cmd(4)->arg2)                  // add  eax, ebx
+         CheckCmds(Cmd(1), Cmd(2), Cmd(3), Cmd(4), PUSH, MOV, POP, ADD)   // DANGER DANGER DANGER !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      && IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1)                  // push eax
+      && IsEqOperands(Cmd(1)->arg1, Cmd(4)->arg1)                  // mov  eax, ebx
+      && IsEqOperands(Cmd(2)->arg2, Cmd(3)->arg1)                  // pop  ebx
+      && IsEqOperands(Cmd(2)->arg2, Cmd(4)->arg2)                  // add  eax, ebx
    ) {
       cmdsContainer.AddCmd(Cmd(4));
+   }
+   return result;
+}
+
+bool Optimizator::OptimizationFor5Cmd()
+{
+   bool result = false;
+   if (CheckForIllegalCommands(Cmd(1))) return false;
+   if (result =
+          CheckCmds(Cmd(1), Cmd(2), Cmd(3), Cmd(4), Cmd(5), CALL, ADD, PUSH, CALL, ADD)
+          && AsmStrImmediate("crt_printf") == Cmd(1)->arg1
+          && AsmStrImmediate("crt_printf") == Cmd(4)->arg1
+          && IsIntImm(Cmd(2)->arg2)
+          && IsIntImm(Cmd(5)->arg2)
+          && Cmd(2)->arg1 == ESP
+          && Cmd(5)->arg1 == ESP
+   ) {
+      cmdsContainer.AddCmd(Cmd(1));
+      cmdsContainer.AddCmd(Cmd(3));
+      cmdsContainer.AddCmd(Cmd(4));
+      cmdsContainer.AddCmd(ADD, ESP, GetIntImmVal(Cmd(2)->arg2) + GetIntImmVal(Cmd(5)->arg2));
    }
    return result;
 }
@@ -826,4 +836,9 @@ bool Optimizator::CheckCmds(Command cmd1, Command cmd2, Command cmd3, OpCode cd1
 bool Optimizator::CheckCmds(Command cmd1, Command cmd2, Command cmd3, Command cmd4, OpCode cd1, OpCode cd2, OpCode cd3, OpCode cd4)
 {
    return CheckCmds(cmd1, cmd2, cmd3, cd1, cd2, cd3) && *cmd4 == cd4;
+}
+
+bool Optimizator::CheckCmds(Command cmd1, Command cmd2, Command cmd3, Command cmd4, Command cmd5, OpCode cd1, OpCode cd2, OpCode cd3, OpCode cd4, OpCode cd5)
+{
+   return CheckCmds(cmd1, cmd2, cmd3, cmd4, cd1, cd2, cd3, cd4) && *cmd5 == cd5;
 }

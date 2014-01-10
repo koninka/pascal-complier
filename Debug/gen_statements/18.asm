@@ -41,10 +41,9 @@ main:
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, 8
 	push	offset fmt_str_new_line
 	call	crt_printf
-	add	esp, 4
+	add	esp, 12
 	jmp	@lcontinue_2
 @lend_1:
 @exit_0:

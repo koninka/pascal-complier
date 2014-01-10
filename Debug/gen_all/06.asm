@@ -70,10 +70,9 @@ includelib c:\masm32\lib\msvcrt.lib
 	push	dword ptr [eax]
 	push	offset fmt_int
 	call	crt_printf
-	add	esp, 8
 	push	offset fmt_str10
 	call	crt_printf
-	add	esp, 4
+	add	esp, 12
 @lcontinue_9:
 	mov	eax, ebp
 	add	eax, -4

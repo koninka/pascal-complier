@@ -5,8 +5,6 @@
 #include "CodeGen.h"
 
 class Optimizator {
-   const unsigned AMOUNT_OF_OPTIMIZATION_WINDOWS = 4;
-
    typedef bool (Optimizator::*optimizationFunc)();
    typedef function<bool()> OptimizationCheckFunc;
    typedef function<void()> OptimizationExecFunc;
@@ -30,6 +28,7 @@ class Optimizator {
    bool OptimizationFor2Cmd();
    bool OptimizationFor3Cmd();
    bool OptimizationFor4Cmd();
+   bool OptimizationFor5Cmd();
    //bool PopUp(Command, Command);
    //bool PushDown(Command, Command);
    bool TryToMovePushPop(Command, Command);
@@ -38,6 +37,7 @@ class Optimizator {
    bool CheckCmds(Command, Command, OpCode, OpCode);
    bool CheckCmds(Command, Command, Command, OpCode, OpCode, OpCode);
    bool CheckCmds(Command, Command, Command, Command, OpCode, OpCode, OpCode, OpCode);
+   bool CheckCmds(Command, Command, Command, Command, Command, OpCode, OpCode, OpCode, OpCode, OpCode);
 public:
    Optimizator();
    void Optimize(AsmCode&);
