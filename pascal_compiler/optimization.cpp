@@ -207,7 +207,8 @@ Optimizator::Optimizator()
    Add2(
       [this]() -> bool {
          return
-               *Cmd(1) == MOV && (*Cmd(2) == ADD || *Cmd(2) == SUB)
+               *Cmd(1) == MOV
+            && (*Cmd(2) == ADD || *Cmd(2) == SUB)
             && IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1)
             && IsIntImm(Cmd(1)->arg2)
             && IsIntImm(Cmd(2)->arg2);
@@ -221,8 +222,9 @@ Optimizator::Optimizator()
    Add2(
       [this]() -> bool {
          return
-               *Cmd(1) == MOV && (*Cmd(2) == ADD || *Cmd(2) == SUB)        //mov   eax, 32
-            && IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1)                    //add   eax, offset v_a
+               *Cmd(1) == MOV
+            && (*Cmd(2) == ADD || *Cmd(2) == SUB)           //mov   eax, 32
+            && IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1)     //add   eax, offset v_a
             && IsIntImm(Cmd(1)->arg2)
             && IsAddr(Cmd(2)->arg2);
       },
@@ -234,8 +236,9 @@ Optimizator::Optimizator()
    Add2(
       [this]() -> bool {
          return
-               *Cmd(1) == MOV && (*Cmd(2) == ADD || *Cmd(2) == SUB)        //mov   eax, offset v_a + 4
-            && IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1)                    //add   eax, 4
+               *Cmd(1) == MOV
+            && (*Cmd(2) == ADD || *Cmd(2) == SUB)           //mov   eax, offset v_a + 4
+            && IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1)     //add   eax, 4
             && IsIntImm(Cmd(2)->arg2)
             && IsAddr(Cmd(1)->arg2);
       },
@@ -258,8 +261,8 @@ Optimizator::Optimizator()
    Add2(
       [this]() -> bool {
          return
-               CheckCmds(Cmd(1), Cmd(2), MOV, MOV)                                  // mov ebx, 4                 mov ebx, ebp
-            && IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1)                             // mov ebx, dword ptr [eax]   mov ebx, [ebx+8]
+               CheckCmds(Cmd(1), Cmd(2), MOV, MOV)          // mov ebx, 4                 mov ebx, ebp
+            && IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1)     // mov ebx, dword ptr [eax]   mov ebx, [ebx+8]
             && !(IsMem(Cmd(2)->arg2) && IsEqOperands(Cmd(1)->arg1, GetMem(Cmd(2)->arg2).arg));
       },
       [this]() {
@@ -402,7 +405,7 @@ Optimizator::Optimizator()
          return
                CheckCmds(Cmd(1), Cmd(2), LEA, ADD)        //lea   ebx, v_a
             && IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg2)   //add   eax, ebx
-            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1); // âîçìîæíî íå íóæíà
+            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1);
       },
       [this]() {
          cmdsContainer.AddCmd(ADD, Cmd(2)->arg1, AsmVarAddr(Cmd(1)->arg2));
@@ -413,7 +416,7 @@ Optimizator::Optimizator()
          return
                CheckCmds(Cmd(1), Cmd(2), XOR, IMUL)     //xor   eax, eax
             && IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1) //imul  eax, ebx
-            && IsEqOperands(Cmd(1)->arg1, Cmd(1)->arg2); // âîçìîæíî íå òðåáóåòñÿ
+            && IsEqOperands(Cmd(1)->arg1, Cmd(1)->arg2);
       },
       [this]() {
          cmdsContainer.AddCmd(Cmd(1));
@@ -424,7 +427,7 @@ Optimizator::Optimizator()
          return
                CheckCmds(Cmd(1), Cmd(2), XOR, ADD)        //xor   eax, eax
             && IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1)   //add   eax, offset v_a + 4
-            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg2); //âîçìîæíî íå òðåáóåòñÿ
+            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg2);
       },
       [this]() {
          cmdsContainer.AddCmd(MOV, Cmd(1)->arg1, Cmd(2)->arg2);
@@ -448,28 +451,27 @@ Optimizator::Optimizator()
             && IsReg(Cmd(1)->arg2)              //mov eax, [ebx + 12]
             && IsMem(Cmd(2)->arg2)
             && IsEqOperands(Cmd(1)->arg1, GetMem(Cmd(2)->arg2).arg)
-            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1);   //not need maybe
+            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1);
       },
       [this]() {
          cmdsContainer.AddCmd(Cmd(2)->GetOpCode(), Cmd(2)->arg1, AsmMemory(Cmd(1)->arg2, GetMem(Cmd(2)->arg2).GetOffset()));
       }
    );
    Add2(
-      [this]() -> bool {                        //DANGER DANGER
+      [this]() -> bool {                 //DANGER DANGER
          return
-               *Cmd(1) == MOV                      //mov ebx, ebp
-            && IsCmd2(Cmd(2))
-            && IsReg(Cmd(1)->arg2)              //mov [ebx + 12], 4
+               *Cmd(1) == MOV            //mov ebx, ebp
+            && IsCmd2(Cmd(2))            //mov [ebx + 12], 4
+            && IsReg(Cmd(1)->arg2)
             && IsMem(Cmd(2)->arg1)
-            && IsEqOperands(Cmd(1)->arg1, GetMem(Cmd(2)->arg1).arg)
-            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg2);   //not need maybe
+            && IsEqOperands(Cmd(1)->arg1, GetMem(Cmd(2)->arg1).arg);
       },
       [this]() {
          cmdsContainer.AddCmd(Cmd(2)->GetOpCode(), AsmMemory(Cmd(1)->arg2, GetMem(Cmd(2)->arg1).GetOffset()), Cmd(2)->arg2);
       }
    );
    Add2(
-      [this]() -> bool {                        //DANGER DANGER
+      [this]() -> bool {                              //DANGER DANGER
          return
                CheckCmds(Cmd(1), Cmd(2), ADD, PUSH)   //add eax, 12
             && IsIntImm(Cmd(1)->arg2)                 //push [eax]
@@ -481,7 +483,7 @@ Optimizator::Optimizator()
       }
    );
    Add2(
-      [this]() -> bool {                        //DANGER DANGER
+      [this]() -> bool {
          return
                CheckCmds(Cmd(1), Cmd(2), XOR, CMP)          //xor ebx, ebx
             && IsEqOperands(Cmd(1)->arg1, Cmd(1)->arg2)     //cmp eax, ebx
@@ -492,7 +494,7 @@ Optimizator::Optimizator()
       }
    );
    Add2(
-      [this]() -> bool {                        //DANGER DANGER
+      [this]() -> bool {
          return
                CheckCmds(Cmd(1), Cmd(2), JMP, LABEL)          //jmp lbl
             && CmpOperands(Cmd(1)->arg1, Cmd(2)->arg1);       //lbl:
@@ -502,7 +504,7 @@ Optimizator::Optimizator()
       }
    );
    Add2(
-      [this]() -> bool {                        //DANGER DANGER
+      [this]() -> bool {
          return CheckCmds(Cmd(1), Cmd(2), JMP, JMP);          //jmp lbl1
       },                                                     //jmp lbl2
       [this]() {
@@ -534,9 +536,7 @@ Optimizator::Optimizator()
             && (*Cmd(3) == ADD || *Cmd(3) == SUB)         // mov ebx, edx
             && IsIntImm(Cmd(1)->arg2)                     // add ebx, eax
             && IsEqOperands(Cmd(2)->arg1, Cmd(3)->arg1)
-            && IsEqOperands(Cmd(1)->arg1, Cmd(3)->arg2)
-            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1)  //ìîæåò íå íóæíà
-            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg2); //ìîæåò íå íóæíà
+            && IsEqOperands(Cmd(1)->arg1, Cmd(3)->arg2);
       },
       [this]() {
          cmdsContainer.AddCmd(Cmd(2));
@@ -552,7 +552,6 @@ Optimizator::Optimizator()
             && IsEqOperands(Cmd(1)->arg1, Cmd(3)->arg2)
             && IsEqOperands(Cmd(2)->arg1, Cmd(3)->arg1)
             && IsEqOperands(Cmd(1)->arg2, Cmd(2)->arg1);
-            //&& !IsEqOperands(Cmd(2)->arg1, Cmd(1)->arg2)
       },
       [this]() {
          cmdsContainer.AddCmd(Cmd(3)->GetOpCode(), Cmd(2)->arg1, Cmd(2)->arg2);
@@ -565,9 +564,7 @@ Optimizator::Optimizator()
             && (*Cmd(3) == ADD || *Cmd(3) == SUB)            //mov   eax, dword ptr[v_a]
             && IsEqOperands(Cmd(1)->arg1, Cmd(3)->arg2)      //add   eax, ebx
             && IsEqOperands(Cmd(2)->arg1, Cmd(3)->arg1)
-            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg2) // ìîæåò íå íóæíà - êðåñò íàêðåñò
-            && !IsEqOperands(Cmd(1)->arg2, Cmd(2)->arg1)
-            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1); // ìîæåíò íå íóæíà
+            && !IsEqOperands(Cmd(1)->arg2, Cmd(2)->arg1);
       },
       [this]() {
          cmdsContainer.AddCmd(Cmd(2));
@@ -577,11 +574,10 @@ Optimizator::Optimizator()
    Add3(
       [this]() -> bool {
          return
-               CheckCmds(Cmd(1), Cmd(2), Cmd(3), MOV, MOV, IMUL)        //mov   ebx, 20
-            && *Cmd(3) == IMUL && IsCmd1(Cmd(3))         //mov   eax, dword ptr[v_i]
-            && IsEqOperands(Cmd(1)->arg1, Cmd(3)->arg1)   //imul  ebx
-            && !IsEqOperands(Cmd(1)->arg2, Cmd(2)->arg1)
-            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1); // âîçìîæíî íå òðåáóåòñÿ
+               CheckCmds(Cmd(1), Cmd(2), Cmd(3), MOV, MOV, IMUL)  //mov   ebx, 20
+            && *Cmd(3) == IMUL && IsCmd1(Cmd(3))                  //mov   eax, dword ptr[v_i]
+            && IsEqOperands(Cmd(1)->arg1, Cmd(3)->arg1)           //imul  ebx
+            && !IsEqOperands(Cmd(1)->arg2, Cmd(2)->arg1);
       },
       [this]() {
          cmdsContainer.AddCmd(Cmd(2));
@@ -593,9 +589,7 @@ Optimizator::Optimizator()
          return
                CheckCmds(Cmd(1), Cmd(2), MOV, MOV)        //mov   eax, -8
             && *Cmd(3) == IMUL && !IsCmd2(Cmd(3))         //mov   ebx, 3
-            && IsEqOperands(Cmd(2)->arg1, Cmd(3)->arg1)   //imul  ebx
-            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg2)
-            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1);  // âîçìîæíî íå òðåáóåòñÿ
+            && IsEqOperands(Cmd(2)->arg1, Cmd(3)->arg1);   //imul  ebx
       },
       [this]() {
          cmdsContainer.AddCmd(Cmd(1));
@@ -619,8 +613,7 @@ Optimizator::Optimizator()
          return
                CheckCmds(Cmd(1), Cmd(2), Cmd(3), MOV, MOV, CMP)      //mov   ebx, intImm1      mov eax, intImm2
             && IsEqOperands(Cmd(1)->arg1, Cmd(3)->arg2)              //mov   eax, intImm2      cmp eax, intImm1
-            && IsEqOperands(Cmd(2)->arg1, Cmd(3)->arg1)              //cmp   eax, ebx
-            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg2); // âîçìîæíî íå òðåáóåòñÿ
+            && IsEqOperands(Cmd(2)->arg1, Cmd(3)->arg1);             //cmp   eax, ebx
       },
       [this]() {
          cmdsContainer.AddCmd(Cmd(2));
@@ -646,8 +639,8 @@ Optimizator::Optimizator()
          return                                                        //mov   ebx, dword ptr - 5
                CheckCmds(Cmd(1), Cmd(2), Cmd(3), MOV, MOV, MOV)        //mov   eax, offset v_c + 4
             && IsEqOperands(Cmd(1)->arg1, Cmd(3)->arg2)                //mov[eax], ebx
-            && IsMem(Cmd(3)->arg1)                                     // âîçìîæíî íå òðåáóåòñÿ
-            && IsEqOperands(Cmd(2)->arg1, GetMem(Cmd(3)->arg1).arg)    // âîçìîæíî íå òðåáóåòñÿ
+            && IsMem(Cmd(3)->arg1)
+            && IsEqOperands(Cmd(2)->arg1, GetMem(Cmd(3)->arg1).arg)
             && !IsMem(Cmd(1)->arg2)
             && !CmpOperands(Cmd(1)->arg2, Cmd(2)->arg1);
       },
@@ -711,8 +704,7 @@ Optimizator::Optimizator()
                CheckCmds(Cmd(1), Cmd(2), Cmd(3), MOV, PUSH, MOV)     //mov ebx, 4
             && IsEqOperands(Cmd(1)->arg1, Cmd(3)->arg2)              //push eax
             && IsEqOperands(Cmd(2)->arg1, Cmd(3)->arg1)              //mov eax, ebx
-            && IsIntImm(Cmd(1)->arg2)
-            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1);            // âîçìîæíî íå òðåáóåòñÿ
+            && IsIntImm(Cmd(1)->arg2);
       },
       [this]() {
          cmdsContainer.AddCmd(Cmd(2));
@@ -752,11 +744,10 @@ Optimizator::Optimizator()
    Add3(
       [this]() -> bool {
          return
-               CheckCmds(Cmd(1), Cmd(3), LEA, MOV)                      //lea   ebx, v_a
-            && (*Cmd(2) == ADD || *Cmd(2) == SUB)                       //add   eax, ebx
-            && IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg2)                 //mov   ebx, 4
+               CheckCmds(Cmd(1), Cmd(3), LEA, MOV)                   //lea   ebx, v_a
+            && (*Cmd(2) == ADD || *Cmd(2) == SUB)                    //add   eax, ebx
+            && IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg2)              //mov   ebx, 4
             && IsEqOperands(Cmd(1)->arg1, Cmd(3)->arg1)
-            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1) //âîçìîæíî íå òðåáóåòñÿ
             && IsStrImm(Cmd(1)->arg2);
       },
       [this]() {
@@ -784,8 +775,7 @@ Optimizator::Optimizator()
             && IsEqOperands(Cmd(1)->arg1, Cmd(3)->arg1)  //add   eax, dword ptr [ebx]
             && IsIntImm(Cmd(1)->arg2)                    //mov   ebx, ebp
             && IsMem(Cmd(2)->arg2)
-            && IsEqOperands(Cmd(1)->arg1, GetMem(Cmd(2)->arg2).arg)
-            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1); //�������� �� ���������
+            && IsEqOperands(Cmd(1)->arg1, GetMem(Cmd(2)->arg2).arg);
       },
       [this]() {
          AsmMemory mem = GetMem(Cmd(2)->arg2);
@@ -796,12 +786,11 @@ Optimizator::Optimizator()
    );
    Add3(
       [this]() -> bool {
-         return                                                        //DANGER!!!!
+         return
                CheckCmds(Cmd(1), Cmd(2), Cmd(3), PUSH, MOV, POP)       //push eax
             && IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg1)                //mov eax, ebx
             && IsMem(Cmd(3)->arg1)                                     //pop [eax]
-            && IsEqOperands(Cmd(1)->arg1, GetMem(Cmd(3)->arg1).arg)
-            && !IsEqOperands(Cmd(1)->arg1, Cmd(2)->arg2); //�������� �� ���������
+            && IsEqOperands(Cmd(1)->arg1, GetMem(Cmd(3)->arg1).arg);
       },
       [this]() {
          AsmMemory mem = GetMem(Cmd(3)->arg1);
@@ -810,7 +799,7 @@ Optimizator::Optimizator()
    );
    Add3(
       [this]() -> bool {
-         return                                                        //DANGER!!!!
+         return
                CheckCmds(Cmd(1), Cmd(2), Cmd(3), MOV, PUSH, MOV)       //mov ebx, ebp
             && IsMem(Cmd(2)->arg1)                                     //push  [ebx - 4]
             && IsEqOperands(Cmd(1)->arg1, GetMem(Cmd(2)->arg1).arg)    //mov ebx, ebp
