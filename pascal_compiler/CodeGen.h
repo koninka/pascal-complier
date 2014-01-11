@@ -3,6 +3,8 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <map>
+#include <unordered_map>
 
 using namespace std;
 
@@ -119,11 +121,14 @@ struct AsmCmd2: public Asm {
 };
 
 class AsmLabel: public Asm {
-   AsmStrImmediate* _label;
+   unsigned refAmount;
 public:
    AsmLabel(AsmStrImmediate*);
    AsmLabel(AsmStrImmediate);
    AsmLabel(string);
+   void IncRefAmount();
+   void DecRefAmount();
+   unsigned GetRefAmount() const;
    void Print() const override;
 };
 
@@ -275,6 +280,7 @@ struct AsmCodeBase {
    void AddCmd(string);
    void AddCmd(OpCode);
    void AddCmd(Command);
+   void AddCmd(OpCode, AsmLabel*);
    void AddCmd(OpCode, AsmVarAddr);
    void AddCmd(OpCode, Register);
    void AddCmd(OpCode, AsmOperand*);
@@ -307,6 +313,8 @@ struct AsmCodeBase {
    Commands GetCommands() const;
 };
 
+typedef unordered_map<string, size_t> LabelInfo;
+
 class AsmCode: public AsmCodeBase {
    size_t labelCounter;
    AsmStrImmediate* formatStrReal;
@@ -316,18 +324,18 @@ class AsmCode: public AsmCodeBase {
    AsmStrImmediate functWrite;
 
    Data data;
+   unordered_map<size_t, AsmLabel*> labels;
+   LabelInfo labelsInfo;
 public:
    AsmCode();
    AsmStrImmediate* AddData(string);
    AsmStrImmediate* AddData(string, double);
    AsmStrImmediate* AddData(string, size_t);
    AsmStrImmediate* AddData(string, string);
-   void AddLabel(AsmStrImmediate*);
-   void AddLabel(AsmStrImmediate);
-   void AddLabel(string);
+   void AddLabel(AsmLabel*);
    void AddSubroutineBegin(AsmStrImmediate*);
    void AddSubroutineEnd(AsmStrImmediate*);
-   AsmStrImmediate* GenLabel(string);
+   AsmLabel* GenLabel(string);
    string GenStrLabel(string);
    void Print() const;
    void PushMemory(unsigned);
@@ -336,6 +344,8 @@ public:
    void GenCallWriteForStr();
    void GenWriteNewLine();
    void ReplaceCommands(Commands, size_t, size_t = 1);
+   bool TryToChangeLabelOfTheJump(Command);
+   Command GetCommand(size_t) const;
    Commands GetCommands(size_t, size_t);
    size_t GetCmdAmount() const;
 };
@@ -344,6 +354,12 @@ template<class T1, class T2>
 bool TryToCast(T2 t)
 {
    return dynamic_cast<T1*>(t) != nullptr;
+}
+
+template<class T1, class T2>
+T1* Cast(T2 t)
+{
+   return dynamic_cast<T1*>(t);
 }
 
 template<class T>
@@ -356,7 +372,7 @@ bool TryToCastOperand(AsmOperand* oper)
 template<class T>
 T* CastOperand(AsmOperand* oper)
 {
-   return dynamic_cast<T*>(oper);
+   return Cast<T>(oper);
 }
 
 extern bool CmpOperands(AsmOperand*, AsmOperand*);

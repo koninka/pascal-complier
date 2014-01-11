@@ -4,12 +4,16 @@ const
 type ArrT = array[1..N] of integer;
 
 procedure Init(var a :  ArrT);
+procedure Init1();
 begin
    a[1] := 1;     a[11] := 2;     a[6] := 3;     a[16] := 4;
    a[2] := 5;     a[12] := 6;     a[7] := 7;     a[17] := 8;
    a[3] := 9;     a[13] := 10;    a[8] := 11;    a[18] := 12;
    a[4] := 13;    a[14] := 14;    a[9] := 15;    a[19] := 16;
    a[5] := 17;    a[15] := 18;    a[10] := 19;   a[20] := 20;
+end;
+begin
+    Init1();
 end;
 
 procedure WriteArr(a :  Array of integer);

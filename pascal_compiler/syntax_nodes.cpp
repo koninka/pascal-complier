@@ -21,7 +21,7 @@ void NodeSubroutineBlock::Generate(AsmCode& asmCode)
    asmCode.AddLabel(exitLabel);
 }
 
-AsmStrImmediate* NodeSubroutineBlock::GetExitLabel() const
+AsmLabel* NodeSubroutineBlock::GetExitLabel() const
 {
    return exitLabel;
 }
@@ -502,8 +502,8 @@ void NodeAssignOp::Generate(AsmCode& asmCode)
          asmCode.AddCmd(MOV, AsmMemory(EAX, i), EBX);
       }
    } else {
-      AsmStrImmediate* labelBegin = asmCode.GenLabel("assignBegin");
-      AsmStrImmediate* labelEnd   = asmCode.GenLabel("assignEnd");
+      AsmLabel* labelBegin = asmCode.GenLabel("assignBegin");
+      AsmLabel* labelEnd = asmCode.GenLabel("assignEnd");
       asmCode.AddCmd(SUB, EAX, 4);
       asmCode.AddCmd(MOV, EBX, 0);
       asmCode.AddLabel(labelBegin);
@@ -825,8 +825,8 @@ void NodeIfStmt::Generate(AsmCode& asmCode)
 {
    expr->Generate(asmCode);
    bool hasElse = elseStmt != nullptr;
-   AsmStrImmediate* endIfLbl = asmCode.GenLabel("endif");
-   AsmStrImmediate* elseLbl  = hasElse ? asmCode.GenLabel("else") : nullptr;
+   AsmLabel* endIfLbl = asmCode.GenLabel("endif");
+   AsmLabel* elseLbl = hasElse ? asmCode.GenLabel("else") : nullptr;
    asmCode.AddCmd(POP, EAX);
    asmCode.AddCmd(MOV, EBX, 0);
    asmCode.AddCmd(CMP, EAX, EBX);
@@ -847,12 +847,12 @@ void NodeLoopStmtBase::GenerateLoopLabels(AsmCode& asmCode)
    continueLabel = asmCode.GenLabel("lcontinue");
 }
 
-AsmStrImmediate* NodeLoopStmtBase::GetBreakLabel() const
+AsmLabel* NodeLoopStmtBase::GetBreakLabel() const
 {
    return breakLabel;
 }
 
-AsmStrImmediate* NodeLoopStmtBase::GetContinueLabel() const
+AsmLabel* NodeLoopStmtBase::GetContinueLabel() const
 {
    return continueLabel;
 }
@@ -964,7 +964,7 @@ void NodeForStmt::Generate(AsmCode& asmCode)
    asmCode.AddCmd(POP, EBX);
    asmCode.AddCmd(POP, EAX);
    asmCode.AddCmd(MOV, AsmMemory(EBX), EAX);
-   AsmStrImmediate* loopBegin = asmCode.GenLabel("forloop");
+   AsmLabel* loopBegin = asmCode.GenLabel("forloop");
    GenerateLoopLabels(asmCode);
    asmCode.AddLabel(loopBegin);
    var->Generate(asmCode, depth);

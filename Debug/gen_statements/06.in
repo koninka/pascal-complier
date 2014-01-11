@@ -4,6 +4,9 @@ begin
    while (i < 20) do
    begin
       break;
+      if (i = 10) then break;
       write(i);
+      if (i = 11) then break;
+         if (i = 14) then break;
    end;
 end.    

@@ -1,6 +1,9 @@
 begin
    if 5 > 0 then
-      write('true')
+   begin
+      exit;
+      write('true');
+   end
    else
       write('false');
 end.    

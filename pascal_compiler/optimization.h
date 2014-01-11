@@ -29,8 +29,6 @@ class Optimizator {
    bool OptimizationFor3Cmd();
    bool OptimizationFor4Cmd();
    bool OptimizationFor5Cmd();
-   //bool PopUp(Command, Command);
-   //bool PushDown(Command, Command);
    bool TryToMovePushPop(Command, Command);
    bool CheckConstraintsForPushPopInstructions(Command, Command);
    bool CheckForIllegalCommands(Command);

@@ -256,7 +256,7 @@ void SymSubroutine::PrintSymbol(int d)
 
 void SymSubroutine::GenerateLabel(AsmCode& asmCode)
 {
-   _label = asmCode.GenLabel(name);
+   _label = new AsmStrImmediate(asmCode.GenStrLabel(name));
 }
 
 SymTable* SymSubroutine::getLocalVars() const

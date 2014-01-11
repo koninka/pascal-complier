@@ -168,23 +168,39 @@ void AsmCmd2::Print() const
 }
 
 AsmLabel::AsmLabel(AsmStrImmediate* ALabel):
-   Asm(LABEL),
-   _label(ALabel)
+   Asm(LABEL, ALabel),
+   refAmount(0)
 {}
 
 AsmLabel::AsmLabel(AsmStrImmediate ALabel):
-   Asm(LABEL),
-   _label(new AsmStrImmediate(ALabel))
+   Asm(LABEL, new AsmStrImmediate(ALabel)),
+   refAmount(0)
  {}
 
 AsmLabel::AsmLabel(string ALabel):
-   Asm(LABEL),
-   _label(new AsmStrImmediate(ALabel))
+   Asm(LABEL, new AsmStrImmediate(ALabel)),
+   refAmount(0)
  {}
+
+void AsmLabel::IncRefAmount()
+{
+   refAmount++;
+}
+
+void AsmLabel::DecRefAmount()
+{
+   refAmount--;
+}
+
+unsigned AsmLabel::GetRefAmount() const
+{
+   return refAmount;
+}
+
 
 void AsmLabel::Print() const
 {
-   _label->PrintBase();
+   arg1->PrintBase();
    cout << ':';
 }
 
@@ -527,6 +543,12 @@ void AsmCodeBase::AddCmd(OpCode cmd, AsmRegister dest, AsmOperand* src)
    commands.push_back(new AsmCmd2(cmd, new AsmRegister(dest), src));
 }
 
+void AsmCodeBase::AddCmd(OpCode cmd, AsmLabel* lbl)
+{
+   lbl->IncRefAmount();
+   commands.push_back(new AsmCmd1(cmd, lbl->arg1));
+}
+
 void AsmCodeBase::AddCmd(OpCode cmd, AsmVarAddr oper)
 {
    commands.push_back(new AsmCmd1(cmd, new AsmVarAddr(oper)));
@@ -696,19 +718,12 @@ AsmStrImmediate* AsmCode::AddData(string name, string value)
    return new AsmStrImmediate(name);
 }
 
-void AsmCode::AddLabel(AsmStrImmediate* label)
+void AsmCode::AddLabel(AsmLabel* label)
 {
-   commands.push_back(new AsmLabel(label));
-}
-
-void AsmCode::AddLabel(AsmStrImmediate label)
-{
-   commands.push_back(new AsmLabel(label));
-}
-
-void AsmCode::AddLabel(string label)
-{
-   commands.push_back(new AsmLabel(new AsmStrImmediate(label)));
+   commands.push_back(label);
+   size_t num = commands.size() + 1;
+   labelsInfo.insert(make_pair(CastOperand<AsmStrImmediate>(label->arg1)->GetStrValue(), num));
+   labels.insert(make_pair(num, label));
 }
 
 void AsmCode::AddSubroutineBegin(AsmStrImmediate* strImm)
@@ -721,10 +736,10 @@ void AsmCode::AddSubroutineEnd(AsmStrImmediate* strImm)
    commands.push_back(new AsmSubroutineEnd(strImm));
 }
 
-AsmStrImmediate* AsmCode::GenLabel(string prefix)
+AsmLabel* AsmCode::GenLabel(string prefix)
 {
    prefix = '@' + prefix + '_' + to_string(labelCounter++);
-   return new AsmStrImmediate(prefix);
+   return new AsmLabel(prefix);
 }
 
 string AsmCode::GenStrLabel(string value)
@@ -759,8 +774,8 @@ void AsmCode::PushMemory(unsigned size)
          AddCmd(PUSH, AsmMemory(EAX, size - i - 4));
       }
    } else {
-      AsmStrImmediate* labelBegin = GenLabel("L");
-      AsmStrImmediate* labelEnd = GenLabel("L");
+      AsmLabel* labelBegin = GenLabel("L");
+      AsmLabel* labelEnd = GenLabel("L");
       AddCmd(ADD, EAX, size);
       AddCmd(MOV, EBX, 0);
       AddLabel(labelBegin);
@@ -813,6 +828,24 @@ void AsmCode::ReplaceCommands(Commands newCommands, size_t idx, size_t amount)
    for (auto &command : newCommands) {
       commands.insert(commands.begin() + idx++, command);
    }
+}
+
+bool AsmCode::TryToChangeLabelOfTheJump(Command cmd)
+{
+   bool result;
+   auto i1 = labelsInfo.find(Cast<AsmStrImmediate>(cmd->arg1)->GetStrValue());
+   auto i2 = next(i1);
+   if (result = i1 != labelsInfo.end() && i2 != labelsInfo.end() && i1->second + 1 == i2->second) {
+      labels[i1->second]->DecRefAmount();
+      labels[i2->second]->IncRefAmount();
+      cmd->arg1 = labels[i2->second]->arg1;
+   }
+   return result;
+}
+
+Command AsmCode::GetCommand(size_t idx) const
+{
+   return commands.at(idx);
 }
 
 Commands AsmCode::GetCommands(size_t idx, size_t amount)

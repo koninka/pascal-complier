@@ -1,5 +1,9 @@
-   procedure proc();
-   begin
-   end;
 begin
-end.
+   if 5 > 0 then
+   begin
+      exit;
+      write('true');
+   end
+   else
+      write('false');
+end.    

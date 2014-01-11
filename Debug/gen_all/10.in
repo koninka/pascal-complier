@@ -1,0 +1,26 @@
+program Simpson;
+var
+   x, a, b, h, s:real;
+   n: integer;
+ 
+   function Y(t: real): real;
+   begin
+      result := 1 + t*t + t*t*t*t;
+   end;
+begin
+   a := 0;
+   b := 10;
+   n := 300;   
+   h := (b - a) / n;
+   s := 0;
+   x := a + h;
+   while x < b do
+   begin
+      s := s + 4 * Y(x);
+      x := x + h;
+      s := s + 2 * Y(x);
+      x := x + h;
+   end;
+   s := h / 3 * (s + Y(a) - Y(b));
+   writeln('The value of integral = ', s);
+end.

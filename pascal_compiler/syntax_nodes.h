@@ -5,12 +5,12 @@
 #include "symbol_table.h"
 
 class NodeSubroutineBlock: public NodeBlock {
-   AsmStrImmediate* exitLabel;
+   AsmLabel* exitLabel;
 public:
    NodeSubroutineBlock();
 	void AddBody(NodeBlock*);
    void Generate(AsmCode&)override;
-   AsmStrImmediate* GetExitLabel() const;
+   AsmLabel* GetExitLabel() const;
 };
 
 struct NodeExpr: public SyntaxNode {
@@ -229,12 +229,12 @@ public:
 
 class NodeLoopStmtBase {
 protected:
-   AsmStrImmediate* breakLabel;
-   AsmStrImmediate* continueLabel;
+   AsmLabel* breakLabel;
+   AsmLabel* continueLabel;
    void GenerateLoopLabels(AsmCode&);
 public:
-   AsmStrImmediate* GetBreakLabel() const;
-   AsmStrImmediate* GetContinueLabel() const;
+   AsmLabel* GetBreakLabel() const;
+   AsmLabel* GetContinueLabel() const;
 };
 
 class NodeWhileStmt: public NodeLoopStmtBase, public NodeExprStmt {
